@@ -1,0 +1,264 @@
+:root {
+    --primary-blue: #2563eb;
+    --deep-navy: #0f172a;
+    --slate-bg: #f8fafc;
+    /* Slightly slower speed for a smoother "passing" effect */
+    --transition-speed: 0.9s;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--slate-bg);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* --- THE SYMMETRIC DYNAMIC WEDGE --- */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Gradient adds professional depth */
+    background: linear-gradient(135deg, var(--deep-navy) 0%, #1e293b 100%);
+
+    /* LOGIN STATE: Forward Lean (Wider at top) */
+    /* Coordinates: Top-Left, Top-Center(40%), Bottom-Center(10%), Bottom-Left */
+    clip-path: polygon(0 0, 40% 0, 10% 100%, 0% 100%);
+
+    transition: all var(--transition-speed) cubic-bezier(0.7, 0, 0.3, 1);
+    z-index: -1;
+}
+
+/* SIGN UP STATE: Inverse Lean (Wider at bottom) */
+body.signup-active::before {
+    /* Coordinates: Top-Center(70%), Top-Right, Bottom-Right, Bottom-Center(100%) */
+    /* This flips the slope angle to point the opposite direction */
+    clip-path: polygon(70% 0, 100% 0, 100% 100%, 40% 100%);
+}
+
+.container-box {
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+    width: 1000px;
+    max-width: 95%;
+    min-height: 650px;
+}
+
+.form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all var(--transition-speed) ease-in-out;
+}
+
+.login-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.signup-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+.container-box.active .login-container {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.container-box.active .signup-container {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+}
+
+/* --- THE SLIDING OVERLAY (Card Interior) --- */
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform var(--transition-speed) ease-in-out;
+    z-index: 100;
+}
+
+.container-box.active .overlay-container {
+    transform: translateX(-100%);
+}
+
+.overlay {
+    background: #1e293b;
+    color: #FFFFFF;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform var(--transition-speed) ease-in-out;
+}
+
+.container-box.active .overlay {
+    transform: translateX(50%);
+}
+
+.overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transition: transform var(--transition-speed) ease-in-out;
+}
+
+.overlay-left {
+    transform: translateX(-20%);
+}
+
+.container-box.active .overlay-left {
+    transform: translateX(0);
+}
+
+.overlay-right {
+    right: 0;
+}
+
+.container-box.active .overlay-right {
+    transform: translateX(20%);
+}
+
+/* Form Elements */
+form {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 45px;
+    height: 100%;
+}
+
+.label-style {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px !important;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 11px 15px;
+    margin-bottom: 12px;
+    width: 100%;
+    font-size: 0.85rem;
+}
+
+.btn-main {
+    border-radius: 8px;
+    background-color: var(--primary-blue);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 12px;
+    width: 100%;
+    border: none;
+    margin-top: 10px;
+}
+
+.btn-ghost {
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 8px 25px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 6px;
+    margin-top: 20px;
+}
+
+/* EYE TOGGLE */
+.pass-group {
+    width: 100%;
+    position: relative;
+}
+
+.eye-toggle {
+    position: absolute;
+    right: 15px;
+    top: 42px;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+/* Modern Error Container */
+.error-container {
+    background: #fff5f5; /* Very light red */
+    border-left: 4px solid #ff4d4d; /* Sharp accent line */
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(255, 77, 77, 0.1);
+    width: 100%;
+}
+
+.error-icon {
+    color: #ff4d4d;
+    font-size: 1.2rem;
+}
+
+/* Entrance Animation */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeInDown 0.4s ease-out forwards;
+}
+
+
+
+/* Hide the default password reveal button in Edge */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}
+
+/* Hide the default password reveal button in Chrome/Safari (if applicable) */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+}
