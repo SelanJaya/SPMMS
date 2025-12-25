@@ -15,170 +15,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-        <style>
-            :root {
-                --sidebar-width: 250px;
-                --sidebar-bg: #0f172a;
-                --primary-blue: #2563eb;
-                --body-bg: #f8fafc;
-            }
-
-            body {
-                font-family: 'Inter', sans-serif;
-                background-color: var(--body-bg);
-                margin: 0;
-                overflow-x: hidden;
-            }
-
-            #wrapper {
-                display: flex;
-            }
-
-            /* --- FIXED SIDEBAR --- */
-            #sidebar {
-                width: var(--sidebar-width);
-                background-color: var(--sidebar-bg);
-                height: 100vh;
-                position: fixed;
-                left: 0;
-                top: 0;
-                color: #94a3b8;
-                z-index: 1000;
-            }
-
-            .sidebar-brand {
-                padding: 1.5rem;
-                color: white;
-                font-weight: 700;
-                font-size: 1.1rem;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-            #sidebar .nav-link {
-                color: #94a3b8;
-                padding: 0.75rem 1.5rem;
-                display: flex;
-                align-items: center;
-                text-decoration: none;
-                font-size: 0.9rem;
-                transition: 0.2s;
-            }
-
-            #sidebar .nav-link:hover,
-            #sidebar .nav-link.active {
-                color: white;
-                background: rgba(255, 255, 255, 0.05);
-            }
-
-            #sidebar .nav-link.active {
-                border-left: 4px solid var(--primary-blue);
-            }
-
-            /* --- CONTENT AREA --- */
-            #content-wrapper {
-                margin-left: var(--sidebar-width);
-                width: calc(100% - var(--sidebar-width));
-                min-height: 100vh;
-            }
-
-            .top-nav {
-                height: 60px;
-                background: white;
-                border-bottom: 1px solid #e2e8f0;
-                padding: 0 1.5rem;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            .user-info {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-            }
-
-            .user-details {
-                text-align: right;
-                line-height: 1.2;
-            }
-
-            .user-name {
-                font-size: 0.85rem;
-                font-weight: 700;
-                color: #1e293b;
-            }
-
-            .user-role {
-                font-size: 0.75rem;
-                color: #64748b;
-            }
-
-            /* --- MINI HEADER --- */
-            .page-header-mini {
-                margin-bottom: 1.5rem;
-            }
-
-            .page-header-mini h1 {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #0f172a;
-                margin: 0;
-            }
-
-            /* --- PROJECT FOLDER CARDS --- */
-            .project-folder-card {
-                border: 1px solid #e2e8f0;
-                border-radius: 8px;
-                background: white;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-                transition: transform 0.2s, box-shadow 0.2s;
-                height: 100%;
-            }
-
-            .project-folder-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            }
-
-            .folder-icon {
-                width: 36px;
-                height: 36px;
-                background: #eff6ff;
-                color: var(--primary-blue);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 6px;
-                margin-bottom: 1rem;
-            }
-
-            .label-style {
-                font-size: 0.75rem;
-                font-weight: 700;
-                color: #64748b;
-                text-transform: uppercase;
-                letter-spacing: 0.025em;
-                margin-bottom: 0.4rem;
-                display: block;
-            }
-
-            .btn-small {
-                font-size: 0.75rem;
-                font-weight: 700;
-            }
-
-            /* --- MODAL --- */
-            .modal-content {
-                border-radius: 12px;
-                border: none;
-            }
-
-            .form-control,
-            .form-select {
-                border-radius: 6px !important;
-                font-size: 0.9rem;
-            }
-        </style>
+        <link rel="dashboard stylesheet" href="css\dashboard.css" />
     </head>
 
     <body>
@@ -187,10 +24,16 @@
             <nav id="sidebar">
                 <div class="sidebar-brand">SPMMS CONSOLE</div>
                 <div class="nav flex-column mt-3">
-                    <a href="profile.html" class="nav-link ">
+                    <a href="profileServlet" class="nav-link ">
                         <i class="fas fa-user-circle me-3"></i> Profile
                     </a>
                     <a href="dashboard.html" class="nav-link active"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
+                </div>
+                <div class="mt-auto">
+                    <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
+                    <a href="login_signUpServlet?processType=logOut" class="nav-link text-danger">
+                        <i class="fas fa-sign-out-alt me-3"></i><span>Logout</span>
+                    </a>
                 </div>
             </nav>
 

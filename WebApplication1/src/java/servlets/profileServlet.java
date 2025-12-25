@@ -1,24 +1,24 @@
-package servlets;
-
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
+package servlets;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import beans.User;
 import DAO.UserDAO;
+import beans.User;
 import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author HP
  */
-public class login_signUpServlet extends HttpServlet {
+public class profileServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,10 +37,10 @@ public class login_signUpServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet login_signUpServlet</title>");
+            out.println("<title>Servlet profileServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet login_signUpServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet profileServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -58,15 +58,16 @@ public class login_signUpServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-  
+        int user_id;
+        User user;
+
         HttpSession session = request.getSession();
-        
-        String processType = request.getParameter("processType");
-        
-        if (processType.equalsIgnoreCase("logOut")) {
-            session.invalidate();
-            response.sendRedirect("login.jsp");
-        }
+        user_id = (int) session.getAttribute("userId");
+
+        UserDAO userDao = new UserDAO();
+        user = userDao.profileInformation(user_id);
+        session.setAttribute("user", user);
+        request.getRequestDispatcher("profile.jsp").forward(request, response);
     }
 
     /**
@@ -81,56 +82,61 @@ public class login_signUpServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String processType, username, phone_number, email, role, password, confirmPassword;
-        int statusUserID;
-        
         PrintWriter out = response.getWriter();
+
         HttpSession session = request.getSession();
 
+        String processType, username, phone_number, email, user_role, password;
+        int user_id;
+        User user;
+        boolean status;
+
         processType = request.getParameter("processType");
-        if (processType.equalsIgnoreCase("login")) {
 
-            email = request.getParameter("email");
-            password = request.getParameter("password");
-
-            User user = new User(email, password);
-
-            UserDAO userDao = new UserDAO();
-            statusUserID = userDao.login(user);
-
-            if (statusUserID > 0) {
-                session.setAttribute("userId", statusUserID);
-                // Store the specific Login Time
-                long loginMillis = System.currentTimeMillis();
-                session.setAttribute("loginTime", loginMillis);
-
-                request.getRequestDispatcher("dashboard.jsp").forward(request, response);
-            } else {
-                request.setAttribute("errorMessage", "Invalid Credential");
-                request.getRequestDispatcher("login.jsp").forward(request, response);
-            }
-
-        } else if (processType.equalsIgnoreCase("signUp")) {    // For Sign UP
-           
+        if (processType.equalsIgnoreCase("editProfile")) {
+            user_id = (int) session.getAttribute("userId");
             username = request.getParameter("username");
             phone_number = request.getParameter("phone_number");
             email = request.getParameter("email");
-            role = request.getParameter("role");
+            user_role = request.getParameter("user_role");
             password = request.getParameter("password");
-            confirmPassword = request.getParameter("confirmPassword");
 
-            User user = new User(username, email, phone_number, password, role);
+            user = new User(user_id, username, email, phone_number, password, user_role);
 
-            UserDAO projectDao = new UserDAO();
-            statusUserID = projectDao.signUp(user);
-            
-            if (statusUserID > 0) {
-                
-                session.setAttribute("userId", statusUserID);
-                request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+            UserDAO userDao = new UserDAO();
+            status = userDao.updateProfile(user);
+
+            if (status == true) {
+                session.setAttribute("user", user);
+                request.getRequestDispatcher("profile.jsp").forward(request, response);
+            } else {
+
             }
-        } 
+        } else if (processType.equalsIgnoreCase("deleteProfile")) {
 
+            // 1. Safety Check: Is the user actually logged in?
+            if (session != null && session.getAttribute("userId") != null) {
+
+                user_id = (int) session.getAttribute("userId");
+                UserDAO userDao = new UserDAO();
+                status = userDao.deleteProfile(user_id);
+
+                // 2. If successfully deleted, log them out immediately
+                if (status) {
+                    session.invalidate();
+                }
+
+                response.setContentType("text/plain");
+                out.print(status); // Sends "true" or "false"
+                out.flush();
+
+            } else {
+                // Session expired or not found
+                response.setContentType("text/plain");
+                out.print("false");
+                out.flush();
+            }
+        }
     }
 
     /**

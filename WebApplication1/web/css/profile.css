@@ -1,0 +1,263 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 25 Dec 2025, 1:55:27 pm
+    Author     : HP
+*/
+/* 1. LAYOUT STABILITY & VARIABLES */
+html {
+    /* Prevents the UI from 'jumping' left when the vertical scrollbar appears */
+    scrollbar-gutter: stable;
+}
+
+:root {
+    --sidebar-width: 250px;
+    --sidebar-bg: #0f172a;
+    --primary-blue: #2563eb;
+    --primary-blue-hover: #1d4ed8;
+    --body-bg: #f8fafc;
+    --border-color: #e2e8f0;
+    --transition-speed: 0.4s;
+    --transition-curve: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--body-bg);
+    color: #1e293b;
+    margin: 0;
+}
+
+#wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* 2. SIDEBAR STYLES */
+#sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    color: #94a3b8;
+    z-index: 1000;
+}
+
+.sidebar-brand {
+    padding: 1.5rem;
+    color: white;
+    font-weight: 700;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar .nav-link {
+    color: #94a3b8;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+#sidebar .nav-link.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid var(--primary-blue);
+}
+
+/* 3. MAIN CONTENT & TOP NAV */
+#content-wrapper {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    transition: margin-left 0.3s ease;
+}
+
+.top-nav {
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 4. CARD & HEADER STYLES */
+.profile-header-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.settings-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    /* Important for smooth height transitions */
+}
+
+.card-header-spmms {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 5. SMOOTH EDIT TOGGLE LOGIC */
+
+/* View Mode Labels (Username, Email, etc.) */
+.display-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #0f172a;
+    display: block;
+    max-height: 50px;
+    opacity: 1;
+    transition: max-height var(--transition-speed) var(--transition-curve),
+        opacity 0.2s ease;
+}
+
+/* Hide labels smoothly in edit mode */
+.edit-mode .display-text {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Input Fields Animation */
+.edit-input {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    /* Use a Bézier curve for a "slide-up" organic feel */
+    transition: max-height var(--transition-speed) var(--transition-curve),
+        opacity 0.3s ease,
+        margin 0.3s ease;
+    margin-bottom: 0 !important;
+    pointer-events: none;
+}
+
+/* Show inputs smoothly in edit mode */
+.edit-mode .edit-input {
+    max-height: 500px;
+    /* High enough to contain any row/group */
+    opacity: 1;
+    margin-bottom: 1rem !important;
+    pointer-events: auto;
+}
+
+/* Special handling for rows to prevent snapping */
+.row.edit-input {
+    transition: max-height var(--transition-speed) var(--transition-curve);
+}
+
+/* 6. FORM & BUTTON STYLES */
+.label-style {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px !important;
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.pass-group {
+    position: relative;
+}
+
+.eye-toggle {
+    position: absolute;
+    right: 15px;
+    top: 38px;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s ease;
+}
+
+.eye-toggle:hover {
+    color: var(--primary-blue);
+}
+
+.btn-action {
+    background-color: var(--primary-blue);
+    color: white;
+    font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-action:hover {
+    background-color: var(--primary-blue-hover);
+}
+
+/* 7. METADATA FOOTER (Optional addition for PM profile) */
+.profile-meta-footer {
+    border-top: 1px solid var(--border-color);
+    margin-top: 1.5rem;
+    padding: 1rem 0rem;
+    background: #fcfdfe;
+}
+
+/* 8. MODAL STYLES */
+.modal-content {
+    border-radius: 20px;
+    border: none;
+}
+
+.danger-circle {
+    width: 70px;
+    height: 70px;
+    background: #fee2e2;
+    color: #ef4444;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 1.5rem;
+}
+
+.success-circle {
+    width: 70px;
+    height: 70px;
+    background: #dcfce7;
+    color: #16a34a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 1.5rem;
+}

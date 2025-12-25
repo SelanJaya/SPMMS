@@ -20,7 +20,7 @@
             <div class="form-container signup-container">
                 <form action="login_signUpServlet" method="post">
 
-                    <input type="hidden" name="pageType" value="signUp" >
+                    <input type="hidden" name="processType" value="signUp" >
 
                     <h4 class="fw-bold mb-1 w-100 text-dark">Create Account</h4>
                     <p class="text-muted small mb-4 w-100">Join the SPMMS network today.</p>
@@ -74,7 +74,7 @@
 
             <div class="form-container login-container">
                 <form action="login_signUpServlet" method="post">
-                    <input type="hidden" name="pageType" value="login" >
+                    <input type="hidden" name="processType" value="login" >
                     <h4 class="fw-bold mb-1 w-100 text-dark">Welcome Back</h4>
                     <p class="text-muted small mb-4 w-100">Enter your credentials to continue.</p>
 
