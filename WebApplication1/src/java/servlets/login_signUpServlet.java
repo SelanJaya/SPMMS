@@ -88,7 +88,8 @@ public class login_signUpServlet extends HttpServlet {
         HttpSession session = request.getSession();
 
         processType = request.getParameter("processType");
-        if (processType.equalsIgnoreCase("login")) {
+        
+        if (processType.equalsIgnoreCase("login")) { //LOG IN
 
             email = request.getParameter("email");
             password = request.getParameter("password");
@@ -103,8 +104,9 @@ public class login_signUpServlet extends HttpServlet {
                 // Store the specific Login Time
                 long loginMillis = System.currentTimeMillis();
                 session.setAttribute("loginTime", loginMillis);
-
-                request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+                
+                response.sendRedirect("dashboardServlet");
+//                request.getRequestDispatcher("dashboard.jsp").forward(request, response);
             } else {
                 request.setAttribute("errorMessage", "Invalid Credential");
                 request.getRequestDispatcher("login.jsp").forward(request, response);

@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -27,7 +28,7 @@
                     <a href="profileServlet" class="nav-link ">
                         <i class="fas fa-user-circle me-3"></i> Profile
                     </a>
-                    <a href="dashboard.html" class="nav-link active"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
+                    <a href="dashboard.jsp" class="nav-link active"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
                 </div>
                 <div class="mt-auto">
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
@@ -42,8 +43,8 @@
                     <div class="small text-muted">Management / <span class="fw-semibold text-dark">Dashboard</span></div>
                     <div class="user-info">
                         <div class="user-details d-none d-sm-block">
-                            <span class="user-name">Douglas McGee</span>
-                            <span class="user-role">Administrator</span>
+                            <span class="user-name">${user.username}</span>
+                            <span class="user-role">${user.user_role}</span>
                         </div>
                         <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
                              class="rounded-circle border" width="34">
@@ -59,18 +60,20 @@
                         </button>
                     </div>
 
-                    <div class="row" id="projectContainer">
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="project-folder-card p-4">
-                                <div class="folder-icon"><i class="fas fa-folder"></i></div>
-                                <span class="label-style">Folder</span>
-                                <h6 class="fw-bold text-dark mb-3 project-name" style="font-size: 0.9rem;">Demo Project</h6>
-                                <a href="projectPage.html"
-                                   class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold btn-small">Open
-                                    Console</a>
+                    <c:forEach var="project" items="${profileInfo}">
+                        <div class="row" id="projectContainer">
+                            <div class="col-xl-3 col-md-6 mb-4">
+                                <div class="project-folder-card p-4">
+                                    <div class="folder-icon"><i class="fas fa-folder"></i></div>
+                                    <span class="label-style">Folder</span>
+                                    <h6 class="fw-bold text-dark mb-3 project-name" style="font-size: 0.9rem;">${project.projectName}</h6>
+                                    <a href="projectPageServlet?projectId=${project.projectId}"
+                                       class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold btn-small">Open
+                                        </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </c:forEach >
                 </div>
             </div>
         </div>
@@ -80,32 +83,34 @@
                 <div class="modal-content shadow">
                     <div class="modal-body p-4">
                         <h6 class="fw-bold text-dark mb-4 text-center">Initialize Project</h6>
-                        <form id="newProjectForm">
+                        <form action="dashboardServlet" method="post" id="ProjectForm">
                             <div class="mb-3">
                                 <span class="label-style">Project Name</span>
-                                <input type="text" id="newProjName" class="form-control" placeholder="Enter title..."
+                                <input type="text" name="ProjName" id="ProjName" class="form-control" placeholder="Enter title..."
                                        required>
                             </div>
                             <div class="mb-3">
                                 <span class="label-style">Description</span>
-                                <textarea id="newProjDesc" class="form-control" rows="2" style="resize:none;"
+                                <textarea name="ProjDesc" id="ProjDesc" class="form-control" rows="2" style="resize:none;"
                                           required></textarea>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-6">
                                     <span class="label-style">Start Date</span>
-                                    <input type="date" id="newProjStart" class="form-control" required>
+                                    <input type="date" name="ProjStart" id="ProjStart" class="form-control" required>
                                 </div>
                                 <div class="col-6">
                                     <span class="label-style">End Date</span>
-                                    <input type="date" id="newProjEnd" class="form-control" required>
+                                    <input type="date" name="ProjEnd" id="ProjEnd" class="form-control" required>
                                 </div>
                             </div>
                             <div class="mb-4">
                                 <span class="label-style">Initial Status</span>
-                                <select id="newProjStatus" class="form-select" required>
+                                <select name="ProjStatus" id="ProjStatus" class="form-select" required>
                                     <option value="Planned">Planned</option>
-                                    <option value="Active">Active</option>
+                                    <option value="Active">Pending</option>
+                                    <option value="Planned">In Progress</option>
+                                    <option value="Active">Completed</option>
                                 </select>
                             </div>
                             <div class="d-grid gap-2">

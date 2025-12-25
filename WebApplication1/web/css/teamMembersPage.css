@@ -1,0 +1,178 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 26 Dec 2025, 12:49:21 am
+    Author     : HP
+*/
+
+:root {
+    --sidebar-width: 250px;
+    --sidebar-bg: #0f172a;
+    --primary-blue: #2563eb;
+    --body-bg: #f8fafc;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--body-bg);
+    margin: 0;
+    overflow-x: hidden;
+}
+
+#wrapper {
+    display: flex;
+}
+
+/* --- FIXED SIDEBAR --- */
+#sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    color: #94a3b8;
+    z-index: 1000;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-brand {
+    padding: 1.5rem;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar .nav-link {
+    color: #94a3b8;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+#sidebar .nav-link:hover,
+#sidebar .nav-link.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#sidebar .nav-link.active {
+    border-left: 4px solid var(--primary-blue);
+}
+
+/* --- CONTENT --- */
+#content-wrapper {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+}
+
+.top-nav {
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-details {
+    text-align: right;
+    line-height: 1.2;
+}
+
+.user-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* --- PAGE HEADER --- */
+.page-header-mini {
+    margin-bottom: 1.5rem;
+}
+
+.page-header-mini h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* --- ROLE SECTIONS --- */
+.role-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.role-header hr {
+    flex-grow: 1;
+    margin-left: 15px;
+    opacity: 0.1;
+}
+
+/* --- TEAM CARDS --- */
+.team-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.team-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.avatar-md {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* --- MODAL --- */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+}
+
+.form-control,
+.form-select {
+    border-radius: 6px !important;
+    font-size: 0.9rem;
+}
+
+.label-style {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    display: block;
+}

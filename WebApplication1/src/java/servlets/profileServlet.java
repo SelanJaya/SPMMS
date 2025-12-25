@@ -58,15 +58,15 @@ public class profileServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int user_id;
-        User user;
-
-        HttpSession session = request.getSession();
-        user_id = (int) session.getAttribute("userId");
-
-        UserDAO userDao = new UserDAO();
-        user = userDao.profileInformation(user_id);
-        session.setAttribute("user", user);
+//        int user_id;
+//        User user;
+//
+//        HttpSession session = request.getSession();
+//        user_id = (int) session.getAttribute("userId");
+//
+//        UserDAO userDao = new UserDAO();
+//        user = userDao.profileInformation(user_id);
+//        session.setAttribute("user", user);
         request.getRequestDispatcher("profile.jsp").forward(request, response);
     }
 

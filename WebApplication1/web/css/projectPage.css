@@ -1,0 +1,121 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 26 Dec 2025, 12:45:29 am
+    Author     : HP
+*/
+
+/* --- HEADER (Smaller/Professional) --- */
+.project-header-mini {
+    margin-bottom: 1.5rem;
+}
+
+.project-header-mini h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.status-badge {
+    background-color: #dcfce7;
+    color: #15803d;
+    font-weight: 600;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.75rem;
+    border-radius: 50px;
+    text-transform: uppercase;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+/* --- FORMS & CARDS --- */
+.card {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.card-header {
+    background: white;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Base state: Looks like plain text */
+.editable-field {
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    padding: 0 !important;
+    color: #475569;
+    width: 100%;
+    outline: none !important;
+    box-shadow: none !important;
+    /* Removes Bootstrap blue glow */
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    pointer-events: none;
+    /* Makes it unclickable/no hover effect */
+    resize: none;
+    /* Prevents textarea resizing handle from showing */
+    appearance: none;
+}
+
+/* Edit state: Switches back to looking like an input */
+.editable-field.active-edit {
+    border: 1px solid #cbd5e1 !important;
+    background: white !important;
+    padding: 8px 12px !important;
+    border-radius: 6px;
+    color: #1e293b;
+    pointer-events: auto;
+    /* Re-enables clicking and typing */
+}
+
+/* Specific fix for the Project Name to keep it bold even in edit mode */
+#projNameInput {
+    font-weight: 700;
+}
+
+.label-style {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+/* --- FILE UI --- */
+.file-icon-box {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    margin-right: 12px;
+    font-size: 1rem;
+}
+
+.bg-pdf {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.bg-img {
+    background: #f0fdf4;
+    color: #16a34a;
+}
+
+.bg-gen {
+    background: #f1f5f9;
+    color: #475569;
+}

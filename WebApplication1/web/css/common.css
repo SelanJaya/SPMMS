@@ -1,0 +1,77 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 26 Dec 2025, 1:05:15 am
+    Author     : HP
+*/
+
+:root {
+    --sidebar-width: 250px;
+    --sidebar-bg: #0f172a;
+    --primary-blue: #2563eb;
+    --body-bg: #f8fafc;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--body-bg);
+    margin: 0;
+}
+
+/* --- SIDEBAR --- */
+#sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+}
+
+.sidebar-brand {
+    padding: 1.5rem;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#sidebar .nav-link {
+    color: #94a3b8;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+#sidebar .nav-link:hover,
+#sidebar .nav-link.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#sidebar .nav-link.active {
+    border-left: 4px solid var(--primary-blue);
+}
+
+/* --- CONTENT --- */
+#content-wrapper {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+}
+
+.top-nav {
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
