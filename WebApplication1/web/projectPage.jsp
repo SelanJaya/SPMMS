@@ -17,6 +17,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
+
         <link href="css\common.css" rel="stylesheet">
         <link href="css\projectPage.css" rel="stylesheet">
     </head>
@@ -66,12 +67,18 @@
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6 class="m-0 fw-bold text-primary" style="font-size: 0.9rem;">General Information</h6>
-                                <button id="editBtn" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-bold"
-                                        style="font-size: 0.75rem;">Edit Details</button>
+                                <div class="d-flex gap-2">
+                                    <button id="deleteBtnHeader" class="btn btn-sm btn-delete-folder px-3 rounded-pill fw-bold" 
+                                            data-bs-toggle="modal" data-bs-target="#deleteFolderModal">
+                                        <i class="fas fa-folder-minus me-1"></i> Delete Project Folder
+                                    </button>
+                                    <button id="editBtn" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-bold"
+                                            style="font-size: 0.75rem;">Edit Details</button>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <form id="projectForm" action="projectPageServlet" method="post">
-                                    <input type="hidden" name="projetcId" value="${project.projectId}">
+                                    <input type="hidden" name="projectId" value="${project.projectId}">
                                     <div class="row g-4">
                                         <div class="col-md-12">
                                             <span class="label-style">Project Name</span>
@@ -87,13 +94,21 @@
                                         <div class="col-md-4">
                                             <span class="label-style">Project Status</span>
                                             <div id="statusView" class="fw-semibold" style="font-size: 0.9rem;">${project.projectStatus}</div>
+
                                             <select id="statusSelect" name="projectStatus" 
-                                                    class="form-select form-select-sm editable-field d-none">
-                                                <option value="Active">Active</option>
-                                                <option value="Pending">Pending</option>
-                                                <option value="Completed">Completed</option>
-                                                <option value="On Hold">On Hold</option>
+                                                    class="form-select form-select-sm editable-field d-none" 
+                                                    onchange="toggleArchiveWarning(this.value)">
+                                                <option value="Pending" ${project.projectStatus == 'Pending' ? 'selected' : ''}>Pending</option>
+                                                <option value="Completed" ${project.projectStatus == 'Completed' ? 'selected' : ''}>Completed</option>
+                                                <option value="On Hold" ${project.projectStatus == 'On Hold' ? 'selected' : ''}>On Hold</option>
+                                                <option value="Archive" ${project.projectStatus == 'Archive' ? 'selected' : ''}>Archived</option>
                                             </select>
+
+                                            <div id="archiveNotice" class="alert alert-warning mt-2 d-none">
+                                                <small><i class="fas fa-info-circle me-1"></i> 
+                                                    Note: Setting status to <strong>Archived</strong> will hide this project from your main dashboard.
+                                                </small>
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
                                             <span class="label-style">Start Date</span>
@@ -183,132 +198,155 @@
             </div>
         </div>
 
-        <script>
-            $(document).ready(function () {
-                /**
-                 * Toggles the interface between View Mode and Edit Mode
-                 */
-                window.toggleEdit = function (enable) {
-                    if (enable) {
-                        // 1. Enable input interaction
-                        $('.editable-field').prop('readonly', false)
-                                .addClass('active-edit')
-                                .css('pointer-events', 'auto'); // Allow hover/click
+    </div>
+    <div class="modal fade" id="deleteFolderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
 
-                        // 2. Adjust Project Name spacing for the input box look
-                        $('#projNameInput').css({'border': '', 'padding-left': '0.75rem'});
+                <div id="initialBody">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title fw-bold" style="font-size: 1rem;">
+                            <i class="fas fa-exclamation-triangle me-2"></i> Permanent Directory Deletion
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-folder-open text-danger fa-4x opacity-25"></i>
+                        </div>
+                        <h5 class="fw-bold">Destroy Project Folder?</h5>
+                        <p class="text-muted">You are about to delete the entire project directory for <strong>${project.projectName}</strong>. This will <strong>permanently remove</strong> all uploaded files.</p>
+                        <div class="alert alert-danger p-2 mb-0">
+                            <small class="fw-bold text-uppercase"><i class="fas fa-info-circle me-1"></i> This action is irreversible.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Folder</button>
+                        <button type="button" id="deleteBtn" class="btn btn-sm btn-danger fw-bold px-3" onc                                                                    lick="executeFolderDeletion(this)">
+                            Yes, Delete Director                                                            y
+                            <                                                            /button>
+                    </div>
+                </div>
+                <d                                                                iv id="successBody" class="d-none">
+                    <div                                                                     class="modal-body p-5 text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-check-circle text-success fa-5x animat                                                                    e__animated animate__bounceIn">                                                                    </i>
+                        </div>
+                        <h5 c                                                                    lass="fw-bold">Project Deleted</h5>
+                        <p class="text-muted mb-0">The directory and all data                                                                     have been successfully removed.</p>
+                        <p class="small text-muted mt                                                                -2">Redirecting to Dashboar                                                            d...</p>
+                    </div>
+            </div                                                            >
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/                                                            bootstrap.bundle.min.js"></script>
 
-                        // 3. Switch Status view to Select dropdown
-                        $('#statusView').addClass('d-none');
-                        $('#statusSelect').removeClass('d-none').addClass('active-edit');
+<script>
+                                                        $(document).ready(function () {
+                                                            /**
+                                                             * Toggles the interface between View Mode and Edit Mode
+                                                             */
+                                                            window.toggleEdit = function (enable) {
+                                                                if (enable) {
+                                                                    $('.editable-field').prop('readonly', false)
+                                                                            .addClass('active-edit')
+                                                                            .css('pointer-events', 'auto');
+                                                                    $('#projNameInput').css({'border': '', 'padding-left': '0.75rem'});
+                                                                    $('#statusView').addClass('d-none');
+                                                                    $('#statusSelect').removeClass('d-none').addClass('active-edit');
+                                                                    $('#editActions').removeClass('d-none');
+                                                                    $('#editBtn, #deleteBtnHeader').addClass('d-none'); // Hide Delete button while editing
+                                                                } else {
+                                                                    $('.editable-field').prop('readonly', true)
+                                                                            .removeClass('active-edit')
+                                                                            .css('pointer-events', 'none');
+                                                                    $('#projNameInput').css({'border': '1px solid transparent', 'padding-left': '0'});
+                                                                    $('#statusView').removeClass('d-none');
+                                                                    $('#statusSelect').addClass('d-none').removeClass('active-edit');
+                                                                    $('#editActions').addClass('d-none');
+                                                                    $('#editBtn, #deleteBtnHeader').removeClass('d-none');
+                                                                }
+                                                            };
+                                                            $('#editBtn').click(() => toggleEdit(true));
+                                                            /**
+                                                             * Confirms before submitting the form
+                                                             */
+                                                            window.confirmSave = function () {
+                                                                if (confirm("Are you sure you want to save these changes?")) {
+                                                                    // Dynamically update UI and then submit the actual form
+                                                                    saveDataLocal();
+                                                                    $('#projectForm').submit();
+                                                                }
+                                                            };
+                                                            window.executeFolderDeletion = function (btn) {
+                                                                const projectId = "${project.projectId}";
+// 1. Loading State on button
+                                                                const originalContent = btn.innerHTML;
+                                                                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                                                                btn.disabled = true;
+// 2. AJAX Request to your Servlet
+                                                                $.ajax({
+                                                                    url: 'projectPageServlet',
+                                                                    type: 'GET',
+                                                                    data: {
+                                                                        processType: 'deleteFolder',
+                                                                        projectId: projectId
+                                                                    },
+                                                                    dataType: 'json',
+                                                                    success: function (response) {
+                                                                        if (response.success) {
+                                                                            // 3. SUCCESS UI SWAP
+                                                                            // Hide the header and footer area
+                                                                            document.getElementById('initialBody').classList.add('d-none');
+                                                                            // Show the success checkmark body
+                                                                            document.getElementById('successBody').classList.remove('d-none');
+                                                                            // 4. Final Redirect after 2 seconds
+                                                                            setTimeout(() => {
+                                                                                window.location.href = "dashboardServlet";
+                                                                            }, 2000);
+                                                                        } else {
+                                                                            alert("DELETION FAILED: " + response.message);
+                                                                            btn.innerHTML = originalContent;
+                                                                            btn.disabled = false;
+                                                                        }
+                                                                    },
+                                                                    error: function (xhr, status, error) {
+                                                                        alert("Network Error: Could not reach the server.");
+                                                                        btn.innerHTML = originalContent;
+                                                                        btn.disabled = false;
+                                                                    }
+                                                                });
+                                                            };
+                                                            function toggleArchiveWarning(val) {
+                                                                const notice = document.getElementById('archiveNotice');
+                                                                if (val === 'ARCHIVED') {
+                                                                    notice.classList.remove('d-none');
+                                                                } else {
+                                                                    notice.classList.add('d-none');
+                                                                }
+                                                            }
 
-                        // 4. Swap buttons
-                        $('#editActions').removeClass('d-none');
-                        $('#editBtn').addClass('d-none');
-                    } else {
-                        // 1. Disable input interaction (REMOVES HOVER EFFECTS)
-                        $('.editable-field').prop('readonly', true)
-                                .removeClass('active-edit')
-                                .css('pointer-events', 'none'); // Block hover/click
 
-                        // 2. Reset Project Name to look like flat text
-                        $('#projNameInput').css({'border': '1px solid transparent', 'padding-left': '0'});
+//                                                            window.deleteFile = function (btn) {
+//                                                                if (confirm("Remove file?")) {
+//                                                                    $(btn).closest('tr').fadeOut(200, function () {
+//                                                                        $(this).remove();
+//                                                                    });
+//                                                                }
+//                                                            };
 
-                        // 3. Switch Status back to Text view
-                        $('#statusView').removeClass('d-none');
-                        $('#statusSelect').addClass('d-none').removeClass('active-edit');
-
-                        // 4. Swap buttons back
-                        $('#editActions').addClass('d-none');
-                        $('#editBtn').removeClass('d-none');
-                    }
-                };
-
-                // Bind the initial Edit button click
-                $('#editBtn').click(() => toggleEdit(true));
-
-                /**
-                 * Saves changes and updates the UI header
-                 */
-                window.saveData = function () {
-                    // 1. Update the Header Project Name from the Input
-                    const newName = $('#projNameInput').val();
-                    $('#headerProjName').text(newName);
-
-                    // 2. Update Status Text and Header Badge
-                    const newStatus = $('#statusSelect').val();
-                    $('#statusView').text(newStatus);
-                    $('#headerStatusBadge').text(newStatus);
-
-                    // 3. Adjust Badge Color Based on Status
-                    const badge = $('#headerStatusBadge');
-                    if (newStatus === 'Completed') {
-                        badge.css({'background': '#dcfce7', 'color': '#15803d'});
-                    } else if (newStatus === 'On Hold') {
-                        badge.css({'background': '#fee2e2', 'color': '#dc2626'});
-                    } else if (newStatus === 'Pending') {
-                        badge.css({'background': '#fef9c3', 'color': '#a16207'});
-                    } else {
-                        badge.css({'background': '#e0e7ff', 'color': '#4338ca'}); // Default Active
-                    }
-
-                    // 4. Lock the fields
-                    toggleEdit(false);
-
-                    // Optional: Show success toast or alert
-                    console.log("Project saved successfully!");
-                };
-
-                /**
-                 * Handles file uploads
-                 */
-                window.addFile = function () {
-                    const fileInput = document.getElementById('actualFile');
-                    const labelInput = document.getElementById('docLabel');
-                    const label = labelInput.value;
-
-                    if (fileInput.files.length === 0) {
-                        alert("Please select a file.");
-                        return;
-                    }
-
-                    const file = fileInput.files[0];
-                    const ext = file.name.split('.').pop().toUpperCase();
-
-                    const row = `
-            <tr>
-                <td class="ps-4 d-flex align-items-center">
-                    <div class="file-icon-box bg-gen"><i class="fas fa-file"></i></div>
-                    <div class="fw-bold">${label || file.name}</div>
-                </td>
-                <td><span class="badge bg-primary-subtle text-primary">${ext}</span></td>
-                <td><code>/uploads/${file.name}</code></td>
-                <td class="text-end pe-4">
-                    <button onclick="deleteFile(this)" class="btn btn-sm btn-light border p-1 px-2">
-                        <i class="fas fa-trash-alt text-danger"></i>
-                    </button>
-                </td>
-            </tr>`;
-
-                    $('#fileRegistry').prepend(row);
-
-                    // Clear inputs
-                    labelInput.value = '';
-                    fileInput.value = '';
-                };
-
-                /**
-                 * Removes a file row
-                 */
-                window.deleteFile = function (btn) {
-                    if (confirm("Remove file?")) {
-                        $(btn).closest('tr').fadeOut(200, function () {
-                            $(this).remove();
-                        });
-                    }
-                };
-            });
-        </script>
-    </body>
+                                                            window.toggleArchiveWarning = function (val) {
+                                                                const notice = document.getElementById('archiveNotice');
+                                                                // We change this to 'Archive' to match your <option value="Archive">
+                                                                if (val === 'Archive') {
+                                                                    notice.classList.remove('d-none');
+                                                                } else {
+                                                                    notice.classList.add('d-none');
+                                                                }
+                                                            }
+                                                        });
+</script>
+</body>
 
 </html>

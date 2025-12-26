@@ -112,7 +112,7 @@ public class login_signUpServlet extends HttpServlet {
                 request.getRequestDispatcher("login.jsp").forward(request, response);
             }
 
-        } else if (processType.equalsIgnoreCase("signUp")) {    // For Sign UP
+        } else if ("signUp".equalsIgnoreCase(processType)) {    // For Sign UP
            
             username = request.getParameter("username");
             phone_number = request.getParameter("phone_number");
@@ -129,7 +129,7 @@ public class login_signUpServlet extends HttpServlet {
             if (statusUserID > 0) {
                 
                 session.setAttribute("userId", statusUserID);
-                request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+                response.sendRedirect("dashboardServlet");
             }
         } 
 

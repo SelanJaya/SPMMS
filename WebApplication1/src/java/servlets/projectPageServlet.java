@@ -59,12 +59,39 @@ public class projectPageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String ProIdParam;
         int projectId;
+        boolean status;
         Project project;
 
-        projectId = Integer.parseInt(request.getParameter("projectId"));
+        ProIdParam = request.getParameter("projectId");
+        projectId = (ProIdParam != null && !ProIdParam.isEmpty()) ? Integer.parseInt(ProIdParam) : -1;
 
         ProjectDAO projectDao = new ProjectDAO();
+        
+        //DELETE PROJECT FOLDER
+        if ("deleteFolder".equalsIgnoreCase(request.getParameter("processType"))) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            try {
+                status = projectDao.deleteProject(projectId);
+
+                if (status) {
+                    response.getWriter().write("{\"success\": true, \"message\": \"Project deleted successfully.\"}");
+                } else {
+                    // Case where DAO returned false (e.g., ID not found)
+                    response.getWriter().write("{\"success\": false, \"message\": \"Database error: Project record could not be removed.\"}");
+                }
+            } catch (Exception e) {
+                // Case where a hard error occurred (e.g., Folder is locked/Open in another program)
+                response.getWriter().write("{\"success\": false, \"message\": \"Server Error: " + e.getMessage() + "\"}");
+            }
+            return;
+        }
+        
+
+        // Retrieve project details
         project = projectDao.ProjectInfoById(projectId);
 
         HttpSession session = request.getSession();
@@ -91,6 +118,7 @@ public class projectPageServlet extends HttpServlet {
         String projectName, projectDesc, projectStatus, startStr, endStr;
         LocalDate projStartDate, projEndDate;
 
+        //profile Update process
         try {
             projectId = Integer.parseInt(request.getParameter("projectId"));
             projectName = request.getParameter("projectName");
@@ -105,16 +133,6 @@ public class projectPageServlet extends HttpServlet {
 
             Project project = new Project(projectId, projectName, projectDesc, projectStatus, projStartDate, projEndDate);
 
-            System.out.println("---------- PROJECT  Update DEBUG INFO ----------");
-            System.out.println("ID         : " + project.getProjectId());
-            System.out.println("Name       : " + project.getProjectName());
-            System.out.println("Description: " + project.getProjectDesc());
-            System.out.println("Status     : " + project.getProjectStatus());
-            System.out.println("Start Date : " + project.getProjStartDate());
-            System.out.println("End Date   : " + project.getProjEndDate());
-            System.out.println("Created By : " + project.getProjCreatedBy());
-            System.out.println("----------------------------------------");
-
             ProjectDAO projectDao = new ProjectDAO();
             status = projectDao.updateProject(project);
 
@@ -123,8 +141,9 @@ public class projectPageServlet extends HttpServlet {
                 session.setAttribute("project", project);
                 session.setAttribute("successMsg", "Project updated successfully!");
 
-                request.getRequestDispatcher("projectPage.jep").forward(request, response);
+                request.getRequestDispatcher("projectPage.jsp").forward(request, response);
             } else {
+                System.out.println("Error }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
                 request.setAttribute("errorMsg", "Database update failed.");
                 request.getRequestDispatcher("projectPage.jsp").forward(request, response);
             }

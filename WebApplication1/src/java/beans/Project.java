@@ -23,9 +23,19 @@ public class Project {
     public Project() {
     }
     
-    //Contructor for create project
-    public Project(int projCreatedBy, String projectName, String projectDesc, String projectStatus, LocalDate projStartDate, LocalDate projEndDate) {
-        this.projCreatedBy = projCreatedBy;
+    //Contructor for update project
+    public Project(String projectName, String projectDesc, String projectStatus, LocalDate projStartDate, LocalDate projEndDate, int createdBy) {
+        this.projectName = projectName;
+        this.projectDesc = projectDesc;
+        this.projectStatus = projectStatus;
+        this.projStartDate = projStartDate;
+        this.projEndDate = projEndDate;
+        this.projCreatedBy = createdBy;
+    }
+    
+    //Contructor for update project
+    public Project(int projectId, String projectName, String projectDesc, String projectStatus, LocalDate projStartDate, LocalDate projEndDate) {
+        this.projectId = projectId;
         this.projectName = projectName;
         this.projectDesc = projectDesc;
         this.projectStatus = projectStatus;

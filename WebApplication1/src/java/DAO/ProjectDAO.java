@@ -55,6 +55,17 @@ public class ProjectDAO {
             e.printStackTrace();
         }
 
+        // Print the results
+        if (projectArr.isEmpty()) {
+            System.out.println("No projects found for user ID: " + user_id);
+        } else {
+            System.out.println("--- Project Info for User " + user_id + " ---");
+            for (Project project : projectArr) {
+                System.out.println(project);
+            }
+            System.out.println("-----------------------------------");
+        }
+
         return projectArr;
     }
 
@@ -112,7 +123,7 @@ public class ProjectDAO {
     }
 
     public boolean updateProject(Project project) {
-        String sql = "UPDATE project SET project_name = ?, project_desc = ?, "
+        String sql = "UPDATE projects SET project_name = ?, project_desc = ?, "
                 + "project_status = ?, proj_start_date = ?, proj_end_date = ? "
                 + "WHERE project_id = ?";
 
@@ -138,4 +149,22 @@ public class ProjectDAO {
         }
     }
 
+    public boolean deleteProject(int projectId) {
+        String sql = "DELETE FROM projects WHERE project_id = ?";
+        boolean isDeleted = false;
+
+        try (Connection conn = DBConnection.getConnection(); // Your DB connection method
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, projectId);
+            int rowsAffected = pstmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+               isDeleted = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isDeleted;
+    }
 }

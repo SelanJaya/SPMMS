@@ -72,29 +72,30 @@ public class dashboardServlet extends HttpServlet {
         UserDAO userDao = new UserDAO();
         user = userDao.profileInformation(user_id);
         session.setAttribute("user", user);
-
+        
+        // DISPLAY ALL PROJECT FOLDER
         ProjectDAO projectDao = new ProjectDAO();
         profileInfo = projectDao.projectInfo(user_id);
         session.setAttribute("profileInfo", profileInfo);
 
         // Print a header to find it easily in the logs
-        System.out.println("=== DEBUG: Project List Start ===");
+//        System.out.println("=== DEBUG: Project List Start ===");
 
-        if (profileInfo != null && !profileInfo.isEmpty()) {
-            for (Project p : profileInfo) {
-                System.out.println("User ID: " + user_id);
-                System.out.println("ID: " + p.getProjectId());
-                System.out.println("Name: " + p.getProjectName());
-                System.out.println("Status: " + p.getProjectStatus());
-                System.out.println("Dates: " + p.getProjStartDate() + " to " + p.getProjEndDate());
-                System.out.println("-----------------------------");
-            }
-        } else {
-            System.out.println("User ID: " + user_id);
-            System.out.println("No projects found for user: " + user.getUser_id());
-        }
-
-        System.out.println("=== DEBUG: Project List End ===");
+//        if (profileInfo != null && !profileInfo.isEmpty()) {
+//            for (Project p : profileInfo) {
+//                System.out.println("User ID: " + user_id);
+//                System.out.println("ID: " + p.getProjectId());
+//                System.out.println("Name: " + p.getProjectName());
+//                System.out.println("Status: " + p.getProjectStatus());
+//                System.out.println("Dates: " + p.getProjStartDate() + " to " + p.getProjEndDate());
+//                System.out.println("-----------------------------");
+//            }
+//        } else {
+//            System.out.println("User ID: " + user_id);
+//            System.out.println("No projects found for user: " + user.getUser_id());
+//        }
+//
+//        System.out.println("=== DEBUG: Project List End ===");
 
         request.getRequestDispatcher("dashboard.jsp").forward(request, response);
     }
@@ -119,6 +120,8 @@ public class dashboardServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
         user_id = (int) session.getAttribute("userId");
+        
+        System.out.println("USER ID  "+user_id);
 
         ProjName = request.getParameter("ProjName");
         ProjDesc = request.getParameter("ProjDesc");
@@ -126,15 +129,14 @@ public class dashboardServlet extends HttpServlet {
         ProjStart = LocalDate.parse(request.getParameter("ProjStart"));
         ProjEnd = LocalDate.parse(request.getParameter("ProjEnd"));
 
-        Project project = new Project(user_id, ProjName, ProjDesc, ProjStatus, ProjStart, ProjEnd);
+        Project project = new Project(ProjName, ProjDesc, ProjStatus, ProjStart, ProjEnd, user_id);
 
         ProjectDAO projectDao = new ProjectDAO();
         status = projectDao.createProject(project);
 
         if (status == true) {
-
             profileInfo = projectDao.projectInfo(user_id);
-//            session.setAttribute("profileInfo", profileInfo);
+            session.setAttribute("profileInfo", profileInfo);
             request.getRequestDispatcher("dashboard.jsp").forward(request, response);
         } else {
             System.out.println("error");
