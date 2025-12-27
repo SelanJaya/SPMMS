@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import beans.Project;
 import DAO.ProjectDAO;
 import java.time.LocalDate;
+import java.util.List;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -68,7 +69,7 @@ public class projectPageServlet extends HttpServlet {
         projectId = (ProIdParam != null && !ProIdParam.isEmpty()) ? Integer.parseInt(ProIdParam) : -1;
 
         ProjectDAO projectDao = new ProjectDAO();
-        
+
         //DELETE PROJECT FOLDER
         if ("deleteFolder".equalsIgnoreCase(request.getParameter("processType"))) {
             response.setContentType("application/json");
@@ -89,7 +90,6 @@ public class projectPageServlet extends HttpServlet {
             }
             return;
         }
-        
 
         // Retrieve project details
         project = projectDao.ProjectInfoById(projectId);
@@ -113,43 +113,85 @@ public class projectPageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        int projectId;
+        int projectId, user_id;
+        String processType;
+        List<Project> profileInfo;
         boolean status;
         String projectName, projectDesc, projectStatus, startStr, endStr;
         LocalDate projStartDate, projEndDate;
 
-        //profile Update process
-        try {
-            projectId = Integer.parseInt(request.getParameter("projectId"));
-            projectName = request.getParameter("projectName");
-            projectDesc = request.getParameter("projectDesc");
-            projectStatus = request.getParameter("projectStatus");
+        processType = request.getParameter("processType");
 
-            // Safety check for dates
-            startStr = request.getParameter("projStartDate");
-            endStr = request.getParameter("projEndDate");
-            projStartDate = (startStr != null && !startStr.isEmpty()) ? LocalDate.parse(startStr) : null;
-            projEndDate = (endStr != null && !endStr.isEmpty()) ? LocalDate.parse(endStr) : null;
+        projectId = Integer.parseInt(request.getParameter("projectId")); //Shared Parameter
+        projectStatus = request.getParameter("projectStatus"); //Shared Parameter
 
-            Project project = new Project(projectId, projectName, projectDesc, projectStatus, projStartDate, projEndDate);
+        ProjectDAO projectDao = new ProjectDAO();
 
-            ProjectDAO projectDao = new ProjectDAO();
-            status = projectDao.updateProject(project);
+        if ("projectInfoUpdate".equalsIgnoreCase(processType)) {
+            //profile Update process
+            try {
+                projectName = request.getParameter("projectName");
+                projectDesc = request.getParameter("projectDesc");
 
-            if (status == true) {
-                HttpSession session = request.getSession();
-                session.setAttribute("project", project);
-                session.setAttribute("successMsg", "Project updated successfully!");
+                // Safety check for dates
+                startStr = request.getParameter("projStartDate");
+                endStr = request.getParameter("projEndDate");
+                projStartDate = (startStr != null && !startStr.isEmpty()) ? LocalDate.parse(startStr) : null;
+                projEndDate = (endStr != null && !endStr.isEmpty()) ? LocalDate.parse(endStr) : null;
 
-                request.getRequestDispatcher("projectPage.jsp").forward(request, response);
-            } else {
-                System.out.println("Error }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
-                request.setAttribute("errorMsg", "Database update failed.");
-                request.getRequestDispatcher("projectPage.jsp").forward(request, response);
+                Project project = new Project(projectId, projectName, projectDesc, projectStatus, projStartDate, projEndDate);
+
+                status = projectDao.updateProject(project);
+
+                if (status == true) {
+                    HttpSession session = request.getSession();
+
+                    if (projectStatus.equalsIgnoreCase("Archive")) {
+                        user_id = (int) session.getAttribute("userId");
+                        profileInfo = projectDao.projectInfo(user_id);
+                        session.setAttribute("profileInfo", profileInfo);
+                    }
+
+                    session.setAttribute("project", project);
+                    session.setAttribute("successMsg", "Project updated successfully!");
+
+                    request.getRequestDispatcher("projectPage.jsp").forward(request, response);
+                } else {
+                    System.out.println("Error }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
+                    request.setAttribute("errorMsg", "Database update failed.");
+                    request.getRequestDispatcher("projectPage.jsp").forward(request, response);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendRedirect("error.jsp");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect("error.jsp");
+        } else if ("updateStatus".equalsIgnoreCase(processType)) {
+
+            // 1. Set the response type to JSON
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            PrintWriter out = response.getWriter();
+            String feedbackMessage = "";
+
+            try {
+                status = projectDao.updateProjectStatus(projectId, projectStatus);
+
+                feedbackMessage = "True";
+
+            } catch (Exception e) {
+                status = false;
+                feedbackMessage = "Error: " + e.getMessage();
+            }
+
+            // 2. Create the JSON string
+            // Format: {"success": true, "message": "..."}
+            String jsonResponse = String.format("{\"success\": %b, \"message\": \"%s\"}",
+                    status, feedbackMessage);
+
+            // 3. Send it back to the JS AJAX call
+            out.print(jsonResponse);
+            out.flush();
         }
     }
 

@@ -75,3 +75,38 @@ body {
     align-items: center;
     justify-content: space-between;
 }
+
+/* --- USER PROFILE NAV STYLES --- */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Space between text and image */
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column; /* FORCES NAME AND ROLE TO STACK */
+    text-align: right;     /* Aligns text toward the image */
+    line-height: 1.2;      /* Prevents text from feeling too far apart */
+}
+
+.user-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: block;        /* Ensures it takes full width of the stack */
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 400;
+    display: block;        /* Ensures it takes full width of the stack */
+    text-transform: capitalize;
+}
+
+/* Avatar Image refine */
+.user-info img {
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+}

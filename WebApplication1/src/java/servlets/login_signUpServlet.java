@@ -105,8 +105,7 @@ public class login_signUpServlet extends HttpServlet {
                 long loginMillis = System.currentTimeMillis();
                 session.setAttribute("loginTime", loginMillis);
                 
-                response.sendRedirect("dashboardServlet");
-//                request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+                response.sendRedirect("dashboardServlet?&processType=projectInfo");
             } else {
                 request.setAttribute("errorMessage", "Invalid Credential");
                 request.getRequestDispatcher("login.jsp").forward(request, response);

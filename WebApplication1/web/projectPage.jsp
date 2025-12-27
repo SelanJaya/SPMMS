@@ -16,6 +16,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 
         <link href="css\common.css" rel="stylesheet">
@@ -78,6 +79,7 @@
                             </div>
                             <div class="card-body">
                                 <form id="projectForm" action="projectPageServlet" method="post">
+                                    <input type="hidden" name="processType" id="projectInfoUpdate" value="projectInfoUpdate">
                                     <input type="hidden" name="projectId" value="${project.projectId}">
                                     <div class="row g-4">
                                         <div class="col-md-12">
@@ -198,7 +200,7 @@
             </div>
         </div>
 
-    </div>
+    
     <div class="modal fade" id="deleteFolderModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
@@ -222,110 +224,114 @@
                     </div>
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Folder</button>
-                        <button type="button" id="deleteBtn" class="btn btn-sm btn-danger fw-bold px-3" onc                                                                    lick="executeFolderDeletion(this)">
-                            Yes, Delete Director                                                            y
-                            <                                                            /button>
+                        <button type="button" id="deleteBtn" class="btn btn-sm btn-danger fw-bold px-3" onclick="executeFolderDeletion(this)">
+                            Yes, Delete Directory
+                            </button>
                     </div>
                 </div>
-                <d                                                                iv id="successBody" class="d-none">
-                    <div                                                                     class="modal-body p-5 text-center">
+                <div id="successBody" class="d-none">
+                    <div class="modal-body p-5 text-center">
                         <div class="mb-3">
-                            <i class="fas fa-check-circle text-success fa-5x animat                                                                    e__animated animate__bounceIn">                                                                    </i>
+                            <i class="fas fa-check-circle text-success fa-5x animate__animated animate__bounceIn"></i>
                         </div>
-                        <h5 c                                                                    lass="fw-bold">Project Deleted</h5>
-                        <p class="text-muted mb-0">The directory and all data                                                                     have been successfully removed.</p>
-                        <p class="small text-muted mt                                                                -2">Redirecting to Dashboar                                                            d...</p>
+                        <h5 class="fw-bold">Project Deleted</h5>
+                        <p class="text-muted mb-0">The directory and all data have been successfully removed.</p>
+                        <p class="small text-muted mt-2">Redirecting to Dashboard...</p>
                     </div>
             </div                                                            >
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/                                                            bootstrap.bundle.min.js"></script>
+
 
 <script>
-                                                        $(document).ready(function () {
-                                                            /**
-                                                             * Toggles the interface between View Mode and Edit Mode
-                                                             */
-                                                            window.toggleEdit = function (enable) {
-                                                                if (enable) {
-                                                                    $('.editable-field').prop('readonly', false)
-                                                                            .addClass('active-edit')
-                                                                            .css('pointer-events', 'auto');
-                                                                    $('#projNameInput').css({'border': '', 'padding-left': '0.75rem'});
-                                                                    $('#statusView').addClass('d-none');
-                                                                    $('#statusSelect').removeClass('d-none').addClass('active-edit');
-                                                                    $('#editActions').removeClass('d-none');
-                                                                    $('#editBtn, #deleteBtnHeader').addClass('d-none'); // Hide Delete button while editing
-                                                                } else {
-                                                                    $('.editable-field').prop('readonly', true)
-                                                                            .removeClass('active-edit')
-                                                                            .css('pointer-events', 'none');
-                                                                    $('#projNameInput').css({'border': '1px solid transparent', 'padding-left': '0'});
-                                                                    $('#statusView').removeClass('d-none');
-                                                                    $('#statusSelect').addClass('d-none').removeClass('active-edit');
-                                                                    $('#editActions').addClass('d-none');
-                                                                    $('#editBtn, #deleteBtnHeader').removeClass('d-none');
-                                                                }
-                                                            };
-                                                            $('#editBtn').click(() => toggleEdit(true));
-                                                            /**
-                                                             * Confirms before submitting the form
-                                                             */
-                                                            window.confirmSave = function () {
-                                                                if (confirm("Are you sure you want to save these changes?")) {
-                                                                    // Dynamically update UI and then submit the actual form
-                                                                    saveDataLocal();
-                                                                    $('#projectForm').submit();
-                                                                }
-                                                            };
-                                                            window.executeFolderDeletion = function (btn) {
-                                                                const projectId = "${project.projectId}";
+    $(document).ready(function () {
+        /**
+         * Toggles the interface between View Mode and Edit Mode
+         */
+        window.toggleEdit = function (enable) {
+            if (enable) {
+                $('.editable-field').prop('readonly', false)
+                        .addClass('active-edit')
+                        .css('pointer-events', 'auto');
+                $('#projNameInput').css({'border': '', 'padding-left': '0.75rem'});
+                $('#statusView').addClass('d-none');
+                $('#statusSelect').removeClass('d-none').addClass('active-edit');
+                $('#editActions').removeClass('d-none');
+                $('#editBtn, #deleteBtnHeader').addClass('d-none'); // Hide Delete button while editing
+            } else {
+                $('.editable-field').prop('readonly', true)
+                        .removeClass('active-edit')
+                        .css('pointer-events', 'none');
+                $('#projNameInput').css({'border': '1px solid transparent', 'padding-left': '0'});
+                $('#statusView').removeClass('d-none');
+                $('#statusSelect').addClass('d-none').removeClass('active-edit');
+                $('#editActions').addClass('d-none');
+                $('#editBtn, #deleteBtnHeader').removeClass('d-none');
+            }
+        };
+        $('#editBtn').click(() => toggleEdit(true));
+        /**
+         * Confirms before submitting the form
+         */
+        window.confirmSave = function () {
+            if (confirm("Are you sure you want to save these changes?")) {
+                // Dynamically update UI and then submit the actual form
+                saveDataLocal();
+                $('#projectForm').submit();
+            }
+        };
+        
+        
+        window.executeFolderDeletion = function (btn) {
+            const projectId = "${project.projectId}";
 // 1. Loading State on button
-                                                                const originalContent = btn.innerHTML;
-                                                                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-                                                                btn.disabled = true;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+            btn.disabled = true;
 // 2. AJAX Request to your Servlet
-                                                                $.ajax({
-                                                                    url: 'projectPageServlet',
-                                                                    type: 'GET',
-                                                                    data: {
-                                                                        processType: 'deleteFolder',
-                                                                        projectId: projectId
-                                                                    },
-                                                                    dataType: 'json',
-                                                                    success: function (response) {
-                                                                        if (response.success) {
-                                                                            // 3. SUCCESS UI SWAP
-                                                                            // Hide the header and footer area
-                                                                            document.getElementById('initialBody').classList.add('d-none');
-                                                                            // Show the success checkmark body
-                                                                            document.getElementById('successBody').classList.remove('d-none');
-                                                                            // 4. Final Redirect after 2 seconds
-                                                                            setTimeout(() => {
-                                                                                window.location.href = "dashboardServlet";
-                                                                            }, 2000);
-                                                                        } else {
-                                                                            alert("DELETION FAILED: " + response.message);
-                                                                            btn.innerHTML = originalContent;
-                                                                            btn.disabled = false;
-                                                                        }
-                                                                    },
-                                                                    error: function (xhr, status, error) {
-                                                                        alert("Network Error: Could not reach the server.");
-                                                                        btn.innerHTML = originalContent;
-                                                                        btn.disabled = false;
-                                                                    }
-                                                                });
-                                                            };
-                                                            function toggleArchiveWarning(val) {
-                                                                const notice = document.getElementById('archiveNotice');
-                                                                if (val === 'ARCHIVED') {
-                                                                    notice.classList.remove('d-none');
-                                                                } else {
-                                                                    notice.classList.add('d-none');
-                                                                }
-                                                            }
+            $.ajax({
+                url: 'projectPageServlet',
+                type: 'GET',
+                data: {
+                    processType: 'deleteFolder',
+                    projectId: projectId
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        // 3. SUCCESS UI SWAP
+                        // Hide the header and footer area
+                        document.getElementById('initialBody').classList.add('d-none');
+                        // Show the success checkmark body
+                        document.getElementById('successBody').classList.remove('d-none');
+                        // 4. Final Redirect after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = "dashboardServlet?processType=projectInfo";
+                        }, 2000);
+                    } else {
+                        alert("DELETION FAILED: " + response.message);
+                        btn.innerHTML = originalContent;
+                        btn.disabled = false;
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("Network Error: Could not reach the server.");
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }
+            });
+        };
+        
+        
+        function toggleArchiveWarning(val) {
+            const notice = document.getElementById('archiveNotice');
+            if (val === 'ARCHIVED') {
+                notice.classList.remove('d-none');
+            } else {
+                notice.classList.add('d-none');
+            }
+        }
 
 
 //                                                            window.deleteFile = function (btn) {
@@ -336,16 +342,16 @@
 //                                                                }
 //                                                            };
 
-                                                            window.toggleArchiveWarning = function (val) {
-                                                                const notice = document.getElementById('archiveNotice');
-                                                                // We change this to 'Archive' to match your <option value="Archive">
-                                                                if (val === 'Archive') {
-                                                                    notice.classList.remove('d-none');
-                                                                } else {
-                                                                    notice.classList.add('d-none');
-                                                                }
-                                                            }
-                                                        });
+        window.toggleArchiveWarning = function (val) {
+            const notice = document.getElementById('archiveNotice');
+            // We change this to 'Archive' to match your <option value="Archive">
+            if (val === 'Archive') {
+                notice.classList.remove('d-none');
+            } else {
+                notice.classList.add('d-none');
+            }
+        }
+    });
 </script>
 </body>
 

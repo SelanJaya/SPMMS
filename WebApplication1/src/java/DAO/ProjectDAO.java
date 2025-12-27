@@ -26,7 +26,7 @@ public class ProjectDAO {
                 + "p.project_status, p.proj_start_date, p.proj_end_date "
                 + "FROM projects p "
                 + "JOIN users u ON p.proj_created_by = u.user_id "
-                + "WHERE u.user_id = ?";
+                + "WHERE u.user_id = ? AND p.project_status != 'Archive'";
 
         // FIX 3: Initialize the list properly (Do NOT set to null)
         List<Project> projectArr = new ArrayList<>();
@@ -154,17 +154,77 @@ public class ProjectDAO {
         boolean isDeleted = false;
 
         try (Connection conn = DBConnection.getConnection(); // Your DB connection method
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, projectId);
             int rowsAffected = pstmt.executeUpdate();
 
             if (rowsAffected > 0) {
-               isDeleted = true;
+                isDeleted = true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return isDeleted;
+    }
+
+    public List<Project> getArchivedProjectsByUserId(int userId) {
+        List<Project> archivedList = new ArrayList<>();
+        String sql = "SELECT project_id, project_name, project_desc, proj_created_at FROM projects WHERE proj_created_by = ? AND "
+                + "project_status = 'Archive'";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Project p = new Project();
+                p.setProjectId(rs.getInt("project_id"));
+                p.setProjectName(rs.getString("project_name"));
+                p.setProjectDesc(rs.getString("project_desc"));
+                p.setProjCreatedAt(rs.getObject("proj_created_at", java.time.LocalDateTime.class));
+                archivedList.add(p);
+
+                System.out.println("----------------------------------------");
+                System.out.println("Project ID   : " + rs.getInt("project_id"));
+                System.out.println("Name         : " + rs.getString("project_name"));
+                System.out.println("Description  : " + rs.getString("project_desc"));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return archivedList;
+    }
+
+    public boolean updateProjectStatus(int projectId, String newStatus) {
+        // Standard SQL for updating a specific column
+        String sql = "UPDATE projects SET project_status = ? WHERE project_id = ?";
+        boolean isUpdated = false;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // Set the new status (e.g., "Completed")
+            ps.setString(1, newStatus);
+
+            // Set the ID to target the specific row
+            ps.setInt(2, projectId);
+
+            // executeUpdate returns the number of rows affected
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected > 0) {
+                isUpdated = true;
+                System.out.println("Status updated successfully for Project ID: " + projectId);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error updating project status: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return isUpdated;
     }
 }

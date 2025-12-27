@@ -15,7 +15,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
+        <link rel="stylesheet" href="css/common.css"
         <link rel="dashboard stylesheet" href="css\dashboard.css" />
     </head>
 
@@ -29,12 +29,14 @@
                         <i class="fas fa-user-circle me-3"></i> Profile
                     </a>
                     <a href="dashboard.jsp" class="nav-link active"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
-                </div>
-                <div class="mt-auto">
-                    <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
-                    <a href="login_signUpServlet?processType=logOut" class="nav-link text-danger">
-                        <i class="fas fa-sign-out-alt me-3"></i><span>Logout</span>
-                    </a>
+                    <a href="dashboardServlet?userId=${user.user_id}&processType=achivedProject" class="nav-link active-archive"><i class="fas fa-box-archive me-3"></i>
+                        Archived Projects</a>
+                    <div class="mt-auto">
+                        <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
+                        <a href="login_signUpServlet?processType=logOut" class="nav-link text-danger">
+                            <i class="fas fa-sign-out-alt me-3"></i><span>Logout</span>
+                        </a>
+                    </div>
                 </div>
             </nav>
 
@@ -69,7 +71,7 @@
                                     <h6 class="fw-bold text-dark mb-3 project-name" style="font-size: 0.9rem;">${project.projectName}</h6>
                                     <a href="projectPageServlet?projectId=${project.projectId}"
                                        class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold btn-small">Open
-                                        </a>
+                                    </a>
                                 </div>
                             </div>
                         </div>

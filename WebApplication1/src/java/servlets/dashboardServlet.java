@@ -63,41 +63,36 @@ public class dashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int user_id;
+        String processType;
         List<Project> profileInfo;
         User user;
+
+        processType = request.getParameter("processType");
 
         HttpSession session = request.getSession();
         user_id = (int) session.getAttribute("userId");
 
-        UserDAO userDao = new UserDAO();
-        user = userDao.profileInformation(user_id);
-        session.setAttribute("user", user);
-        
-        // DISPLAY ALL PROJECT FOLDER
         ProjectDAO projectDao = new ProjectDAO();
-        profileInfo = projectDao.projectInfo(user_id);
-        session.setAttribute("profileInfo", profileInfo);
+        UserDAO userDao = new UserDAO();
 
-        // Print a header to find it easily in the logs
-//        System.out.println("=== DEBUG: Project List Start ===");
+        if ("projectInfo".equalsIgnoreCase(processType)) {
+            
+            // DISPLAY ALL PROJECT FOLDER
+            user = userDao.profileInformation(user_id);
+            session.setAttribute("user", user);
 
-//        if (profileInfo != null && !profileInfo.isEmpty()) {
-//            for (Project p : profileInfo) {
-//                System.out.println("User ID: " + user_id);
-//                System.out.println("ID: " + p.getProjectId());
-//                System.out.println("Name: " + p.getProjectName());
-//                System.out.println("Status: " + p.getProjectStatus());
-//                System.out.println("Dates: " + p.getProjStartDate() + " to " + p.getProjEndDate());
-//                System.out.println("-----------------------------");
-//            }
-//        } else {
-//            System.out.println("User ID: " + user_id);
-//            System.out.println("No projects found for user: " + user.getUser_id());
-//        }
-//
-//        System.out.println("=== DEBUG: Project List End ===");
+            profileInfo = projectDao.projectInfo(user_id);
+            session.setAttribute("profileInfo", profileInfo);
 
-        request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+            request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+
+        } else if ("achivedProject".equalsIgnoreCase(processType)) {
+
+            profileInfo = projectDao.getArchivedProjectsByUserId(user_id);
+
+            session.setAttribute("profileInfo", profileInfo);
+            request.getRequestDispatcher("projectArchive.jsp").forward(request, response);
+        }
     }
 
     /**
@@ -120,8 +115,8 @@ public class dashboardServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
         user_id = (int) session.getAttribute("userId");
-        
-        System.out.println("USER ID  "+user_id);
+
+        System.out.println("USER ID  " + user_id);
 
         ProjName = request.getParameter("ProjName");
         ProjDesc = request.getParameter("ProjDesc");
