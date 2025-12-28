@@ -199,18 +199,15 @@ public class ProjectDAO {
         return archivedList;
     }
 
-    public boolean updateProjectStatus(int projectId, String newStatus) {
+    public boolean updateProjectStatus(int projectId) {
         // Standard SQL for updating a specific column
-        String sql = "UPDATE projects SET project_status = ? WHERE project_id = ?";
+        String sql = "UPDATE projects SET project_status = 'Active' WHERE project_id = ?";
         boolean isUpdated = false;
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            // Set the new status (e.g., "Completed")
-            ps.setString(1, newStatus);
-
             // Set the ID to target the specific row
-            ps.setInt(2, projectId);
+            ps.setInt(1, projectId);
 
             // executeUpdate returns the number of rows affected
             int rowsAffected = ps.executeUpdate();
@@ -226,5 +223,32 @@ public class ProjectDAO {
         }
 
         return isUpdated;
+    }
+
+    public List<User> getAllUsers() {
+        List<User> userList = new ArrayList<>();
+        // Querying exactly the columns shown in your schema images
+        String sql = "SELECT username, email FROM user";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                User user = new User();
+                // 'username' and 'email' match your database column names
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+
+                userList.add(user);
+            }
+
+            // Console log for your debugging
+            System.out.println("DAO Log: " + userList.size() + " users retrieved.");
+
+        } catch (SQLException e) {
+            System.err.println("SQL Error in getAllUsers: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return userList;
     }
 }

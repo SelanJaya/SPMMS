@@ -26,6 +26,8 @@
                 <div class="nav flex-column mt-3">
                     <a href="profile.jsp" class="nav-link active"><i class="fas fa-user-circle me-3"></i> Profile</a>
                     <a href="dashboard.jsp" class="nav-link "><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
+                    <a href="dashboardServlet?userId=${user.user_id}&processType=achivedProject" class="nav-link active-archive"><i class="fas fa-box-archive me-3"></i>
+                        Archived Projects</a>
                 </div>
                 <div class="mt-auto">
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>

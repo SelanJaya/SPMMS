@@ -257,4 +257,79 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 .btn-cancel-link:hover {
     color: #1e293b;
-    }
+}
+
+/* Custom Width Modal Helper */
+.modal-premium {
+    border: none !important;
+}
+
+/* Success Icon Box - Matches the 'Destroy' box proportions */
+.icon-box-success {
+    width: 72px;
+    height: 72px;
+    background: #ecfdf5;
+    border-radius: 20px; /* Matches the square-rounded look in your image */
+    color: #10b981;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Success Status Pill - Matches 'Action is Irreversible' pill */
+.success-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: #ecfdf5;
+    border: 1px solid #d1fae5;
+    border-radius: 50px;
+}
+
+.success-pill-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #10b981;
+    border-radius: 50%;
+}
+
+.success-pill-text {
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #10b981;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+}
+
+/* Success Primary Button - Matches 'Restore' button width/color */
+.btn-success-modern {
+    background: #10b981;
+    color: white !important;
+    border-radius: 14px; /* Matching the high radius in your images */
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-success-modern:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+}
+
+/* Matching the search input style in image_f0a2fb.png */
+.input-group-text {
+    border-color: #e2e8f0;
+    border-radius: 8px 0 0 8px !important;
+}
+
+.form-control {
+    border-color: #e2e8f0;
+    border-radius: 0 8px 8px 0 !important;
+}
+
+.form-control:focus {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+}

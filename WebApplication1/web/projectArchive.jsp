@@ -57,16 +57,33 @@
             </nav>
 
             <div class="container-fluid p-4">
-                <div class="d-flex justify-content-between align-items-end mb-4">
+                <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
                     <div>
-                        <h4 class="fw-bold mb-1">Archive Vault</h4>
+                        <h2 class="fw-bold text-dark mb-1" style="letter-spacing: -1px; font-size: 1.6rem;">Archive Vault</h2>
                         <p class="text-muted small mb-0">Manage long-term project storage and history.</p>
                     </div>
-                    <div class="input-group input-group-sm" style="width: 300px;">
-                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" id="vaultSearch" class="form-control border-start-0" placeholder="Search by name or description...">
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="input-group input-group-sm" style="width: 300px;">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0 ps-0 shadow-none" 
+                                   placeholder="Search by name or description..." 
+                                   style="font-size: 0.85rem;">
+                        </div>
                     </div>
                 </div>
+                <!--                <div class="d-flex justify-content-between align-items-end mb-4">
+                                    <div>
+                                        <h4 class="fw-bold mb-1">Archive Vault</h4>
+                                        <p class="text-muted small mb-0">Manage long-term project storage and history.</p>
+                                    </div>
+                                    <div class="input-group input-group-sm" style="width: 300px;">
+                                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                        <input type="text" id="vaultSearch" class="form-control border-start-0" placeholder="Search by name or description...">
+                                    </div>
+                                </div>-->
 
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-0">
@@ -197,7 +214,7 @@
                             </div>
 
                             <div class="d-grid gap-2">
-                                <button type="button" id="deleteBtn" class="btn btn-confirm-destruction shadow-sm" onclick="executeFolderDeletion(this)">
+                                <button type="button" id="deleteBtn" class="btn btn-confirm-destruction shadow-sm">
                                     Confirm Destruction
                                 </button>
                                 <button class="btn btn-link btn-cancel-link" data-bs-dismiss="modal">
@@ -251,21 +268,31 @@
         </div>
 
         <div class="modal fade" id="decisionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-            <div class="modal-dialog modal-dialog-centered modal-sm">
-                <div class="modal-content modal-premium border-0 shadow-lg">
-                    <div class="modal-body p-4 text-center">
-                        <div class="mb-3">
-                            <i class="fas fa-check-circle text-success fa-3x animate__animated animate__bounceIn"></i>
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;"> 
+                <div class="modal-content modal-premium border-0 shadow-2xl" style="border-radius: 24px;">
+                    <div class="modal-body p-5 text-center">
+                        <button type="button" class="btn-close position-absolute end-0 top-0 m-4 shadow-none opacity-50" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                        <div class="icon-box-success mb-4 mx-auto">
+                            <i class="fas fa-check fa-2x"></i>
                         </div>
-                        <h5 class="fw-bold mb-1">Process Complete</h5>
-                        <p class="text-muted small mb-4">The directory has been updated. Where to next?</p>
+
+                        <h3 class="fw-bold text-dark mb-2" style="letter-spacing: -0.5px;">Process Complete</h3>
+                        <p class="text-secondary mb-4 mx-auto" style="font-size: 0.95rem; line-height: 1.6;">
+                            The directory has been updated. <br>Where would you like to go next?
+                        </p>
+
+                        <div class="success-pill mb-4">
+                            <span class="success-pill-dot"></span>
+                            <span class="success-pill-text">Update Successful</span>
+                        </div>
 
                         <div class="d-grid gap-2">
-                            <a href="dashboardServlet?processType=projectInfo" class="btn btn-primary fw-bold py-2" style="border-radius: 10px;">
-                                <i class="fas fa-chart-line me-2"></i>View Dashboard
+                            <a href="dashboardServlet?processType=projectInfo" class="btn btn-success-modern py-3 fw-bold">
+                                View Dashboard
                             </a>
 
-                            <button type="button" class="btn btn-outline-secondary btn-sm border-0" onclick="location.reload()" style="font-size: 0.8rem;">
+                            <button type="button" class="btn btn-link text-decoration-none text-muted fw-bold py-2 mt-1" onclick="location.reload()" style="font-size: 0.9rem;">
                                 Stay in Archive
                             </button>
                         </div>
@@ -276,11 +303,10 @@
 
 
 
-
         <script>
             let currentId = null;
             let currentMode = '';
-            const actionModal = new bootstrap.Modal('#actionModal');
+            //const actionModal = new bootstrap.Modal('#actionModal');
 
             // Search Filter
             $('#vaultSearch').on('keyup', function () {
@@ -291,22 +317,20 @@
             });
 
 
-
-
-
             document.addEventListener('DOMContentLoaded', function () {
 
-                // 1. THE ACTION ENGINE
-                function executeAction(btn, projectId, type, method, initialId, successId, redirect) {
+                // Dedicated Execute Action for Delete project 
+                function executeFolderDeletion(btn, projectId, method, initialId, successId, redirect) {
                     const originalContent = btn.innerHTML;
+
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
                     btn.disabled = true;
 
                     $.ajax({
                         url: 'projectPageServlet',
-                        type: method, // Switches between GET and POST
+                        type: 'GET',
                         data: {
-                            processType: type,
+                            processType: method,
                             projectId: projectId
                         },
                         dataType: 'json',
@@ -325,6 +349,13 @@
                         },
                         error: function () {
                             alert("Network Error: Could not reach server.");
+                            alert(
+                                    "Network Error: Could not reach server.\n" +
+                                    "Status: " + status + "\n" +
+                                    "Error: " + error + "\n" +
+                                    "Request Data: " + JSON.stringify(requestData) + "\n" +
+                                    "Response Text: " + xhr.responseText
+                                    );
                             btn.innerHTML = originalContent;
                             btn.disabled = false;
                         }
@@ -341,7 +372,7 @@
                     const projectName = triggerBtn.getAttribute('data-project-name');
                     const projectStatus = triggerBtn.getAttribute('data-project-status');
 
-                    const modalId = event.target.id;
+                    const modalId = event.target.getAttribute('id');
 
                     // Handle Delete Modal (GET)
                     if (modalId === 'deleteFolderModal') {
@@ -350,72 +381,60 @@
                         document.getElementById('successBody').classList.add('d-none');
 
                         document.getElementById('deleteBtn').onclick = function () {
-                            executeAction(this, projectId, 'deleteFolder', 'GET', 'initialBody', 'successBody', 'dashboardServlet?processType=achivedProject');
+                            executeFolderDeletion(this, projectId, 'deleteFolder', 'initialBody', 'successBody', 'dashboardServlet?processType=projectInfo');
                         };
                     }
-
-//                    // Handle Restore Modal (POST)
-//                    if (modalId === 'restoreFolderModal') {
-//                        document.getElementById('displayRestoreName').textContent = projectName;
-//                        document.getElementById('restoreInitialBody').classList.remove('d-none');
-//                        document.getElementById('restoreSuccessBody').classList.add('d-none');
-//
-//                        document.getElementById('confirmRestoreBtn').onclick = function () {
-//                            executeAction(this, projectId, 'restoreProject', 'POST', 'restoreInitialBody', 'restoreSuccessBody', 'dashboardServlet?processType=projectInfo');
-//                        };
-//                    }
 
 
                     if (modalId === 'restoreFolderModal') {
                         // 1. Extract multiple details from the button
                         const projectId = triggerBtn.getAttribute('data-project-id');
                         const projectName = triggerBtn.getAttribute('data-project-name');
-                        const userId = triggerBtn.getAttribute('data-user-id'); // Assuming you added this to the button
-                        const projectTag = triggerBtn.getAttribute('data-tag');     // Assuming you added this to the button
+//                        const userId = triggerBtn.getAttribute('data-user-id'); // Assuming you added this to the button
+//                        const projectTag = triggerBtn.getAttribute('data-tag');     // Assuming you added this to the button
 
                         document.getElementById('displayRestoreName').textContent = projectName;
                         document.getElementById('restoreInitialBody').classList.remove('d-none');
                         document.getElementById('restoreSuccessBody').classList.add('d-none');
 
                         document.getElementById('confirmRestoreBtn').onclick = function () {
-                            // 2. Wrap extra details in an object
-                            const extraData = {
-                                userId: userId,
-                                tag: projectTag
-                            };
 
                             // 3. Pass the object to the engine
-                            executeAction(this, projectId, extraData, 'restoreProject', 'POST', 'restoreInitialBody', 'restoreSuccessBody', 'dashboardServlet?processType=projectInfo');
+                            executeRestoreFolder(this, projectId, 'updateStatus', 'restoreInitialBody', 'restoreSuccessBody', 'projectPageServlet?processType=updateStatus');
                         };
                     }
                 });
 
-                // Add more parameters like 'extraData' to the function signature
-                function executeAction(btn, projectId, extraData, type, method, initialId, successId, redirect) {
+                // Funtion for restore project
+                function executeRestoreFolder(btn, projectId, method, initialId, successId, redirect) {
                     const originalContent = btn.innerHTML;
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
                     btn.disabled = true;
 
                     $.ajax({
                         url: 'projectPageServlet',
-                        type: method,
+                        type: 'POST',
                         data: {
-                            processType: updateStatus,
+                            processType: "updateStatus",
                             projectId: projectId,
-                            ProjStatus: Active,
-                            // Add as many extra keys as you want here
-                            userId: extraData.userId,
-                            projectTag: extraData.tag
                         },
                         dataType: 'json',
                         success: function (response) {
                             // 1. JS reads the 'success' boolean from your Servlet's JSON
                             if (response.success === true) {
 
-                                // 1. Find the current open modal (Delete or Restore) and hide it
+                                // 1. Find the current open modal
                                 const currentModalEl = document.querySelector('.modal.show');
+
                                 if (currentModalEl) {
-                                    const currentModal = bootstrap.Modal.getInstance(currentModalEl);
+                                    // Attempt to get the existing instance
+                                    let currentModal = bootstrap.Modal.getInstance(currentModalEl);
+
+                                    // FIX: If instance is null, initialize it manually before hiding
+                                    if (!currentModal) {
+                                        currentModal = new bootstrap.Modal(currentModalEl);
+                                    }
+
                                     currentModal.hide();
                                 }
 
@@ -442,14 +461,6 @@
                     });
                 }
 
-                // --- Keep your Search Filter and Dropdown Aesthetics ---
-                $('#vaultSearch').on('keyup', function () {
-                    let val = $(this).val().toLowerCase();
-                    $('.vault-row').each(function () {
-                        $(this).toggle($(this).attr('data-search').indexOf(val) > -1);
-                    });
-                });
-
                 document.querySelectorAll('.dropdown').forEach(dropdown => {
                     dropdown.addEventListener('show.bs.dropdown', function () {
                         const menu = this.querySelector('.dropdown-menu');
@@ -462,140 +473,6 @@
             function toggleDescription(element) {
                 element.classList.toggle('expanded');
             }
-
-
-
-
-
-
-
-//            const deleteModal = document.getElementById('deleteFolderModal');
-//
-//            deleteModal.addEventListener('show.bs.modal', function (event) {
-//                // 1. The button that was clicked
-//                const triggerButton = event.relatedTarget;
-//
-//                // 2. Extract the data from the data- attributes
-//                const projectId = triggerButton.getAttribute('data-project-id');
-//                const projectName = triggerButton.getAttribute('data-project-name');
-//
-//                // 3. Update the modal text so the user knows WHICH folder they are deleting
-//                const modalNameSpan = deleteModal.querySelector('#initialBody strong');
-//                if (modalNameSpan)
-//                    modalNameSpan.textContent = projectName;
-//
-//                // 4. Update the "Yes, Delete" button to send the correct ID
-//                const confirmBtn = document.getElementById('deleteBtn');
-//                confirmBtn.onclick = function () {
-//                    executeFolderDeletion(this, projectId); // Pass the ID here
-//                };
-//            });
-//
-//
-//
-//            window.executeFolderDeletion = function (btn, projectId) { // Receive the ID here
-//                // Loading State
-//                const originalContent = btn.innerHTML;
-//                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-//                btn.disabled = true;
-//
-//                $.ajax({
-//                    url: 'projectPageServlet',
-//                    type: 'GET',
-//                    data: {
-//                        processType: 'deleteFolder',
-//                        projectId: projectId // Use the ID we passed in
-//                    },
-//                    dataType: 'json',
-//                    success: function (response) {
-//                        if (response.success) {
-//                            document.getElementById('initialBody').classList.add('d-none');
-//                            document.getElementById('successBody').classList.remove('d-none');
-//                            setTimeout(() => {
-//                                window.location.href = "dashboardServlet?processType=achivedProject";
-//                            }, 2000);
-//                        } else {
-//                            alert("DELETION FAILED: " + response.message);
-//                            btn.innerHTML = originalContent;
-//                            btn.disabled = false;
-//                        }
-//                    },
-//                    error: function () {
-//                        alert("Network Error: Could not reach server.");
-//                        btn.innerHTML = originalContent;
-//                        btn.disabled = false;
-//                    }
-//                });
-//            };
-
-
-
-//            function setupModal(title, text, btnClass, btnText, iconClass) {
-//                $('#actionTitle').text(title);
-//                $('#actionText').html(text);
-//                $('#confirmBtn').attr('class', `btn btn-sm btn-${btnClass} px-4 fw-bold`).text(btnText);
-//                $('#actionIcon').html(`<i class="${iconClass}"></i>`);
-//                $('#confirmBody').removeClass('d-none');
-//                $('#successBody').addClass('d-none');
-//                $('#confirmBtn').prop('disabled', false);
-//            }
-//
-//            $('#confirmBtn').click(function () {
-//                const $btn = $(this);
-//                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
-//                const processType = (currentMode === 'RESTORE') ? 'restoreProject' : 'deleteFolder';
-//                const redirectUrl = (currentMode === 'RESTORE') ? 'dashboardServlet' : 'archiveVaultServlet';
-//
-//                $.ajax({
-//                    url: 'projectPageServlet',
-//                    type: 'GET',
-//                    data: {processType: processType, projectId: currentId},
-//                    dataType: 'json',
-//                    success: function (res) {
-//                        if (res.success) {
-//                            $('#confirmBody').addClass('d-none');
-//                            $('#successTitle').text(currentMode === 'RESTORE' ? 'Project Restored' : 'Project Deleted');
-//                            $('#successText').text(currentMode === 'RESTORE' ? 'Redirecting to Dashboard...' : 'Updating Vault list...');
-//                            $('#successBody').removeClass('d-none');
-//                            setTimeout(() => window.location.href = redirectUrl, 1800);
-//                        }
-//                    }
-//                });
-//            });
-//
-//            // Dropdown Aesthetics JS
-//            document.querySelectorAll('.dropdown').forEach(dropdown => {
-//                dropdown.addEventListener('hide.bs.dropdown', function () {
-//                    const menu = this.querySelector('.dropdown-menu');
-//                    menu.style.opacity = '0';
-//                    menu.style.transform = 'translateY(10px)';
-//                });
-//                dropdown.addEventListener('show.bs.dropdown', function () {
-//                    const menu = this.querySelector('.dropdown-menu');
-//                    menu.style.opacity = '1';
-//                    menu.style.transform = 'translateY(0)';
-//                });
-//            });
-//
-//
-//
-//            function toggleDescription(element) {
-//                // Check if the element is already expanded
-//                const isExpanded = element.classList.contains('expanded');
-//
-//                // Optional: Collapse all other expanded snippets first for a clean look
-//                document.querySelectorAll('.description-snippet.expanded').forEach(el => {
-//                    if (el !== element)
-//                        el.classList.remove('expanded');
-//                });
-//
-//                // Toggle the current one
-//                if (isExpanded) {
-//                    element.classList.remove('expanded');
-//                } else {
-//                    element.classList.add('expanded');
-//                }
-//            }
 
         </script>
     </body>

@@ -70,6 +70,8 @@ public class projectPageServlet extends HttpServlet {
 
         ProjectDAO projectDao = new ProjectDAO();
 
+        System.out.println("Deleting project with ID: " + projectId);
+
         //DELETE PROJECT FOLDER
         if ("deleteFolder".equalsIgnoreCase(request.getParameter("processType"))) {
             response.setContentType("application/json");
@@ -171,28 +173,57 @@ public class projectPageServlet extends HttpServlet {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
-            PrintWriter out = response.getWriter();
-            String feedbackMessage = "";
+            String message = "";
 
             try {
-                status = projectDao.updateProjectStatus(projectId, projectStatus);
+                status = projectDao.updateProjectStatus(projectId);
 
-                feedbackMessage = "True";
+                message = status ? "Project restored successfully!" : "Restore failed.";
 
             } catch (Exception e) {
                 status = false;
-                feedbackMessage = "Error: " + e.getMessage();
+                message = "Error: " + e.getMessage();
             }
 
             // 2. Create the JSON string
             // Format: {"success": true, "message": "..."}
-            String jsonResponse = String.format("{\"success\": %b, \"message\": \"%s\"}",
-                    status, feedbackMessage);
+            String jsonResponse = String.format("{\"success\": %b, \"message\": \"%s\"}", status, message);
 
+            PrintWriter out = response.getWriter();
             // 3. Send it back to the JS AJAX call
             out.print(jsonResponse);
             out.flush();
+            return;
         }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String ProIdParam = request.getParameter("projectId");
+        int projectId = (ProIdParam != null && !ProIdParam.isEmpty()) ? Integer.parseInt(ProIdParam) : -1;
+
+        ProjectDAO projectDao = new ProjectDAO();
+        boolean status;
+        String jsonResponse;
+
+        try {
+            status = projectDao.deleteProject(projectId);
+            if (status) {
+                jsonResponse = "{\"success\": true, \"message\": \"Project deleted successfully.\"}";
+            } else {
+                jsonResponse = "{\"success\": false, \"message\": \"Database error: Project record could not be removed.\"}";
+            }
+        } catch (Exception e) {
+            jsonResponse = "{\"success\": false, \"message\": \"Server Error: " + e.getMessage() + "\"}";
+        }
+
+        response.getWriter().write(jsonResponse);
+        response.getWriter().flush();
     }
 
     /**
