@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import beans.Project;
+import beans.User;
 import DAO.ProjectDAO;
+import DAO.projectTeamDAO;
 import java.time.LocalDate;
 import java.util.List;
 import javax.servlet.http.HttpSession;
@@ -61,7 +63,8 @@ public class projectPageServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String ProIdParam;
-        int projectId;
+        int projectId, userId;
+        List<User> projectTeamAssignment;
         boolean status;
         Project project;
 
@@ -69,8 +72,6 @@ public class projectPageServlet extends HttpServlet {
         projectId = (ProIdParam != null && !ProIdParam.isEmpty()) ? Integer.parseInt(ProIdParam) : -1;
 
         ProjectDAO projectDao = new ProjectDAO();
-
-        System.out.println("Deleting project with ID: " + projectId);
 
         //DELETE PROJECT FOLDER
         if ("deleteFolder".equalsIgnoreCase(request.getParameter("processType"))) {
@@ -93,12 +94,22 @@ public class projectPageServlet extends HttpServlet {
             return;
         }
 
-        // Retrieve project details
-        project = projectDao.ProjectInfoById(projectId);
-
         HttpSession session = request.getSession();
+
+        // Retrieve all project details save in session as caching
+        project = projectDao.ProjectInfoById(projectId);
         session.setAttribute("project", project);
 
+        userId = (int) session.getAttribute("userId");
+
+        projectTeamDAO projectTeamDao = new projectTeamDAO();
+        projectTeamAssignment = projectTeamDao.getAssignedMembers(projectId);
+
+        for (User member : projectTeamAssignment) {
+            System.out.println("User: " + member.getUsername() + " | Email: " + member.getEmail() + " | Role: " + member.getUser_role());
+        }
+
+        session.setAttribute("projectTeamAssignmentData", projectTeamAssignment);
         request.getRequestDispatcher("projectPage.jsp").forward(request, response);
 
     }
@@ -117,7 +128,7 @@ public class projectPageServlet extends HttpServlet {
 
         int projectId, user_id;
         String processType;
-        List<Project> profileInfo;
+        List<Project> projectInfo;
         boolean status;
         String projectName, projectDesc, projectStatus, startStr, endStr;
         LocalDate projStartDate, projEndDate;
@@ -150,8 +161,8 @@ public class projectPageServlet extends HttpServlet {
 
                     if (projectStatus.equalsIgnoreCase("Archive")) {
                         user_id = (int) session.getAttribute("userId");
-                        profileInfo = projectDao.projectInfo(user_id);
-                        session.setAttribute("profileInfo", profileInfo);
+                        projectInfo = projectDao.projectInfo(user_id);
+                        session.setAttribute("projectInfo", projectInfo);
                     }
 
                     session.setAttribute("project", project);
@@ -197,35 +208,34 @@ public class projectPageServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        String ProIdParam = request.getParameter("projectId");
-        int projectId = (ProIdParam != null && !ProIdParam.isEmpty()) ? Integer.parseInt(ProIdParam) : -1;
-
-        ProjectDAO projectDao = new ProjectDAO();
-        boolean status;
-        String jsonResponse;
-
-        try {
-            status = projectDao.deleteProject(projectId);
-            if (status) {
-                jsonResponse = "{\"success\": true, \"message\": \"Project deleted successfully.\"}";
-            } else {
-                jsonResponse = "{\"success\": false, \"message\": \"Database error: Project record could not be removed.\"}";
-            }
-        } catch (Exception e) {
-            jsonResponse = "{\"success\": false, \"message\": \"Server Error: " + e.getMessage() + "\"}";
-        }
-
-        response.getWriter().write(jsonResponse);
-        response.getWriter().flush();
-    }
-
+//    @Override
+//    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//
+//        response.setContentType("application/json");
+//        response.setCharacterEncoding("UTF-8");
+//
+//        String ProIdParam = request.getParameter("projectId");
+//        int projectId = (ProIdParam != null && !ProIdParam.isEmpty()) ? Integer.parseInt(ProIdParam) : -1;
+//
+//        ProjectDAO projectDao = new ProjectDAO();
+//        boolean status;
+//        String jsonResponse;
+//
+//        try {
+//            status = projectDao.deleteProject(projectId);
+//            if (status) {
+//                jsonResponse = "{\"success\": true, \"message\": \"Project deleted successfully.\"}";
+//            } else {
+//                jsonResponse = "{\"success\": false, \"message\": \"Database error: Project record could not be removed.\"}";
+//            }
+//        } catch (Exception e) {
+//            jsonResponse = "{\"success\": false, \"message\": \"Server Error: " + e.getMessage() + "\"}";
+//        }
+//
+//        response.getWriter().write(jsonResponse);
+//        response.getWriter().flush();
+//    }
     /**
      * Returns a short description of the servlet.
      *

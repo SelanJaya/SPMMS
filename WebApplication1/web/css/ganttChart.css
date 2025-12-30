@@ -13,13 +13,17 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     --sidebar-bg: #0f172a;
     --primary-blue: #2563eb;
     --body-bg: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
 }
 
+/* --- BASE STYLES --- */
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--body-bg);
     margin: 0;
-    overflow: hidden;
+    overflow: hidden; /* Keeps sidebar/top-nav fixed while content scrolls */
 }
 
 #wrapper {
@@ -43,12 +47,8 @@ body {
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    /* ... existing styles ... */
     user-select: none;
-    /* Prevents text from being highlighted on double-tap */
     -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
 }
 
 #sidebar.collapsed {
@@ -81,7 +81,7 @@ body {
 }
 
 #sidebar .nav-link i {
-    min-width: 14px;
+    min-width: 20px;
 }
 
 #sidebar .nav-link:hover,
@@ -98,28 +98,40 @@ body {
 #content-wrapper {
     margin-left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
-#sidebar.collapsed+#content-wrapper {
+#sidebar.collapsed + #content-wrapper {
     margin-left: var(--sidebar-collapsed-width);
     width: calc(100% - var(--sidebar-collapsed-width));
 }
 
-/* Top nav */
+/* --- TOP NAVIGATION (Header) --- */
 .top-nav {
-    height: 60px;
+    min-height: 80px;
     background: white;
-    border-bottom: 1px solid #e2e8f0;
-    padding: 0 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    display: block; /* Allows breadcrumbs to sit above titles */
 }
 
+.project-header-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.project-header-mini h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* --- USER INFO & BADGES --- */
 .user-info {
     display: flex;
     align-items: center;
@@ -134,24 +146,119 @@ body {
 .user-name {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-main);
 }
 
 .user-role {
     font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.status-badge {
+    background-color: #dcfce7;
+    color: #15803d;
+    font-weight: 600;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.75rem;
+    border-radius: 50px;
+    text-transform: uppercase;
+    margin-left: 12px;
+}
+
+/* --- GANTT CHART CONTAINER --- */
+#gantt_container {
+    flex-grow: 1;
+    margin: 1.5rem; /* Creates the "Card" effect */
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+    height: calc(100vh - 180px); /* Keeps chart within viewport */
+}
+
+/* --- BUTTONS --- */
+.btn-export {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.btn-export:hover {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+/* --- SCROLLBARS --- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* --- HEADER CONSISTENCY FIXES --- */
+.header-title {
+    font-size: 1.75rem; /* Matches Project Console title size */
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.025em;
+}
+
+/* Rounded Pill Badge to match Timeline Active status */
+.status-badge-pill {
+    background-color: #dcfce7;
+    color: #15803d;
+    font-weight: 700;
+    font-size: 0.65rem;
+    padding: 0.25rem 0.8rem;
+    border-radius: 50px;
+    letter-spacing: 0.05em;
+}
+
+/* Button style matching "Edit Details" button padding */
+.btn-export-consistent {
+    background-color: transparent;
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-export-consistent:hover {
+    background-color: #2563eb;
+    color: white;
+}
+
+/* User Info Styling */
+.user-name-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+.user-role-label {
+    font-size: 0.75rem;
     color: #64748b;
 }
 
-#gantt_container {
-    flex-grow: 1;
-    position: relative;
-    background: #fff;
-}
-
-/* Export Button Styling */
-.btn-export {
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 0.4rem 1rem;
-    border-radius: 6px;
+.header-right-group .border-end {
+    border-color: #e2e8f0 !important;
 }

@@ -16,6 +16,10 @@
         <servlet-name>projectPageServlet</servlet-name>
         <servlet-class>servlets.projectPageServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>teamAssignmentServlet</servlet-name>
+        <servlet-class>servlets.teamAssignmentServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>login_signUpServlet</servlet-name>
         <url-pattern>/login_signUpServlet</url-pattern>
@@ -31,6 +35,10 @@
     <servlet-mapping>
         <servlet-name>projectPageServlet</servlet-name>
         <url-pattern>/projectPageServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>teamAssignmentServlet</servlet-name>
+        <url-pattern>/teamAssignmentServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

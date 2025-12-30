@@ -15,8 +15,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <link rel="stylesheet" href="css/common.css"
-              <link rel="dashboard stylesheet" href="css\dashboard.css" />
+
+        <link rel="stylesheet" href="css/common.css" />
+        <link rel="dashboard stylesheet" href="css/dashboard.css" />
     </head>
 
     <body>
@@ -70,112 +71,122 @@
                                        style="border-radius: 0 10px 10px 0; border-color: #e2e8f0; font-size: 0.85rem; height: 38px;">
                             </div>
 
-                            <button class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#createProjectModal"
-                                    style="background-color: #0d6efd; border: none; font-size: 0.85rem; height: 38px;">
-                                <i class="fas fa-plus me-2"></i>New Project
-                            </button>
+                            <c:if test="${userInfo.user_role == 'Project Manager'}">
+                                <button class="btn btn-primary px-4 rounded-pill fw-bold shadow-sm" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#createProjectModal"
+                                        style="background-color: #0d6efd; border: none; font-size: 0.85rem; height: 38px;">
+                                    <i class="fas fa-plus me-2"></i>New Project
+                                </button>
+                            </c:if>
                         </div>
                     </div>
                 </div>
 
-                <c:forEach var="project" items="${profileInfo}">
-                    <div class="row" id="projectContainer">
+                <div class="row px-3" id="projectContainer">
+                    <c:forEach var="project" items="${profileInfo}">
+                        <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+                            <div class="project-folder-card">
+                                <div class="folder-tab"></div>
+
+                                <div class="folder-content p-4">
+                                    <div class="folder-icon">
+                                        <i class="fas fa-folder"></i>
+                                    </div>
+                                    <span class="label-style">Project</span>
+                                    <h6 class="project-name">${project.projectName}</h6>
+
+                                    <a href="projectPageServlet?projectId=${project.projectId}"
+                                       class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold btn-small mt-3">
+                                        Open Project
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="createProjectModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content shadow">
+                    <div class="modal-body p-4">
+                        <h6 class="fw-bold text-dark mb-4 text-center">Initialize Project</h6>
+                        <form action="dashboardServlet" method="post" id="ProjectForm">
+                            <div class="mb-3">
+                                <span class="label-style">Project Name</span>
+                                <input type="text" name="ProjName" id="ProjName" class="form-control" placeholder="Enter title..."
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <span class="label-style">Description</span>
+                                <textarea name="ProjDesc" id="ProjDesc" class="form-control" rows="2" style="resize:none;"
+                                          required></textarea>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <span class="label-style">Start Date</span>
+                                    <input type="date" name="ProjStart" id="ProjStart" class="form-control" required>
+                                </div>
+                                <div class="col-6">
+                                    <span class="label-style">End Date</span>
+                                    <input type="date" name="ProjEnd" id="ProjEnd" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <span class="label-style">Initial Status</span>
+                                <select name="ProjStatus" id="ProjStatus" class="form-select" required>
+                                    <option value="Planned">Planned</option>
+                                    <option value="Active">Pending</option>
+                                    <option value="Planned">In Progress</option>
+                                    <option value="Active">Completed</option>
+                                </select>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary fw-bold py-2 rounded-pill btn-small">Create
+                                    Project</button>
+                                <button type="button" class="btn btn-link text-muted small text-decoration-none"
+                                        data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                $('#newProjectForm').on('submit', function (e) {
+                    e.preventDefault();
+
+                    // Get values from form
+                    const projectName = $('#newProjName').val();
+
+                    // Create a new folder card template
+                    const newCard = `
                         <div class="col-xl-3 col-md-6 mb-4">
                             <div class="project-folder-card p-4">
                                 <div class="folder-icon"><i class="fas fa-folder"></i></div>
                                 <span class="label-style">Folder</span>
-                                <h6 class="fw-bold text-dark mb-3 project-name" style="font-size: 0.9rem;">${project.projectName}</h6>
-                                <a href="projectPageServlet?projectId=${project.projectId}"
-                                   class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold btn-small">Open
-                                </a>
+                                <h6 class="fw-bold text-dark mb-3" style="font-size: 0.9rem;">${projectName}</h6>
+                                <a href="projectPage.html" class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold btn-small">Open Console</a>
                             </div>
                         </div>
-                    </div>
-                </c:forEach >
-            </div>
-        </div>
-    </div>
+                    `;
 
-    <div class="modal fade" id="createProjectModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow">
-                <div class="modal-body p-4">
-                    <h6 class="fw-bold text-dark mb-4 text-center">Initialize Project</h6>
-                    <form action="dashboardServlet" method="post" id="ProjectForm">
-                        <div class="mb-3">
-                            <span class="label-style">Project Name</span>
-                            <input type="text" name="ProjName" id="ProjName" class="form-control" placeholder="Enter title..."
-                                   required>
-                        </div>
-                        <div class="mb-3">
-                            <span class="label-style">Description</span>
-                            <textarea name="ProjDesc" id="ProjDesc" class="form-control" rows="2" style="resize:none;"
-                                      required></textarea>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <span class="label-style">Start Date</span>
-                                <input type="date" name="ProjStart" id="ProjStart" class="form-control" required>
-                            </div>
-                            <div class="col-6">
-                                <span class="label-style">End Date</span>
-                                <input type="date" name="ProjEnd" id="ProjEnd" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <span class="label-style">Initial Status</span>
-                            <select name="ProjStatus" id="ProjStatus" class="form-select" required>
-                                <option value="Planned">Planned</option>
-                                <option value="Active">Pending</option>
-                                <option value="Planned">In Progress</option>
-                                <option value="Active">Completed</option>
-                            </select>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary fw-bold py-2 rounded-pill btn-small">Create
-                                Project</button>
-                            <button type="button" class="btn btn-link text-muted small text-decoration-none"
-                                    data-bs-dismiss="modal">Cancel</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+                    // Append to container
+                    $('#projectContainer').append(newCard);
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            $('#newProjectForm').on('submit', function (e) {
-                e.preventDefault();
-
-                // Get values from form
-                const projectName = $('#newProjName').val();
-
-                // Create a new folder card template
-                const newCard = `
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="project-folder-card p-4">
-                            <div class="folder-icon"><i class="fas fa-folder"></i></div>
-                            <span class="label-style">Folder</span>
-                            <h6 class="fw-bold text-dark mb-3" style="font-size: 0.9rem;">${projectName}</h6>
-                            <a href="projectPage.html" class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold btn-small">Open Console</a>
-                        </div>
-                    </div>
-                `;
-
-                // Append to container
-                $('#projectContainer').append(newCard);
-
-                // Close modal and reset form
-                $('#createProjectModal').modal('hide');
-                this.reset();
+                    // Close modal and reset form
+                    $('#createProjectModal').modal('hide');
+                    this.reset();
+                });
             });
-        });
-    </script>
-</body>
+        </script>
+    </body>
 
 </html>

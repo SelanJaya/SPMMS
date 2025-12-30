@@ -19,8 +19,6 @@ import java.util.List;
 
 public class UserDAO {
 
-    private Connection connection;
-
     public UserDAO() {
     }
 
@@ -29,7 +27,7 @@ public class UserDAO {
 
         String sql = "INSERT INTO users (username, phone_number, email, password_hash, user_role) VALUES (?, ?, ?, ?, ?)";
 
-        try ( Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPhone_number());
             ps.setString(3, user.getEmail());
@@ -128,21 +126,20 @@ public class UserDAO {
 
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getPhone_number());
-            preparedStatement.setString(3, user.getEmail()); 
+            preparedStatement.setString(3, user.getEmail());
             preparedStatement.setString(4, user.getUser_role());
             preparedStatement.setInt(5, user.getUser_id());
 
             // executeUpdate returns the number of rows affected
             rowUpdated = preparedStatement.executeUpdate() > 0;
 
-            
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return rowUpdated;
     }
-    
+
     public boolean deleteProfile(int user_Id) {
         boolean rowUpdated = false;
         // We don't update created_at because that should stay the same forever
@@ -153,12 +150,65 @@ public class UserDAO {
             preparedStatement.setInt(1, user_Id);
 
             // executeUpdate returns the number of rows affected
-            rowUpdated = preparedStatement.executeUpdate() > 0;    
+            rowUpdated = preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return rowUpdated;
+    }
+
+    public List<User> getUsersByRole(String role) {
+        List<User> userList = new ArrayList<>();
+        // Use a placeholder '?' for the role parameter
+        String sql = "SELECT user_id, username, email FROM users WHERE user_role = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // Set the role parameter before executing
+            ps.setString(1, role);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    // Matching your schema columns: user_id, username, email
+                    user.setUser_id(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+
+                    userList.add(user);
+                }
+            }
+
+            System.out.println("DAO Log: " + userList.size() + " users found for role: " + role);
+
+        } catch (SQLException e) {
+            System.err.println("SQL Error in getUsersByRole: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return userList;
+    }
+
+    public String getUserRoleById(int userId) {
+        String role = null;
+        // Note: Table name in your schema is 'user' (singular)
+        String sql = "SELECT user_role FROM users WHERE user_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    role = rs.getString("user_role");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching user role: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return role;
     }
 
 }

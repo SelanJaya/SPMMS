@@ -7,32 +7,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     Author     : HP
 */
 
-/* --- HEADER (Smaller/Professional) --- */
-.project-header-mini {
-    margin-bottom: 1.5rem;
-}
-
-.project-header-mini h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin: 0;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.status-badge {
-    background-color: #dcfce7;
-    color: #15803d;
-    font-weight: 600;
-    font-size: 0.7rem;
-    padding: 0.2rem 0.75rem;
-    border-radius: 50px;
-    text-transform: uppercase;
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 10px;
-}
 
 /* --- FORMS & CARDS --- */
 .card {

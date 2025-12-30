@@ -6,7 +6,7 @@ package beans;
  */
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter ;
-import javax.swing.text.PasswordView;
+
 
 /**
  *
@@ -14,9 +14,9 @@ import javax.swing.text.PasswordView;
  */
 public class User {
 
-    int user_id;
-    String username, email, password, user_role, phone_number;
-    LocalDateTime created_at;
+    private int user_id;
+    private String username, email, password, user_role, phone_number;
+    private transient LocalDateTime created_at;
 
     public User() {
     }
@@ -26,6 +26,14 @@ public class User {
         this.email = email;
         this.password = password;
     }
+    
+    //To session and interface control
+    public User(int user_id, String user_role) {
+        this.user_id = user_id;
+        this.user_role = user_role;
+    }
+    
+    
 
     //constructor for sign up and update
     public User(String username, String email, String phone_number, String password, String user_role) {

@@ -52,12 +52,14 @@
                     <div class="small text-muted">Analytics / <span class="fw-semibold text-dark">Performance Reports</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="text-right hidden sm:block">
-                            <div class="user-name">Douglas McGee</div>
-                            <div class="user-role">Administrator</div>
+                        <div class="user-info">
+                            <div class="user-details d-none d-sm-block">
+                                <span class="user-name">${user.username}</span>
+                                <span class="user-role">${user.user_role}</span>
+                            </div>
+                            <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
+                                 class="rounded-circle border" width="34">
                         </div>
-                        <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
-                             class="rounded-circle border" width="34">
                     </div>
                 </nav>
 

@@ -9,6 +9,7 @@ import beans.Project;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,37 +70,95 @@ public class ProjectDAO {
         return projectArr;
     }
 
-    public boolean createProject(Project project) {
+    public List<Project> getProjectsByNonPMUserId(int userId) {
+        List<Project> projects = new ArrayList<>();
+        String query = "SELECT p.project_id, p.project_name FROM projects p "
+                + "JOIN project_team pt ON p.project_id = pt.project_id "
+                + "WHERE pt.assign_to = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Project proj = new Project();
+                proj.setProjectId(rs.getInt("project_id"));
+                proj.setProjectName(rs.getString("project_name"));
+                projects.add(proj);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return projects;
+    }
+
+//    public boolean createProject(Project project) {
+//        String sql = "INSERT INTO projects (project_name, project_desc, project_status, "
+//                + "proj_start_date, proj_end_date, proj_created_by) "
+//                + "VALUES (?, ?, ?, ?, ?, ?)";
+//
+//        try (Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+//
+//            ps.setString(1, project.getProjectName());
+//            ps.setString(2, project.getProjectDesc());
+//            // Default new projects to 'Active' or 'Pending'
+//            ps.setString(3, project.getProjectStatus());
+//
+//            // Convert LocalDate to SQL Date
+//            ps.setObject(4, project.getProjStartDate());
+//            ps.setObject(5, project.getProjEndDate());
+//            ps.setInt(6, project.getProjCreatedBy());
+//
+//            int rowsAffected = ps.executeUpdate();
+//            return rowsAffected > 0;
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
+    public int createProject(Project project) {
+        // Correct table name from your schema is 'project' (singular)
         String sql = "INSERT INTO projects (project_name, project_desc, project_status, "
                 + "proj_start_date, proj_end_date, proj_created_by) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+        // Initialize with -1 to indicate failure
+        int generatedId = -1;
 
-            ps.setString(1, project.getProjectName());
-            ps.setString(2, project.getProjectDesc());
-            // Default new projects to 'Active' or 'Pending'
-            ps.setString(3, project.getProjectStatus());
+        // Pass RETURN_GENERATED_KEYS flag to the connection
+        try (Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            // Convert LocalDate to SQL Date
-            ps.setObject(4, project.getProjStartDate());
-            ps.setObject(5, project.getProjEndDate());
-            ps.setInt(6, project.getProjCreatedBy());
+            ps.setString(1, project.getProjectName()); //
+            ps.setString(2, project.getProjectDesc()); //
+            ps.setString(3, project.getProjectStatus()); //
+            ps.setObject(4, project.getProjStartDate()); //
+            ps.setObject(5, project.getProjEndDate()); //
+            ps.setInt(6, project.getProjCreatedBy()); //
 
             int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
 
+            if (rowsAffected > 0) {
+                // Retrieve the generated key
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        generatedId = rs.getInt(1);
+                    }
+                }
+            }
         } catch (SQLException e) {
+            System.err.println("Error creating project: " + e.getMessage());
             e.printStackTrace();
-            return false;
         }
+        return generatedId;
     }
 
     public Project ProjectInfoById(int projectId) {
         String sql = "SELECT * FROM projects WHERE project_id = ?";
         Project project = null;
 
-        try (Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, projectId);
             ResultSet rs = ps.executeQuery();
@@ -223,32 +282,5 @@ public class ProjectDAO {
         }
 
         return isUpdated;
-    }
-
-    public List<User> getAllUsers() {
-        List<User> userList = new ArrayList<>();
-        // Querying exactly the columns shown in your schema images
-        String sql = "SELECT username, email FROM user";
-
-        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                User user = new User();
-                // 'username' and 'email' match your database column names
-                user.setUsername(rs.getString("username"));
-                user.setEmail(rs.getString("email"));
-
-                userList.add(user);
-            }
-
-            // Console log for your debugging
-            System.out.println("DAO Log: " + userList.size() + " users retrieved.");
-
-        } catch (SQLException e) {
-            System.err.println("SQL Error in getAllUsers: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return userList;
     }
 }

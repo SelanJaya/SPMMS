@@ -26,7 +26,6 @@
     </head>
 
     <body>
-
         <div id="wrapper">
             <nav id="sidebar" title="Double-click to toggle">
                 <div class="sidebar-brand">
@@ -50,9 +49,9 @@
                         <i class="fas fa-users-gear me-3"></i><span>Team</span>
                     </a>
                     <a href="projectAnalytics.jsp" class="nav-link">
-                        <i class="fas fa-file-contract me-3"></i>
-                        <span>Reports</span>
+                        <i class="fas fa-file-contract me-3"></i><span>Reports</span>
                     </a>
+
                     <div class="mt-auto">
                         <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
                         <a href="login_signUpServlet?processType=logOut" class="nav-link text-danger">
@@ -63,28 +62,44 @@
             </nav>
 
             <div id="content-wrapper">
-                <nav class="top-nav">
-                    <div class="d-flex align-items-center">
-                        <div class="small text-muted me-3">Management / <span class="fw-bold text-dark">Timeline</span>
-                        </div>
-                        <button class="btn btn-outline-primary btn-export" onclick="exportCenteredGantt()">
-                            <i class="fas fa-file-pdf me-2"></i>Export PDF
-                        </button>
-                    </div>
+                <header class="top-nav px-4 pt-3">
+                    <nav aria-label="breadcrumb" class="mb-1">
+                        <ol class="breadcrumb small mb-0">
+                            <li class="breadcrumb-item text-muted">Management</li>
+                            <li class="breadcrumb-item active fw-bold text-dark" aria-current="page">Timeline</li>
+                        </ol>
+                    </nav>
 
-                    <div class="user-info">
-                        <div class="user-details d-none d-sm-block">
-                            <span class="user-name">Douglas McGee</span>
-                            <span class="user-role">Administrator</span>
+                    <div class="d-flex justify-content-between align-items-center pb-3">
+                        <div class="d-flex align-items-center">
+                            <h1 class="header-title me-3 mb-0">Project Timeline</h1>
+                            <span class="status-badge-pill">ACTIVE</span>
                         </div>
-                        <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
-                             class="rounded-circle border" width="34">
-                    </div>
-                </nav>
 
-                <div id="gantt_container">
+                        <div class="header-right-group d-flex align-items-center">
+                            <div class="action-buttons me-4 pe-4 border-end">
+                                <button class="btn btn-export-consistent" onclick="exportCenteredGantt()">
+                                    <i class="fas fa-file-pdf me-2"></i>Export PDF
+                                </button>
+                            </div>
+
+                            <div class="user-profile-section d-flex align-items-center">
+                                <div class="user-info-text d-none d-sm-block text-end me-3">
+                                    <div class="user-name-label">${user.username}</div>
+                                    <div class="user-role-label">${user.user_role}</div>
+                                </div>
+                                <div class="avatar-wrapper">
+                                    <img src="https://ui-avatars.com/api/?name=${user.username}&background=2563eb&color=fff"
+                                         class="rounded-circle border" width="38" alt="Profile">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main id="gantt_container">
                     <div id="gantt_here" style='width:100%; height:100%;'></div>
-                </div>
+                </main>
             </div>
         </div>
 

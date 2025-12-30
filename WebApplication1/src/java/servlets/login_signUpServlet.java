@@ -101,10 +101,15 @@ public class login_signUpServlet extends HttpServlet {
 
             if (statusUserID > 0) {
                 session.setAttribute("userId", statusUserID);
+                
+                role = userDao.getUserRoleById(statusUserID);
+                User userObj= new User(statusUserID, role);               
+                session.setAttribute("userInfo", userObj);
+                
                 // Store the specific Login Time
                 long loginMillis = System.currentTimeMillis();
                 session.setAttribute("loginTime", loginMillis);
-                
+                     
                 response.sendRedirect("dashboardServlet?&processType=projectInfo");
             } else {
                 request.setAttribute("errorMessage", "Invalid Credential");

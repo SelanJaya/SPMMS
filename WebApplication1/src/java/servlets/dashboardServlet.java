@@ -6,8 +6,10 @@ package servlets;
  */
 import DAO.UserDAO;
 import DAO.ProjectDAO;
+import DAO.projectTeamDAO;
 import beans.User;
 import beans.Project;
+import beans.ProjectTeamAssignment;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -72,18 +74,27 @@ public class dashboardServlet extends HttpServlet {
         HttpSession session = request.getSession();
         user_id = (int) session.getAttribute("userId");
 
+        user = (User) session.getAttribute("userInfo");
+
         ProjectDAO projectDao = new ProjectDAO();
         UserDAO userDao = new UserDAO();
 
         if ("projectInfo".equalsIgnoreCase(processType)) {
+
+            if ("Project Manager".equalsIgnoreCase(user.getUser_role())) {
+                // DISPLAY ALL PROJECT FOLDER
+                profileInfo = projectDao.projectInfo(user_id);
+                session.setAttribute("profileInfo", profileInfo);
+            }else{
+                
+                profileInfo = projectDao.getProjectsByNonPMUserId(user.getUser_id());
+                session.setAttribute("profileInfo", profileInfo);
+            }
             
-            // DISPLAY ALL PROJECT FOLDER
+            //GET PROFILE INFO
             user = userDao.profileInformation(user_id);
             session.setAttribute("user", user);
-
-            profileInfo = projectDao.projectInfo(user_id);
-            session.setAttribute("profileInfo", profileInfo);
-
+            
             request.getRequestDispatcher("dashboard.jsp").forward(request, response);
 
         } else if ("achivedProject".equalsIgnoreCase(processType)) {
@@ -110,9 +121,11 @@ public class dashboardServlet extends HttpServlet {
         String ProjName, ProjDesc, ProjStatus;
         int user_id;
         List<Project> profileInfo;
-        boolean status;
+        int created_key;
+        boolean assigned;
         LocalDate ProjStart, ProjEnd;
 
+        //RETRIEVE PROJECT INFO
         HttpSession session = request.getSession();
         user_id = (int) session.getAttribute("userId");
 
@@ -127,12 +140,19 @@ public class dashboardServlet extends HttpServlet {
         Project project = new Project(ProjName, ProjDesc, ProjStatus, ProjStart, ProjEnd, user_id);
 
         ProjectDAO projectDao = new ProjectDAO();
-        status = projectDao.createProject(project);
 
-        if (status == true) {
-            profileInfo = projectDao.projectInfo(user_id);
-            session.setAttribute("profileInfo", profileInfo);
-            request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+        created_key = projectDao.createProject(project);
+
+        if (created_key > -1) {
+            ProjectTeamAssignment projectTeamAssignmentObj = new ProjectTeamAssignment(created_key, user_id, user_id);
+            projectTeamDAO projectTeamDao = new projectTeamDAO();
+
+            assigned = projectTeamDao.assignTeamMember(projectTeamAssignmentObj);
+            if (assigned) {
+                profileInfo = projectDao.projectInfo(user_id);
+                session.setAttribute("profileInfo", profileInfo);
+                request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+            }
         } else {
             System.out.println("error");
         }
