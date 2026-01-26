@@ -139,6 +139,30 @@ public class UserDAO {
 
         return rowUpdated;
     }
+    
+    public boolean updateProfileWithPassword(User user) {
+        boolean rowUpdated = false;
+        // We don't update created_at because that should stay the same forever
+        String sql = "UPDATE users SET username = ?, phone_number = ?, email = ?, user_role = ? , password_hash = ? WHERE user_id = ?";
+
+        try (Connection connection = DBConnection.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, user.getPhone_number());
+            preparedStatement.setString(3, user.getEmail());
+            preparedStatement.setString(4, user.getUser_role());
+            preparedStatement.setString(5, user.getPassword());
+            preparedStatement.setInt(6, user.getUser_id());
+
+            // executeUpdate returns the number of rows affected
+            rowUpdated = preparedStatement.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return rowUpdated;
+    }
 
     public boolean deleteProfile(int user_Id) {
         boolean rowUpdated = false;

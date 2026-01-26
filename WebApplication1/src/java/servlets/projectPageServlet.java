@@ -130,13 +130,13 @@ public class projectPageServlet extends HttpServlet {
         String processType;
         List<Project> projectInfo;
         boolean status;
-        String projectName, projectDesc, projectStatus, startStr, endStr;
+        String projectName, projectDesc, projectStatus,projectType,projClient, startStr, endStr;
         LocalDate projStartDate, projEndDate;
 
         processType = request.getParameter("processType");
 
         projectId = Integer.parseInt(request.getParameter("projectId")); //Shared Parameter
-        projectStatus = request.getParameter("projectStatus"); //Shared Parameter
+//        projectStatus = request.getParameter("projectStatus"); //Shared Parameter
 
         ProjectDAO projectDao = new ProjectDAO();
 
@@ -145,6 +145,9 @@ public class projectPageServlet extends HttpServlet {
             try {
                 projectName = request.getParameter("projectName");
                 projectDesc = request.getParameter("projectDesc");
+                projectType = request.getParameter("projectType");
+                projClient = request.getParameter("projClient");
+                
 
                 // Safety check for dates
                 startStr = request.getParameter("projStartDate");
@@ -152,18 +155,18 @@ public class projectPageServlet extends HttpServlet {
                 projStartDate = (startStr != null && !startStr.isEmpty()) ? LocalDate.parse(startStr) : null;
                 projEndDate = (endStr != null && !endStr.isEmpty()) ? LocalDate.parse(endStr) : null;
 
-                Project project = new Project(projectId, projectName, projectDesc, projectStatus, projStartDate, projEndDate);
+                Project project = new Project(projectId, projectName, projectDesc, "Active", projectType, projClient, projStartDate, projEndDate);
 
                 status = projectDao.updateProject(project);
 
                 if (status == true) {
                     HttpSession session = request.getSession();
 
-                    if (projectStatus.equalsIgnoreCase("Archive")) {
+                 
                         user_id = (int) session.getAttribute("userId");
                         projectInfo = projectDao.projectInfo(user_id);
                         session.setAttribute("projectInfo", projectInfo);
-                    }
+                    
 
                     session.setAttribute("project", project);
                     session.setAttribute("successMsg", "Project updated successfully!");
@@ -178,34 +181,35 @@ public class projectPageServlet extends HttpServlet {
                 e.printStackTrace();
                 response.sendRedirect("error.jsp");
             }
-        } else if ("updateStatus".equalsIgnoreCase(processType)) {
-
-            // 1. Set the response type to JSON
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-
-            String message = "";
-
-            try {
-                status = projectDao.updateProjectStatus(projectId);
-
-                message = status ? "Project restored successfully!" : "Restore failed.";
-
-            } catch (Exception e) {
-                status = false;
-                message = "Error: " + e.getMessage();
-            }
-
-            // 2. Create the JSON string
-            // Format: {"success": true, "message": "..."}
-            String jsonResponse = String.format("{\"success\": %b, \"message\": \"%s\"}", status, message);
-
-            PrintWriter out = response.getWriter();
-            // 3. Send it back to the JS AJAX call
-            out.print(jsonResponse);
-            out.flush();
-            return;
-        }
+        } 
+//         else if ("updateStatus".equalsIgnoreCase(processType)) {
+//
+//            // 1. Set the response type to JSON
+//            response.setContentType("application/json");
+//            response.setCharacterEncoding("UTF-8");
+//
+//            String message = "";
+//
+//            try {
+//                status = projectDao.updateProjectStatus(projectId);
+//
+//                message = status ? "Project restored successfully!" : "Restore failed.";
+//
+//            } catch (Exception e) {
+//                status = false;
+//                message = "Error: " + e.getMessage();
+//            }
+//
+//            // 2. Create the JSON string
+//            // Format: {"success": true, "message": "..."}
+//            String jsonResponse = String.format("{\"success\": %b, \"message\": \"%s\"}", status, message);
+//
+//            PrintWriter out = response.getWriter();
+//            // 3. Send it back to the JS AJAX call
+//            out.print(jsonResponse);
+//            out.flush();
+//            return;
+//        }
     }
 
 //    @Override

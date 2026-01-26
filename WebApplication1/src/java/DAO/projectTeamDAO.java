@@ -48,7 +48,7 @@ public class projectTeamDAO {
     }
 
     public boolean assignTeamMember(ProjectTeamAssignment teamAssignment) {
-        String sql = "INSERT INTO project_team (project_id, assign_to, assign_by) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO project_assignments (project_id, proj_assign_to, proj_assign_by) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, teamAssignment.getProject_id()); //
@@ -65,9 +65,9 @@ public class projectTeamDAO {
     public List<User> getAssignedMembers(int projectId) {
         List<User> assignedUsers = new ArrayList<>();
         // SQL targets the columns from your user and team schemas
-        String sql = "SELECT u.user_id, u.username, u.email, u.user_role FROM project_team pt "
-                + "JOIN users u ON pt.assign_to = u.user_id "
-                + "WHERE pt.project_id = ? ";
+        String sql = "SELECT u.user_id, u.username, u.email, u.user_role FROM project_assignments pa "
+                + "JOIN users u ON pa.proj_assign_to = u.user_id "
+                + "WHERE pa.project_id = ? ";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -92,7 +92,7 @@ public class projectTeamDAO {
 
     public boolean removeTeamMember(ProjectTeamAssignment teamAssignment) {
         // SQL targets the primary key 'projectTeamID'
-        String sql = "DELETE FROM project_team WHERE project_id = ? AND assign_by = ? AND assign_to = ?";
+        String sql = "DELETE FROM project_assignments WHERE project_id = ? AND proj_assign_by  = ? AND proj_assign_to  = ?";
         boolean isDeleted = false;
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {

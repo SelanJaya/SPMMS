@@ -1,0 +1,187 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 21 Jan 2026, 2:13:24 am
+    Author     : HP
+*/
+
+:root {
+    --primary-blue: #2563eb;
+    --bg-gray: #f8fafc;
+    --column-bg: #f1f5f9;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-gray);
+}
+
+/* --- PAGE HEADER --- */
+.page-header-mini {
+    margin-bottom: 1.5rem;
+}
+
+.page-header-mini h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* --- VERTICAL SCRUM BOARD STYLES --- */
+.scrum-container {
+    display: flex;
+    flex-direction: column;
+    /* Changed to column for vertical stacking */
+    gap: 2rem;
+    /* Space between different boards */
+    padding-bottom: 2rem;
+    align-items: center;
+    /* Centers the boards */
+}
+
+.scrum-board-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    width: 100%;
+    /* Fill available width */
+    max-width: 1100px;
+    /* Optional: limit max width for better readability */
+    padding: 1.5rem;
+    border-top: 5px solid var(--primary-blue);
+    flex-shrink: 0;
+}
+
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.info-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.05em;
+}
+
+.val-goal {
+    font-size: 0.95rem;
+    color: #334155;
+    margin-bottom: 1rem;
+}
+
+.date-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #475569;
+    font-weight: 600;
+}
+
+.notes-grid {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.note-box {
+    flex: 1;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    height: auto;
+    min-height: 80px;
+}
+
+.note-content {
+    font-size: 0.9rem;
+    color: #1e293b;
+    white-space: pre-wrap;
+}
+
+/* Kanban Layout remains horizontal within the vertical board */
+.board-layout {
+    display: flex;
+    gap: 1rem;
+}
+
+.column {
+    background: var(--column-bg);
+    border-radius: 8px;
+    width: 33.33%;
+    padding: 1rem;
+    height: fit-content;
+    min-height: 150px;
+}
+
+.column h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.task {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: grab;
+    font-size: 0.85rem;
+    border-left: 3px solid transparent;
+    transition: 0.2s;
+}
+
+.task:hover {
+    border-left-color: var(--primary-blue);
+}
+
+.task.dragging {
+    opacity: 0.4;
+    border: 2px dashed var(--primary-blue);
+}
+
+#content-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.hidden-board {
+    display: none !important;
+}
+
+/* Styling for the Modern Modal Inputs */
+#viewTaskModal .form-control,
+#viewTaskModal .form-select {
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #334155;
+}
+
+#viewTaskModal .info-label {
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+}
+
+/* Custom rounded corners for the modal */
+.rounded-4 {
+    border-radius: 1.25rem !important;
+}
+
+/* Ensure light gray backgrounds */
+.bg-light {
+    background-color: #f1f5f9 !important;
+}

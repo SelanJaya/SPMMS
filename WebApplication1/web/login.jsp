@@ -48,8 +48,6 @@
                                 <option value="Project Manager">Project Manager</option>
                                 <option value="Product Owner">Product Owner</option>
                                 <option value="Scrum Master">Scrum Master</option>
-                                <option value="Designer">Designer</option>
-                                <option value="Tester">Tester</option>
                                 <option value="Developer">Developer</option>
                             </select>
                         </div>
@@ -106,7 +104,7 @@
                         <a href="#" class="small text-primary text-decoration-none fw-bold">Forgot Password?</a>
                     </div>
 
-                    <button class="btn-main">Login to Console</button>
+                    <button class="btn-main">Login</button>
                 </form>
             </div>
 

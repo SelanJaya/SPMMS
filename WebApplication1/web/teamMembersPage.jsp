@@ -30,14 +30,21 @@
 
         <div id="wrapper">
             <nav id="sidebar">
-                <div class="sidebar-brand">SPMMS CONSOLE</div>
+                <div class="sidebar-brand text-center">SPMMS </div>
                 <div class="nav flex-column mt-3">
                     <a href="dashboard.jsp" class="nav-link"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
 
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
 
                     <a href="projectPage.jsp" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
-                    <a href="ganttChart.jsp" class="nav-link"><i class="fas fa-stream me-3"></i> Timeline</a>
+
+                    <a href="sprint.jsp" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
+
+
+                    <a href="backlog.jsp" class="nav-link">
+                        <i class="fas fa-list-check me-3"></i><span>Backlog</span>
+                    </a>
+
                     <a href="teamMembersPage.jsp" class="nav-link active"><i class="fas fa-users-gear me-3"></i> Team</a>
                     <a href="projectAnalytics.jsp" .html" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                     <div class="mt-auto">
@@ -85,25 +92,27 @@
                     </div>
                     <div class="row g-3 mb-4">
                         <c:forEach var="user" items="${projectTeamAssignmentData}">
-                            <c:if test="${user.user_role == 'Project Manager'}">
+                            <c:if test="${user1.user_role == 'Project Manager'}">
 
                                 <div class="col-xl-3 col-md-6">
                                     <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user.username}&background=eff6ff&color=2563eb"
+                                        <img src="https://ui-avatars.com/api/?name=${user1.username}&background=eff6ff&color=2563eb"
                                              class="avatar-md me-3" />
 
                                         <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user.username} HAHA </div>
-                                            <div class="text-muted" style="font-size: 11px;">${user.email}</div>
+                                            <div class="fw-bold text-dark small">${user1.username} HAHA </div>
+                                            <div class="text-muted" style="font-size: 11px;">${user1.email}</div>
                                         </div>
 
-                                        <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                data-bs-target="#deleteMemberModal" 
-                                                data-project-id="${project.projectId}"
-                                                data-user-id="${user.user_id}"
-                                                name="Delete" value="Delete"
-                                                > Delete
-                                        </button>
+                                        <c:if test="${user.user_role == 'Project Manager'}">
+                                            <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteMemberModal" 
+                                                    data-project-id="${project.projectId}"
+                                                    data-user-id="${user1.user_id}"
+                                                    name="Delete" value="Delete"
+                                                    > Delete
+                                            </button>
+                                        </c:if>
 
                                     </div>
                                 </div>
@@ -115,28 +124,28 @@
                         <hr>
                     </div>
                     <div class="row g-3 mb-4">
-                        <c:forEach var="user" items="${projectTeamAssignmentData}">
-                            <c:if test="${user.user_role == 'Product Owner'}">
+                        <c:forEach var="user1" items="${projectTeamAssignmentData}">
+                            <c:if test="${user1.user_role == 'Product Owner'}">
 
                                 <div class="col-xl-3 col-md-6">
                                     <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user.username}&background=eff6ff&color=2563eb"
+                                        <img src="https://ui-avatars.com/api/?name=${user1.username}&background=eff6ff&color=2563eb"
                                              class="avatar-md me-3" />
 
                                         <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user.username} </div>
-                                            <div class="text-muted" style="font-size: 11px;">${user.email}</div>
+                                            <div class="fw-bold text-dark small">${user1.username} </div>
+                                            <div class="text-muted" style="font-size: 11px;">${user1.email}</div>
                                         </div>
 
-
-                                        <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                data-bs-target="#deleteMemberModal" 
-                                                data-project-id="${project.projectId}"
-                                                data-user-id="${user.user_id}"
-                                                name="Delete" value="Delete"
-                                                > Delete
-                                        </button>
-
+                                        <c:if test="${user.user_role == 'Project Manager'}">
+                                            <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteMemberModal" 
+                                                    data-project-id="${project.projectId}"
+                                                    data-user-id="${user1.user_id}"
+                                                    name="Delete" value="Delete"
+                                                    > Delete
+                                            </button>
+                                        </c:if>
                                     </div>
                                 </div>
 
@@ -148,28 +157,28 @@
                         <hr>
                     </div>
                     <div class="row g-3 mb-4">
-                        <c:forEach var="user" items="${projectTeamAssignmentData}">
-                            <c:if test="${user.user_role == 'Scrum Master'}">
+                        <c:forEach var="user1" items="${projectTeamAssignmentData}">
+                            <c:if test="${user1.user_role == 'Scrum Master'}">
 
                                 <div class="col-xl-3 col-md-6">
                                     <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user.username}&background=eff6ff&color=2563eb"
+                                        <img src="https://ui-avatars.com/api/?name=${user1.username}&background=eff6ff&color=2563eb"
                                              class="avatar-md me-3" />
 
                                         <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user.username}</div>
-                                            <div class="text-muted" style="font-size: 11px;">${user.email}</div>
+                                            <div class="fw-bold text-dark small">${user1.username}</div>
+                                            <div class="text-muted" style="font-size: 11px;">${user1.email}</div>
                                         </div>
 
-
-                                        <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                data-bs-target="#deleteMemberModal" 
-                                                data-project-id="${project.projectId}"
-                                                data-user-id="${user.user_id}"
-                                                name="Delete" value="Delete"
-                                                > Delete
-                                        </button>
-
+                                        <c:if test="${user.user_role == 'Project Manager'}">
+                                            <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteMemberModal" 
+                                                    data-project-id="${project.projectId}"
+                                                    data-user-id="${user1.user_id}"
+                                                    name="Delete" value="Delete"
+                                                    > Delete
+                                            </button>
+                                        </c:if>
                                     </div>
                                 </div>
 
@@ -181,101 +190,34 @@
                         <hr>
                     </div>
                     <div class="row g-3 mb-4">
-                        <c:forEach var="user" items="${projectTeamAssignmentData}">
-                            <c:if test="${user.user_role == 'Developer'}">
+                        <c:forEach var="user1" items="${projectTeamAssignmentData}">
+                            <c:if test="${user1.user_role == 'Developer'}">
 
                                 <div class="col-xl-3 col-md-6">
                                     <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user.username}&background=eff6ff&color=2563eb"
+                                        <img src="https://ui-avatars.com/api/?name=${user1.username}&background=eff6ff&color=2563eb"
                                              class="avatar-md me-3" />
 
                                         <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user.username}</div>
+                                            <div class="fw-bold text-dark small">${user1.username}</div>
                                             <div class="text-muted" style="font-size: 11px;">${user.email}</div>
                                         </div>
 
-
-                                        <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                data-bs-target="#deleteMemberModal" 
-                                                data-project-id="${project.projectId}"
-                                                data-user-id="${user.user_id}"
-                                                name="Delete" value="Delete"
-                                                > Delete
-                                        </button>
-
+                                        <c:if test="${user.user_role == 'Project Manager'}">
+                                            <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteMemberModal" 
+                                                    data-project-id="${project.projectId}"
+                                                    data-user-id="${user1.user_id}"
+                                                    name="Delete" value="Delete"
+                                                    > Delete
+                                            </button>
+                                        </c:if>
                                     </div>
                                 </div>
 
                             </c:if>
                         </c:forEach>
                     </div> 
-
-                    <div class="role-header">Testers
-                        <hr>
-                    </div>
-                    <div class="row g-3 mb-4">
-                        <c:forEach var="user" items="${projectTeamAssignmentData}">
-                            <c:if test="${user.user_role == 'Tester'}">
-
-                                <div class="col-xl-3 col-md-6">
-                                    <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user.username}&background=eff6ff&color=2563eb"
-                                             class="avatar-md me-3" />
-
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user.username}</div>
-                                            <div class="text-muted" style="font-size: 11px;">${user.email}</div>
-                                        </div>
-
-
-                                        <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                data-bs-target="#deleteMemberModal" 
-                                                data-project-id="${project.projectId}"
-                                                data-user-id="${user.user_id}"
-                                                name="Delete" value="Delete"
-                                                > Delete
-                                        </button>
-
-                                    </div>
-                                </div>
-
-                            </c:if>
-                        </c:forEach>
-                    </div> 
-
-                    <div class="role-header">Designers
-                        <hr>
-                    </div>
-                    <div class="row g-3 mb-4">
-                        <c:forEach var="user" items="${projectTeamAssignmentData}">
-                            <c:if test="${user.user_role == 'Designer'}">
-
-                                <div class="col-xl-3 col-md-6">
-                                    <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user.username}&background=eff6ff&color=2563eb"
-                                             class="avatar-md me-3" />
-
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user.username}</div>
-                                            <div class="text-muted" style="font-size: 11px;">${user.email}</div>
-                                        </div>
-                                        <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                data-bs-target="#deleteMemberModal" 
-                                                data-project-id="${project.projectId}"
-                                                data-user-id="${user.user_id}"
-                                                name="Delete" value="Delete"
-                                                > Delete
-                                        </button>
-
-
-
-                                    </div>
-                                </div>
-
-                            </c:if>
-                        </c:forEach>
-                    </div> 
-
                 </div>
 
                 <div class="modal fade" id="deleteMemberModal" tabindex="-1" aria-hidden="true">
@@ -347,8 +289,6 @@
                                         <option value="" selected disabled>Choose a role...</option>
                                         <option value="Product Owner">Product Owner</option>
                                         <option value="Scrum Master">Scrum Master</option>
-                                        <option value="Designer">Designer</option>
-                                        <option value="Tester">Tester</option>
                                         <option value="Developer">Developer</option>
                                     </select>
 

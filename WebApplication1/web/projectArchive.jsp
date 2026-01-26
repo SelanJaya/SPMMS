@@ -27,7 +27,7 @@
     <body>
 
         <nav id="sidebar">
-            <div class="sidebar-brand">SPMMS CONSOLE</div>
+            <div class="sidebar-brand text-center">SPMMS </div>
             <div class="nav flex-column mt-3">
                 <a href="profileServlet" class="nav-link">
                     <i class="fas fa-user-circle me-3"></i> Profile

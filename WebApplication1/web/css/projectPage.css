@@ -121,3 +121,50 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     color: white;
     border-color: #be123c;
 }
+/* Professional Dropzone for SPMMS - Fixed Sizing & Overflow */
+#dropZone {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 2px dashed #e2e8f0 !important;
+    background-color: #f8fafc !important;
+    border-radius: 12px;
+    cursor: pointer;
+
+    /* FIX: Ensure content stays inside the box */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 15px; /* Fixed padding for consistent height */
+    width: 100%;        /* Fits the parent container width */
+    max-width: 100%;    /* Prevents horizontal overflow */
+    box-sizing: border-box; /* Includes padding in width/height */
+    overflow: hidden;   /* Clips any element that tries to spill out */
+}
+
+/* State when a file is hovered over the zone */
+#dropZone.dragover {
+    background-color: #f0f7ff !important;
+    border-color: #3b82f6 !important;
+    border-style: solid !important;
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+/* Hover state without dragging */
+#dropZone:hover {
+    border-color: #94a3b8 !important;
+    background-color: #ffffff !important;
+}
+
+/* Optional: Icon animation when dragging over */
+#dropZone.dragover img {
+    transform: translateY(-5px);
+    transition: transform 0.2s ease;
+}
+
+/* Ensure the image/icon inside doesn't cause overflow */
+#dropZone img {
+    max-width: 60px; /* Limits icon size */
+    height: auto;
+    display: block;
+}

@@ -86,10 +86,10 @@ public class profileServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
 
-        String processType, username, phone_number, email, user_role, password;
+        String processType, username, phone_number, email, user_role, newPassword, confirmPassword;
         int user_id;
         User user;
-        boolean status;
+        boolean status = false;
 
         processType = request.getParameter("processType");
 
@@ -99,18 +99,25 @@ public class profileServlet extends HttpServlet {
             phone_number = request.getParameter("phone_number");
             email = request.getParameter("email");
             user_role = request.getParameter("user_role");
-            password = request.getParameter("password");
-
-            user = new User(user_id, username, email, phone_number, password, user_role);
-
+            newPassword = request.getParameter("newPassword");
+            
+            user = new User(user_id, username, email, phone_number, newPassword, user_role);
+            
             UserDAO userDao = new UserDAO();
-            status = userDao.updateProfile(user);
+            
+            if(!newPassword.isEmpty()){
+                confirmPassword = request.getParameter("confirmPassword");
+                if (newPassword.equals(confirmPassword)) {
+                   status = userDao.updateProfileWithPassword(user);
+                }
+            }else{
+                status = userDao.updateProfile(user);   
+            }
+            
 
             if (status == true) {
                 session.setAttribute("user", user);
                 request.getRequestDispatcher("profile.jsp").forward(request, response);
-            } else {
-
             }
         } else if (processType.equalsIgnoreCase("deleteProfile")) {
 

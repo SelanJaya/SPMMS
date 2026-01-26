@@ -24,7 +24,7 @@
 
         <div id="wrapper">
             <nav id="sidebar">
-                <div class="sidebar-brand">SPMMS CONSOLE</div>
+                <div class="sidebar-brand text-center">SPMMS </div>
                 <div class="nav flex-column mt-3">
                     <a href="profileServlet" class="nav-link ">
                         <i class="fas fa-user-circle me-3"></i> Profile
@@ -90,14 +90,18 @@
                                 <div class="folder-tab"></div>
 
                                 <div class="folder-content p-4">
-                                    <div class="folder-icon">
+                                    <div class="folder-icon mb-2">
                                         <i class="fas fa-folder"></i>
                                     </div>
+
                                     <span class="label-style">Project</span>
-                                    <h6 class="project-name">${project.projectName}</h6>
+
+                                    <h6 class="project-id">${project.projectId}</h6>
+
+                                    <h6 class="project-title">${project.projectName}</h6>
 
                                     <a href="projectPageServlet?projectId=${project.projectId}"
-                                       class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold btn-small mt-3">
+                                       class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold mt-3">
                                         Open Project
                                     </a>
                                 </div>
@@ -136,13 +140,18 @@
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <span class="label-style">Initial Status</span>
-                                <select name="ProjStatus" id="ProjStatus" class="form-select" required>
-                                    <option value="Planned">Planned</option>
-                                    <option value="Active">Pending</option>
-                                    <option value="Planned">In Progress</option>
-                                    <option value="Active">Completed</option>
+                                <span class="label-style">Project Type</span>
+                                <select name="ProjType" id="ProjType" class="form-select" required>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Academic">Academic</option>
+                                    <option value="Student">Student</option>
+                                    <option value="PTJ">PTJ</option>
                                 </select>
+                            </div>
+                            <div class="mb-3">
+                                <span class="label-style">Project Client</span>
+                                <input type="text" name="ProjClient" id="ProjClient" class="form-control" placeholder="Enter Project Client..."
+                                       required>
                             </div>
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary fw-bold py-2 rounded-pill btn-small">Create

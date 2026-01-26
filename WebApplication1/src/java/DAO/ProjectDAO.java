@@ -73,8 +73,8 @@ public class ProjectDAO {
     public List<Project> getProjectsByNonPMUserId(int userId) {
         List<Project> projects = new ArrayList<>();
         String query = "SELECT p.project_id, p.project_name FROM projects p "
-                + "JOIN project_team pt ON p.project_id = pt.project_id "
-                + "WHERE pt.assign_to = ?";
+                + "JOIN project_assignments pa ON p.project_id = pa.project_id "
+                + "WHERE pa.proj_assign_to = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(query)) {
 
@@ -120,9 +120,9 @@ public class ProjectDAO {
 //    }
     public int createProject(Project project) {
         // Correct table name from your schema is 'project' (singular)
-        String sql = "INSERT INTO projects (project_name, project_desc, project_status, "
-                + "proj_start_date, proj_end_date, proj_created_by) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO projects (project_name, project_desc, project_status, proj_type, proj_client"
+                + ",proj_start_date, proj_end_date, proj_created_by) "
+                + "VALUES (?, ?, ?, ?, ?,?, ?, ?)";
 
         // Initialize with -1 to indicate failure
         int generatedId = -1;
@@ -133,9 +133,11 @@ public class ProjectDAO {
             ps.setString(1, project.getProjectName()); //
             ps.setString(2, project.getProjectDesc()); //
             ps.setString(3, project.getProjectStatus()); //
-            ps.setObject(4, project.getProjStartDate()); //
-            ps.setObject(5, project.getProjEndDate()); //
-            ps.setInt(6, project.getProjCreatedBy()); //
+            ps.setString(4, project.getProjectType()); //
+            ps.setString(5, project.getProjectClient()); //
+            ps.setObject(6, project.getProjStartDate()); //
+            ps.setObject(7, project.getProjEndDate()); //
+            ps.setInt(8, project.getProjCreatedBy()); //
 
             int rowsAffected = ps.executeUpdate();
 
@@ -169,6 +171,8 @@ public class ProjectDAO {
                 project.setProjectName(rs.getString("project_name"));
                 project.setProjectDesc(rs.getString("project_desc"));
                 project.setProjectStatus(rs.getString("project_status"));
+                project.setProjectType(rs.getString("proj_type"));
+                project.setProjectClient(rs.getString("proj_client"));
 
                 // Modern Date Mapping
                 project.setProjStartDate(rs.getObject("proj_start_date", java.time.LocalDate.class));
@@ -183,21 +187,21 @@ public class ProjectDAO {
 
     public boolean updateProject(Project project) {
         String sql = "UPDATE projects SET project_name = ?, project_desc = ?, "
-                + "project_status = ?, proj_start_date = ?, proj_end_date = ? "
+                + "proj_type = ?, proj_client =?, proj_start_date = ?, proj_end_date = ? "
                 + "WHERE project_id = ?";
 
         try (Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, project.getProjectName());
             ps.setString(2, project.getProjectDesc());
-            ps.setString(3, project.getProjectStatus());
-
+            ps.setString(3, project.getProjectType());
+            ps.setString(4, project.getProjectClient());
             // Mapping LocalDates to SQL
-            ps.setObject(4, project.getProjStartDate());
-            ps.setObject(5, project.getProjEndDate());
+            ps.setObject(5, project.getProjStartDate());
+            ps.setObject(6, project.getProjEndDate());
 
             // The WHERE clause ID
-            ps.setInt(6, project.getProjectId());
+            ps.setInt(7, project.getProjectId());
 
             int rowsUpdated = ps.executeUpdate();
             return rowsUpdated > 0;

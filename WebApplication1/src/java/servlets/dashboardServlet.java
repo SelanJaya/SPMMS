@@ -118,7 +118,7 @@ public class dashboardServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String ProjName, ProjDesc, ProjStatus;
+        String ProjName, ProjDesc, ProjType, ProjClient;
         int user_id;
         List<Project> profileInfo;
         int created_key;
@@ -133,11 +133,12 @@ public class dashboardServlet extends HttpServlet {
 
         ProjName = request.getParameter("ProjName");
         ProjDesc = request.getParameter("ProjDesc");
-        ProjStatus = request.getParameter("ProjStatus");
+        ProjType = request.getParameter("ProjType");
+        ProjClient = request.getParameter("ProjClient");
         ProjStart = LocalDate.parse(request.getParameter("ProjStart"));
         ProjEnd = LocalDate.parse(request.getParameter("ProjEnd"));
 
-        Project project = new Project(ProjName, ProjDesc, ProjStatus, ProjStart, ProjEnd, user_id);
+        Project project = new Project(ProjName, ProjDesc, "Active", ProjType, ProjClient, ProjStart, ProjEnd, user_id);
 
         ProjectDAO projectDao = new ProjectDAO();
 

@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -27,14 +28,21 @@
 
         <div id="wrapper" class="flex">
             <nav id="sidebar">
-                <div class="sidebar-brand">SPMMS CONSOLE</div>
+                <div class="sidebar-brand text-center">SPMMS </div>
                 <div class="nav flex-column mt-3">
                     <a href="dashboard.jsp" class="nav-link"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
 
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
 
                     <a href="projectPage.jsp" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
-                    <a href="ganttChart.jsp" class="nav-link"><i class="fas fa-stream me-3"></i> Timeline</a>
+
+                    <a href="sprint.jsp" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
+
+
+                    <a href="backlog.jsp" class="nav-link">
+                        <i class="fas fa-list-check me-3"></i><span>Backlog</span>
+                    </a>
+
                     <a href="teamMembersPage.jsp" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
                     <a href="projectAnalytics.jsp" class="nav-link active"><i class="fas fa-chart-line me-3"></i> Reports</a>
                     <div class="mt-auto">
@@ -63,107 +71,105 @@
                     </div>
                 </nav>
 
-                <main class="p-8">
-                    <header class="flex justify-between items-center mb-8">
+                <main class="container-fluid p-4">
+                    <header class="d-flex justify-content-between align-items-center mb-4">
                         <div>
-                            <h1 class="text-2xl font-bold text-slate-900">Project Performance</h1>
-                            <p class="text-slate-500 text-sm">Real-time breakdown of team velocity and sprint health</p>
+                            <h1 class="h3 fw-bold text-dark mb-1">Project Performance</h1>
+                            <p class="text-muted small mb-0">Real-time breakdown of team velocity and sprint health</p>
                         </div>
-                        <div class="flex gap-2">
-                            <button
-                                class="bg-white border border-slate-200 hover:bg-slate-50 px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary btn-sm fw-bold d-flex align-items-center gap-2">
                                 <i class="fas fa-file-pdf text-danger"></i> Export PDF
                             </button>
-                            <button
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition">
+                            <button class="btn btn-primary btn-sm fw-bold">
                                 Refresh Data
                             </button>
                         </div>
                     </header>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                        <div class="report-card">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="font-bold text-slate-800">Team Velocity</h3>
-                                <span class="label-style">Story Points</span>
-                            </div>
-                            <div class="h-[350px]">
-                                <canvas id="velocityChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="report-card">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="font-bold text-slate-800">Sprint Burndown</h3>
-                                <span class="label-style">Remaining Effort</span>
-                            </div>
-                            <div class="h-[350px]">
-                                <canvas id="burndownChart"></canvas>
+                    <div class="row g-4">
+                        <div class="col-12 col-lg-6">
+                            <div class="card shadow-sm p-4 border-0">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="fw-bold text-dark mb-0">Team Velocity</h5>
+                                    <span class="badge bg-light text-dark border">Story Points</span>
+                                </div>
+                                <div style="height: 350px;">
+                                    <canvas id="velocityChart"></canvas>
+                                </div>
                             </div>
                         </div>
 
+                        <div class="col-12 col-lg-6">
+                            <div class="card shadow-sm p-4 border-0">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="fw-bold text-dark mb-0">Sprint Burndown</h5>
+                                    <span class="badge bg-light text-dark border">Remaining Effort</span>
+                                </div>
+                                <div style="height: 350px;">
+                                    <canvas id="burndownChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </main>
-            </div>
-        </div>
 
-        <script>
-            // Chart Styling to match professional theme
-            Chart.defaults.color = '#64748b';
-            Chart.defaults.font.family = "'Inter', sans-serif";
+                <script>
+                    // Chart Styling to match professional theme
+                    Chart.defaults.color = '#64748b';
+                    Chart.defaults.font.family = "'Inter', sans-serif";
 
-            // Velocity Chart
-            new Chart(document.getElementById('velocityChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Sprint 1', 'Sprint 2', 'Sprint 3', 'Sprint 4', 'Sprint 5'],
-                    datasets: [
-                        {label: 'Planned', data: [25, 30, 28, 35, 32], backgroundColor: '#94a3b8', borderRadius: 4},
-                        {label: 'Completed', data: [22, 30, 32, 30, 34], backgroundColor: '#2563eb', borderRadius: 4}
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {legend: {position: 'bottom', labels: {boxWidth: 12, usePointStyle: true}}},
-                    scales: {y: {grid: {display: true, drawBorder: false, color: '#f1f5f9'}}, x: {grid: {display: false}}}
-                }
-            });
-
-            // Burndown Chart
-            new Chart(document.getElementById('burndownChart'), {
-                type: 'line',
-                data: {
-                    labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7', 'Day 8', 'Day 9', 'Day 10'],
-                    datasets: [
-                        {
-                            label: 'Ideal Burn',
-                            data: [40, 36, 32, 28, 24, 20, 16, 12, 8, 0],
-                            borderColor: '#cbd5e1',
-                            borderDash: [5, 5],
-                            borderWidth: 2,
-                            pointRadius: 0
+                    // Velocity Chart
+                    new Chart(document.getElementById('velocityChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Sprint 1', 'Sprint 2', 'Sprint 3', 'Sprint 4', 'Sprint 5'],
+                            datasets: [
+                                {label: 'Planned', data: [25, 30, 28, 35, 32], backgroundColor: '#94a3b8', borderRadius: 4},
+                                {label: 'Completed', data: [22, 30, 32, 30, 34], backgroundColor: '#2563eb', borderRadius: 4}
+                            ]
                         },
-                        {
-                            label: 'Actual Burn',
-                            data: [40, 38, 35, 35, 25, 22, 15, 10, 5, 0],
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.05)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {legend: {position: 'bottom', labels: {boxWidth: 12, usePointStyle: true}}},
+                            scales: {y: {grid: {display: true, drawBorder: false, color: '#f1f5f9'}}, x: {grid: {display: false}}}
                         }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {legend: {position: 'bottom', labels: {boxWidth: 12, usePointStyle: true}}},
-                    scales: {y: {grid: {color: '#f1f5f9'}}, x: {grid: {display: false}}}
-                }
-            });
-        </script>
-    </body>
+                    });
 
-</html>
+                    // Burndown Chart
+                    new Chart(document.getElementById('burndownChart'), {
+                        type: 'line',
+                        data: {
+                            labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7', 'Day 8', 'Day 9', 'Day 10'],
+                            datasets: [
+                                {
+                                    label: 'Ideal Burn',
+                                    data: [40, 36, 32, 28, 24, 20, 16, 12, 8, 0],
+                                    borderColor: '#cbd5e1',
+                                    borderDash: [5, 5],
+                                    borderWidth: 2,
+                                    pointRadius: 0
+                                },
+                                {
+                                    label: 'Actual Burn',
+                                    data: [40, 38, 35, 35, 25, 22, 15, 10, 5, 0],
+                                    borderColor: '#2563eb',
+                                    backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    borderWidth: 3
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {legend: {position: 'bottom', labels: {boxWidth: 12, usePointStyle: true}}},
+                            scales: {y: {grid: {color: '#f1f5f9'}}, x: {grid: {display: false}}}
+                        }
+                    });
+                </script>
+                </body>
+
+                </html>

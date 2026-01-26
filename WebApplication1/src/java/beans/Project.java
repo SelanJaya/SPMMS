@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 public class Project {
 
     private int projectId, projCreatedBy;
-    private String projectName, projectDesc, projectStatus;
+    private String projectName, projectDesc, projectStatus, projectType, projectClient;
     private LocalDate projStartDate;
     private LocalDate projEndDate;
     private LocalDateTime projCreatedAt;
@@ -24,21 +24,37 @@ public class Project {
     }
     
     //Contructor for update project
-    public Project(String projectName, String projectDesc, String projectStatus, LocalDate projStartDate, LocalDate projEndDate, int createdBy) {
+    public Project(String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, LocalDate projStartDate, LocalDate projEndDate, int createdBy) {
         this.projectName = projectName;
         this.projectDesc = projectDesc;
         this.projectStatus = projectStatus;
+        this.projectType = projectType;
+        this.projectClient = projectClient;
         this.projStartDate = projStartDate;
         this.projEndDate = projEndDate;
         this.projCreatedBy = createdBy;
     }
     
     //Contructor for update project
-    public Project(int projectId, String projectName, String projectDesc, String projectStatus, LocalDate projStartDate, LocalDate projEndDate) {
+    public Project(int projectId, String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, LocalDate projStartDate, LocalDate projEndDate) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDesc = projectDesc;
         this.projectStatus = projectStatus;
+        this.projectType = projectType;
+        this.projectClient = projectClient;
+        this.projStartDate = projStartDate;
+        this.projEndDate = projEndDate;
+    }
+    
+     //Contructor for update project
+    public Project(int projectId, String projectName, String projectDesc,String projectType, String projectClient, LocalDate projStartDate, LocalDate projEndDate) {
+        this.projectId = projectId;
+        this.projectName = projectName;
+        this.projectDesc = projectDesc;
+        this.projectStatus = projectStatus;
+        this.projectType = projectType;
+        this.projectClient = projectClient;
         this.projStartDate = projStartDate;
         this.projEndDate = projEndDate;
     }
@@ -61,6 +77,14 @@ public class Project {
 
     public void setProjectStatus(String projectStatus) {
         this.projectStatus = projectStatus;
+    }
+
+    public void setProjectType(String projectType) {
+        this.projectType = projectType;
+    }
+
+    public void setProjectClient(String projectClient) {
+        this.projectClient = projectClient;
     }
 
     public void setProjStartDate(LocalDate projStartDate) {
@@ -95,6 +119,15 @@ public class Project {
         return projectStatus;
     }
 
+    public String getProjectType() {
+        return projectType;
+    }
+
+    public String getProjectClient() {
+        return projectClient;
+    }
+
+    
     public LocalDate getProjStartDate() {
         return projStartDate;
     }

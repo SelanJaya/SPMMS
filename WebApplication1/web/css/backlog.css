@@ -1,0 +1,302 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 21 Jan 2026, 2:56:01 am
+    Author     : HP
+*/
+
+:root {
+    --sidebar-width: 250px;
+    --sidebar-collapsed-width: 70px;
+    --sidebar-bg: #0f172a;
+    --primary-blue: #2563eb;
+    --body-bg: #f8fafc;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+#wrapper {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* --- SIDEBAR --- */
+/* --- SIDEBAR --- */
+#sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    color: #94a3b8;
+    z-index: 1000;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    /* ... existing styles ... */
+    user-select: none;
+    /* Prevents text from being highlighted on double-tap */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+#sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+.sidebar-brand {
+    padding: 1.5rem;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+}
+
+#sidebar.collapsed .brand-text,
+#sidebar.collapsed .nav-link span {
+    display: none;
+}
+
+#sidebar .nav-link {
+    color: #94a3b8;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+#sidebar .nav-link i {
+    min-width: 14px;
+}
+
+#sidebar .nav-link:hover,
+#sidebar .nav-link.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#sidebar .nav-link.active {
+    border-left: 4px solid var(--primary-blue);
+}
+
+/* --- CONTENT AREA --- */
+#content-wrapper {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#sidebar.collapsed+#content-wrapper {
+    margin-left: var(--sidebar-collapsed-width);
+    width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+
+/* --- CONTENT AREA & RETRACTION FIX --- */
+#content-wrapper {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#sidebar.collapsed+#content-wrapper {
+    margin-left: var(--sidebar-collapsed-width);
+    width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+
+/* This is the rule you specifically asked for */
+#sidebar.collapsed+#content-wrapper {
+    margin-left: var(--sidebar-collapsed-width);
+    width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+/* --- LOGOUT ALIGNMENT FIX --- */
+.sidebar-footer {
+    margin-top: auto;
+    /* Pushes the logout section to the bottom */
+    padding-bottom: 1rem;
+}
+
+/* Top nav */
+.top-nav {
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.backlog-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.label-style {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* --- TABLE SPECIFICS --- */
+.drag-handle {
+    cursor: grab;
+    color: #cbd5e1;
+    width: 30px;
+    text-align: center;
+}
+
+.priority-rank {
+    font-weight: 700;
+    color: var(--primary-blue);
+    text-align: center;
+    width: 60px;
+}
+
+.editable-cell {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    min-height: 34px;
+}
+
+.editable-cell:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    cursor: text;
+}
+
+/* Styling for modal form elements to match your theme */
+.modal-content input:focus,
+.modal-content textarea:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.1) !important;
+    outline: none;
+}
+
+/* Matching the primary button style from your image */
+#confirmAddBtn:hover {
+    background-color: #1d4ed8 !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+.label-style {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    /* Matching the muted labels in your project image */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Adds a small margin between the search bar and the table */
+.dataTables_filter {
+    margin-bottom: 15px !important;
+}
+
+/* Fixed Size & Draggable Modal */
+#backlogDocModal .modal-dialog {
+    max-width: 800px;
+    margin: 1.75rem auto;
+}
+
+#backlogDocModal .modal-content {
+    min-height: 580px;
+    border-radius: 12px;
+    border: none;
+    overflow: hidden !important;
+}
+
+/* Label Styling */
+.label-style {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--label-gray);
+}
+
+/* Tab Styling */
+.nav-tabs .nav-link {
+    border: none;
+    color: #9ca3af;
+    font-weight: 600;
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--spmms-blue);
+    background: none;
+    border-bottom: 3px solid var(--spmms-blue);
+}
+
+/* Dropzone Styling */
+.dropzone-container {
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+    padding: 50px 20px;
+    text-align: center;
+    background-color: #f9fafb;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.dropzone-container:hover {
+    border-color: var(--spmms-blue);
+    background-color: #f0f7ff;
+}
+
+/* Table Styling */
+.table thead th {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background-color: #f8fafc;
+}
+
+code {
+    color: #db2777;
+    background: #fdf2f8;
+    padding: 2px 4px;
+    border-radius: 4px;
+}

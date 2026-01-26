@@ -22,7 +22,7 @@
     <body>
         <div id="wrapper">
             <nav id="sidebar">
-                <div class="sidebar-brand">SPMMS CONSOLE</div>
+                <div class="sidebar-brand text-center">SPMMS </div>
                 <div class="nav flex-column mt-3">
                     <a href="profile.jsp" class="nav-link active"><i class="fas fa-user-circle me-3"></i> Profile</a>
                     <a href="dashboard.jsp" class="nav-link "><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
@@ -101,13 +101,13 @@
                                         <div class="row edit-input mb-4">
                                             <div class="col-md-6 pass-group">
                                                 <label class="label-style text-primary">New Password</label>
-                                                <input type="password" class="form-control pass-input"
+                                                <input name="newPassword" type="newPassword" class="form-control pass-input"
                                                        placeholder="Leave empty to keep current">
                                                 <i class="fas fa-eye eye-toggle"></i>
                                             </div>
                                             <div class="col-md-6 pass-group">
                                                 <label class="label-style text-primary">Confirm Password</label>
-                                                <input type="password" class="form-control pass-input"
+                                                <input name="confirmPassword" type="confirmPassword" class="form-control pass-input"
                                                        placeholder="Repeat new password">
                                                 <i class="fas fa-eye eye-toggle"></i>
                                             </div>
