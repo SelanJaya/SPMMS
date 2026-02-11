@@ -1,6 +1,6 @@
 :root {
-    --primary-blue: #2563eb;
-    --deep-navy: #0f172a;
+    --primary-blue: #6D28D9;
+    --deep-navy: #2D1B4E;
     --slate-bg: #f8fafc;
     /* Slightly slower speed for a smoother "passing" effect */
     --transition-speed: 0.9s;
@@ -27,7 +27,7 @@ body::before {
     width: 100%;
     height: 100%;
     /* Gradient adds professional depth */
-    background: linear-gradient(135deg, var(--deep-navy) 0%, #1e293b 100%);
+    background: linear-gradient(135deg, var(--deep-navy) 0%, #2D1B4E 100%);
 
     /* LOGIN STATE: Forward Lean (Wider at top) */
     /* Coordinates: Top-Left, Top-Center(40%), Bottom-Center(10%), Bottom-Left */
@@ -103,7 +103,7 @@ body.signup-active::before {
 }
 
 .overlay {
-    background: #1e293b;
+    background: #2D1B4E;
     color: #FFFFFF;
     position: relative;
     left: -100%;
@@ -128,6 +128,15 @@ body.signup-active::before {
     height: 100%;
     width: 50%;
     transition: transform var(--transition-speed) ease-in-out;
+}
+
+
+.link-color {
+    color: #8B5CF6;
+}
+
+.overlay-panel h2 i.text-purple-brand {
+    color: #6d28d9 !important;
 }
 
 .overlay-left {

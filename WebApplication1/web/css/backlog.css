@@ -10,8 +10,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 :root {
     --sidebar-width: 250px;
     --sidebar-collapsed-width: 70px;
-    --sidebar-bg: #0f172a;
-    --primary-blue: #2563eb;
     --body-bg: #f8fafc;
 }
 
@@ -206,7 +204,12 @@ body {
     cursor: text;
 }
 
+.table-responsive {
+    overflow: visible !important;
+}
+
 /* Styling for modal form elements to match your theme */
+
 .modal-content input:focus,
 .modal-content textarea:focus {
     border-color: #2563eb !important;
@@ -245,7 +248,7 @@ body {
     min-height: 580px;
     border-radius: 12px;
     border: none;
-    overflow: hidden !important;
+    /*    overflow: hidden !important;*/
 }
 
 /* Label Styling */
@@ -268,6 +271,17 @@ body {
     color: var(--spmms-blue);
     background: none;
     border-bottom: 3px solid var(--spmms-blue);
+}
+
+.dropdown-menu {
+    position: absolute !important;
+    z-index: 2000 !important;
+}
+
+/* 2. Allow the tab containers to show overflowing content */
+.tab-content, 
+.tab-pane {
+    overflow: visible !important;
 }
 
 /* Dropzone Styling */

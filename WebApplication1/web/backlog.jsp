@@ -15,7 +15,8 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
+        
+        <link rel="stylesheet" href="css/common.css">
         <link rel="stylesheet" href="css/backlog.css">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -99,7 +100,10 @@
                                     <th>ACCEPTANCE CRITERIA</th>
                                     <th>Mandays</th>
                                     <th>POINTS</th>
-                                    <th class="no-sort">ACTION</th>
+                                    
+                                    <c:if test="${user.user_role == 'Product Owner'}">
+                                        <th class="no-sort">ACTION</th>
+                                    </c:if>
                                 </tr>
                             </thead>
                             <tbody id="sortableBody">
@@ -261,11 +265,36 @@
                                                 </td>
                                                 <td><code>/uploads/p01/arch.png</code></td>
                                                 <td class="text-end">
-                                                    <button class="btn btn-sm btn-light border"><i
-                                                            class="fas fa-download text-primary"></i></button>
-                                                    <button class="btn btn-sm btn-light border ms-1"><i
-                                                            class="fas fa-trash-alt text-danger"></i></button>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-boundary="viewport">
+                                                            <i class="fas fa-ellipsis-v text-secondary"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                            <li>
+                                                                <a class="dropdown-item" href="#">
+                                                                    <i class="fas fa-eye me-2 text-purple-brand"></i> View Details
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item" href="#">
+                                                                    <i class="fas fa-download me-2 text-purple-brand"></i> Download
+                                                                </a>
+                                                            </li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li>
+                                                                <a class="dropdown-item text-danger" href="#">
+                                                                    <i class="fas fa-trash-alt me-2"></i> Delete
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                                 </td>
+                                                <!--                                                <td class="text-end">
+                                                                                                    <button class="btn btn-sm btn-light border"><i
+                                                                                                            class="fas fa-download text-primary"></i></button>
+                                                                                                    <button class="btn btn-sm btn-light border ms-1"><i
+                                                                                                            class="fas fa-trash-alt text-danger"></i></button>
+                                                                                                </td>-->
                                             </tr>
                                         </tbody>
                                     </table>

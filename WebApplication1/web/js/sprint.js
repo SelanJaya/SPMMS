@@ -6,11 +6,11 @@
 
 // JS logic for Search, Drag&Drop, Edit, and Save (remains identical to your established logic)
 let isEditMode = false;
-const bsModal = new bootstrap.Modal(document.getElementById('projectModal'));
+const bsModal = new bootstrap.Modal(document.getElementById('sprintModal'));
 function openModal() {
     isEditMode = false;
     document.getElementById('modalTitle').innerText = "Initialize Project";
-    document.querySelectorAll('#projectModal input, #projectModal textarea').forEach(el => el.value = '');
+    document.querySelectorAll('#sprintModal input, #sprintModal textarea').forEach(el => el.value = '');
     bsModal.show();
 }
 document.getElementById('boardSearch').addEventListener('input', function (e) {

@@ -140,37 +140,74 @@
             </div>
         </div>
 
-        <div class="modal fade" id="projectModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
+        <div class="modal fade" id="sprintModal" tabindex="-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content border-0 shadow">
-                    <div class="modal-header border-0 pb-0">
-                        <h5 class="modal-title fw-bold" id="modalTitle">Initialize Project</h5><button type="button"
-                                                                                                       class="btn-close" data-bs-dismiss="modal"></button>
+                    <div class="modal-header mx-4 border-0 pb-0">
+                        <h3 class="modal-title fw-bold" id="modalTitle">Create Sprint</h3><button type="button"  class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body mx-4">
                         <input type="hidden" id="editBoardId">
-                        <div class="mb-3"><label class="info-label">Project Name</label><input type="text"
-                                                                                               class="form-control" id="m_name"></div>
-                        <div class="mb-3"><label class="info-label">Description</label><textarea class="form-control"
-                                                                                                 id="m_goal" rows="2"></textarea></div>
-                        <div class="row g-3 mb-3">
-                            <div class="col-6"><label class="info-label">Start Date</label><input type="date"
-                                                                                                  class="form-control" id="m_start"></div>
-                            <div class="col-6"><label class="info-label">End Date</label><input type="date"
-                                                                                                class="form-control" id="m_end"></div>
+                        <div class="mb-3"><label class="info-labeltext-muted fw-bold small mb-2">Sprint Name</label>
+                            <input type="text" class="form-control bg-light border-0 py-2" id="m_name">
                         </div>
-                        <div class="mb-3"><label class="info-label">Status</label><select class="form-select" id="m_status">
+
+                        <div class="mb-3"><label class="info-label text-muted fw-bold small mb-2">Goal</label>
+                            <textarea class="form-control  bg-light border-0 py-2" id="m_goal" rows="2"></textarea>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6"><label class="info-label text-muted fw-bold small mb-2">Start Date</label>
+                                <input type="date" class="form-control bg-light border-0 py-2" id="m_start">
+                            </div>
+                            <div class="col-6">
+                                <label class="info-label text-muted fw-bold small mb-2">End Date</label>
+                                <input type="date" class="form-control bg-light border-0 py-2" id="m_end">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="info-label text-muted fw-bold small mb-2 ">Status</label>
+                            <select class="form-select bg-light border-0 py-2" id="m_status">
                                 <option value="Planned">Planned</option>
                                 <option value="Active">Active</option>
                                 <option value="Review">Review</option>
-                            </select></div>
-                        <div class="mb-3"><label class="info-label">Review Notes</label><textarea class="form-control"
-                                                                                                  id="m_review" rows="2"></textarea></div>
-                        <div class="mb-3"><label class="info-label">Retrospective Notes</label><textarea
-                                class="form-control" id="m_retro" rows="2"></textarea></div>
-                        <button class="btn btn-primary w-100 rounded-pill fw-bold py-2 mt-2" onclick="saveBoard()">Save
-                            Project</button>
+                            </select>
+                        </div>
+
+                        <div class="mb-3"><label class="info-labeltext-muted fw-bold small mb-2">Review Notes</label>
+                            <textarea class="form-control bg-light border-0 py-2" id="m_review" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3"><label class="info-label text-muted fw-bold small mb-2">Retrospective Notes</label>
+                            <textarea
+                                class="form-control bg-light border-0 py-2" id="m_retro" rows="2"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="info-label text-muted fw-bold small mb-2 ">Link Backlog Items</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-list-ul text-muted"></i>
+                                </span>
+                                <select class="form-select bg-light border-0 py-2" id="m_backlog_links" multiple style="height: 120px;">
+                                    <c:forEach items="${availableBacklogItems}" var="item">
+                                        <option value="${item.id}">${item.title} (${item.points} pts)</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <!--                            <small class="text-muted">Hold Ctrl (or Cmd) to select multiple items for this sprint.</small>-->
+                        </div>
+                        <div class="row g-3 my-3">
+                            <button class="btn btn-primary col-6 w-100 rounded-pill fw-bold py-2 mt-2" onclick="saveBoard()">Create
+                                Sprint
+                            </button>
+                            <button class="btn btn-outline-secondary col-6 w-100 px-5 py-2 rounded-pill fw-bold"
+                                    data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -180,7 +217,7 @@
                 <div class="modal-content border-0 shadow-lg rounded-4">
                     <div class="modal-body p-4">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="h3 fw-bold mb-0">Add New Task</h2>
+                            <h3 class="h3 fw-bold mb-0">Add New Task</h3>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
 
@@ -189,7 +226,7 @@
 
                         <div class="mb-4">
                             <label class="info-label text-muted fw-bold small mb-2">TASK NAME</label>
-                            <input type="text" class="form-control form-control-lg bg-light border-0 py-3" id="t_name"
+                            <input type="text" class="form-control bg-light border-0 py-2" id="t_name"
                                    placeholder="e.g., Design Login Page">
                         </div>
 
@@ -244,7 +281,7 @@
                         </div>
 
                         <div class="d-flex gap-3 mt-4">
-                            <button class="btn btn-primary px-5 py-2 rounded-pill fw-bold" onclick="confirmAddTask()">
+                            <button class="btn btn-primary w-100 py-2 rounded-pill fw-bold" onclick="confirmAddTask()">
                                 <i class="fas fa-plus me-2"></i> Add Task to Board
                             </button>
                             <button class="btn btn-outline-secondary px-5 py-2 rounded-pill fw-bold"

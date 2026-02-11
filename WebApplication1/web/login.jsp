@@ -101,7 +101,7 @@
 
                     <div class="w-100 d-flex justify-content-between my-2">
                         <div class="small text-muted"><input type="checkbox"> Remember me</div>
-                        <a href="#" class="small text-primary text-decoration-none fw-bold">Forgot Password?</a>
+                        <a href="#" class="small link-color text-primary text-decoration-none fw-bold">Forgot Password?</a>
                     </div>
 
                     <button class="btn-main">Login</button>
@@ -111,12 +111,12 @@
             <div class="overlay-container">
                 <div class="overlay">
                     <div class="overlay-panel overlay-left">
-                        <h2 class="fw-bold"><i class="fas fa-layer-group text-primary me-2"></i>SPMMS</h2>
+                        <h2 class="fw-bold"><i class="fas fa-layer-group text-purple-brand me-2"></i>SPMMS</h2>
                         <p class="small opacity-75 mt-2">Manage your projects with enterprise-grade security.</p>
                         <button class="btn-ghost" id="signIn">Return to Login</button>
                     </div>
                     <div class="overlay-panel overlay-right">
-                        <h2 class="fw-bold"><i class="fas fa-layer-group text-primary me-2"></i>SPMMS</h2>
+                        <h2 class="fw-bold"><i class="fas fa-layer-group text-purple-brand me-2"></i>SPMMS</h2>
                         <p class="small opacity-75 mt-2">Join the next generation of project monitoring.</p>
                         <button class="btn-ghost" id="signUp">Create Account</button>
                     </div>
