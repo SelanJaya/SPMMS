@@ -30,7 +30,7 @@
                         <i class="fas fa-user-circle me-3"></i> Profile
                     </a>
                     <a href="dashboard.jsp" class="nav-link active"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
-                    <a href="dashboardServlet?userId=${user.user_id}&processType=achivedProject" class="nav-link active-archive"><i class="fas fa-box-archive me-3"></i>
+                    <a href="dashboardServlet&processType=achivedProject" class="nav-link active-archive"><i class="fas fa-box-archive me-3"></i>
                         Archived Projects</a>
                     <div class="mt-auto">
                         <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
@@ -42,7 +42,37 @@
             </nav>
 
             <div id="content-wrapper">
-                <nav class="top-nav">
+
+                <c:if test="${processStatus == true}">
+                    <div id="successProcessTab" class="alert alert-success alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                        <div class="icon-container me-3">
+                            <i class="fas fa-check-circle fa-lg"></i>
+                        </div>
+                        <div class="message-content">
+                            <h6 class="alert-heading mb-0 fw-bold" style="font-size: 0.9rem;">Project Created</h6>
+                            <p class="mb-0 small">${sessionScope.successMessage}</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <c:remove var="processStatus" scope="session" />
+                </c:if>
+                <c:if test="${processStatus == false}">
+                    <div id="successProcessTab" class="alert alert-danger alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                        <div class="icon-container me-3">
+                            <i class="fas fa-times-circle fa-lg"></i>
+                        </div>
+                        <div class="message-content">
+                            <h6 class="alert-danger mb-0 fw-bold" style="font-size: 0.9rem;">Project Creation Failed</h6>
+                            <p class="mb-0 small">${sessionScope.successMessage}</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <c:remove var="processStatus" scope="session" />
+                </c:if>
+
+                <nav class="top-nav">         
+                    <%-- Clear message after displaying --%>
+
                     <div class="small text-muted">Management / <span class="fw-semibold text-dark">Dashboard</span></div>
                     <div class="user-info">
                         <div class="user-details d-none d-sm-block">
@@ -133,6 +163,7 @@
                                 <div class="col-6">
                                     <span class="label-style">Start Date</span>
                                     <input type="date" name="ProjStart" id="ProjStart" class="form-control" required>
+                                    <p id="errorMsgStartDate"></p>
                                 </div>
                                 <div class="col-6">
                                     <span class="label-style">End Date</span>
@@ -154,9 +185,9 @@
                                        required>
                             </div>
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary fw-bold py-2 rounded-pill btn-small">Create
+                                <button id="formSubbtn" type="submit" class="btn btn-primary fw-bold py-2 rounded-pill btn-small" >Create
                                     Project</button>
-                                <button type="button" class="btn btn-link text-muted small text-decoration-none"
+                                <button id="formCanbtn" type="button"  class="btn btn-link text-muted small text-decoration-none"
                                         data-bs-dismiss="modal">Cancel</button>
                             </div>
                         </form>
@@ -166,15 +197,49 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="js/common.js"></script>
 
         <script>
-            $(document).ready(function () {
+            document.addEventListener("DOMContentLoaded", function () {
+
+                var projStart = document.getElementById("ProjStart");
+                var projEnd = document.getElementById("ProjEnd");
+                var formSubbtn = document.getElementById("formSubbtn");
+                var errorContainer = document.getElementById("errorMsgStartDate");
+                //                functon parseDate(date){
+                //                  cont[date,month,year] = date.split("/");  
+                //                  return 
+                //                };
+
+                function validateDates() {
+                    if (projStart.value && projEnd.value) {
+
+                        var start = new Date(projStart.value);
+                        var end = new Date(projEnd.value);
+
+                        if (start > end) {
+                            errorContainer.innerHTML = `<div class="alert alert-danger py-2 mt-2" style="font-size: 0.8rem;">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        <strong>Invalid!</strong> Start date cannot be after end date.
+                    </div>`;
+                            formSubbtn.disabled = true;
+                        } else {
+                            errorContainer.innerHTML = "";
+                            formSubbtn.disabled = false;
+                        }
+                    }
+                }
+                ;
+
+                // 5. Add event listeners so it checks every time the user picks a date
+                projStart.addEventListener("change", validateDates);
+                projEnd.addEventListener("change", validateDates);
+
+
                 $('#newProjectForm').on('submit', function (e) {
                     e.preventDefault();
-
                     // Get values from form
                     const projectName = $('#newProjName').val();
-
                     // Create a new folder card template
                     const newCard = `
                         <div class="col-xl-3 col-md-6 mb-4">
@@ -186,16 +251,16 @@
                             </div>
                         </div>
                     `;
-
                     // Append to container
                     $('#projectContainer').append(newCard);
-
                     // Close modal and reset form
                     $('#createProjectModal').modal('hide');
                     this.reset();
                 });
-            });
+            }
+
         </script>
     </body>
+
 
 </html>

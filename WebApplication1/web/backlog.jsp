@@ -15,7 +15,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-        
+
         <link rel="stylesheet" href="css/common.css">
         <link rel="stylesheet" href="css/backlog.css">
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -100,53 +100,49 @@
                                     <th>ACCEPTANCE CRITERIA</th>
                                     <th>Mandays</th>
                                     <th>POINTS</th>
-                                    
-                                    <c:if test="${user.user_role == 'Product Owner'}">
-                                        <th class="no-sort">ACTION</th>
-                                    </c:if>
+                                    <th class="no-sort">ACTION</th>
                                 </tr>
                             </thead>
                             <tbody id="sortableBody">
-                                <tr>
-                                    <td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
-                                    <td class="priority-rank">1</td>
-                                    <td>
-                                        <div class="editable-cell" contenteditable="true">Initial Database Schema</div>
-                                    </td>
-                                    <td>
-                                        <div class="editable-cell" contenteditable="true">Create tables for backlog and
-                                            users.</div>
-                                    </td>
-                                    <td>
-                                        <div class="editable-cell" contenteditable="true">MySQL scripts verified.</div>
-                                    </td>
-                                    <td>
-                                        <div class="editable-cell" contenteditable="true">3</div>
-                                    </td>
-                                    <td>
-                                        <div class="editable-cell" contenteditable="true">3</div>
-                                    </td>
-                                    <c:if test="${user.user_role == 'Product Owner'}">
-
-                                        <td class="text-center">
-                                            <div class="d-flex justify-content-center align-items-center gap-2">
-                                                <button type="button" 
-                                                        class="btn btn-sm btn-outline-primary shadow-sm" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#backlogDocModal"
-                                                        title="Manage Documents">
-                                                    <i class="fas fa-file-alt"></i>
-                                                </button>
-
-                                                <button type="button" 
-                                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" 
-                                                        title="Delete Item">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </c:if>
-                                </tr>
+                                <!--                                <tr>
+                                                                    <td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
+                                                                    <td class="priority-rank">1</td>
+                                                                    <td>
+                                                                        <div class="editable-cell" contenteditable="true">Initial Database Schema</div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="editable-cell" contenteditable="true">Create tables for backlog and
+                                                                            users.</div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="editable-cell" contenteditable="true">MySQL scripts verified.</div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="editable-cell" contenteditable="true">3</div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="editable-cell" contenteditable="true">3</div>
+                                                                    </td>
+                                                                    
+                                                                        <td class="text-center">
+                                                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                                                <button type="button" 
+                                                                                        class="btn btn-sm btn-outline-primary shadow-sm" 
+                                                                                        data-bs-toggle="modal" 
+                                                                                        data-bs-target="#backlogDocModal"
+                                                                                        title="Manage Documents">
+                                                                                    <i class="fas fa-file-alt"></i>
+                                                                                </button>
+                                
+                                                                                <button type="button" 
+                                                                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" 
+                                                                                        title="Delete Item">
+                                                                                    <i class="fas fa-trash-alt"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </td>
+                                                                    
+                                                                </tr>-->
                             </tbody>
                         </table>
                     </div>
@@ -162,16 +158,16 @@
                     </div>
 
                     <div class="modal-body p-4">
-                        <form id="addItemForm">
+                        <form id="addItemForm" action="backlogServlet" method="post">
                             <div class="mb-3">
                                 <label class="label-style d-block mb-2">Backlog Title</label>
-                                <input type="text" id="m_title" class="form-control" placeholder="Enter title..."
+                                <input type="text" id="backlog_title" class="form-control" placeholder="Enter title..."
                                        style="border-radius: 8px; padding: 10px; border: 1px solid #e2e8f0;" required>
                             </div>
 
                             <div class="mb-3">
                                 <label class="label-style d-block mb-2">Description</label>
-                                <textarea id="m_desc" class="form-control" rows="3" placeholder="Describe the task... example:
+                                <textarea id="backlog_description" class="form-control" rows="3" placeholder="Describe the task... example:
                                           As a [role],
                                           I want [feature],
                                           So that [business value]." style="border-radius: 8px; border: 1px solid #e2e8f0;"></textarea>
@@ -179,7 +175,7 @@
 
                             <div class="mb-3">
                                 <label class="label-style d-block mb-2">Acceptance Criteria</label>
-                                <textarea id="m_crit" class="form-control" rows="2"
+                                <textarea id="backlog_ACriteria" class="form-control" rows="2"
                                           placeholder="Conditions for completion..."
                                           style="border-radius: 8px; border: 1px solid #e2e8f0;"></textarea>
                             </div>
@@ -187,20 +183,21 @@
                             <div class="row mb-4">
                                 <div class="col-md-4">
                                     <label class="label-style d-block mb-2">Story Points</label>
-                                    <input type="number" id="m_pts" class="form-control" value="0" min="0" max="10"
+                                    <input type="number" id="backlog_SPts" class="form-control" value="0" min="0" max="10"
                                            style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;">
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="label-style d-block mb-2">Mandays</label>
-                                    <input type="number" id="m_pts" class="form-control" value="0" min="0" max="10"
+                                    <input type="number" id="backlog_Mdys" class="form-control" value="0" min="0" max="10"
                                            style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;">
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="label-style d-block mb-2">Priority Rank</label>
-                                    <input type="number" id="m_priority" class="form-control" placeholder="e.g. 1"
+                                    <input type="number" id="backlog_priority" class="form-control" placeholder="e.g. 1"
                                            style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;">
+                                    <span id="alertPriority"></span>
                                 </div>
                             </div>
 
@@ -347,6 +344,65 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="deleteBacklogModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+
+                    <div id="initialBody">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title fw-bold" style="font-size: 1rem;">
+                                <i class="fas fa-exclamation-triangle me-2"></i> Permanent Directory Deletion
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-folder-open text-danger fa-4x opacity-25"></i>
+                            </div>
+                            <h5 class="fw-bold">Delete Backlog Item?</h5>
+                            <p class="text-muted">You are about to delete the backlog item for <strong id="backlogTitle"></strong>. This will <strong>permanently remove</strong> all uploaded files.</p>
+                            <div class="alert alert-danger p-2 mb-0">
+                                <small class="fw-bold text-uppercase"><i class="fas fa-info-circle me-1"></i> This action is irreversible.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Folder</button>
+                            <button type="button" id="deleteModelBtn" class="btn btn-sm btn-danger fw-bold px-3">
+                                Yes, Delete Directory
+                            </button>
+                        </div>
+                    </div>
+                    <div id="successBody" class="d-none">
+                        <div class="modal-body p-5 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle text-success fa-5x animate__animated animate__bounceIn"></i>
+                            </div>
+                            <h5 class="fw-bold">Project Deleted</h5>
+                            <p class="text-muted mb-0">The directory and all data have been successfully removed.</p>
+                            <p class="small text-muted mt-2">Redirecting to Dashboard...</p>
+                        </div>
+                    </div                                                            >
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var projectId = ${project.projectId};
+            var userRole = "${user.user_role}";
+            let table;
+
+//            table = $('#backlogTable').DataTable({
+//                order: [[1, 'asc']],
+//                paging: false, info: false, searching: true,
+//                columnDefs: [{targets: 'no-sort', orderable: false}]
+//            });
+
+            if (userRole !== "Product Owner") {
+                table.column(0).visible(false); // drag column
+                table.column(7).visible(false); // action column
+            }
+        </script>
         <script src="js/backlog.js"></script>
     </body>
 

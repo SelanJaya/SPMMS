@@ -7,27 +7,29 @@ $(document).ready(function () {
     /**
      * Toggles the interface between View Mode and Edit Mode
      */
-    window.toggleEdit = function (enable) {
-        if (enable) {
-            $('.editable-field').not('#statusSelect').prop('readonly', false)
-                    .addClass('active-edit')
-                    .css('pointer-events', 'auto');
-            $('#projNameInput').css({'border': '', 'padding-left': '0.75rem'});
-            $('#statusView').addClass('d-none');
-            $('#statusSelect').removeClass('d-none').addClass('active-edit');
-            $('#editActions').removeClass('d-none');
-            $('#editBtn, #deleteBtnHeader').addClass('d-none'); // Hide Delete button while editing
-        } else {
-            $('.editable-field').prop('readonly', true)
-                    .removeClass('active-edit')
-                    .css('pointer-events', 'none');
-            $('#projNameInput').css({'border': '1px solid transparent', 'padding-left': '0'});
-            $('#statusView').removeClass('d-none');
-            $('#statusSelect').addClass('d-none').removeClass('active-edit');
-            $('#editActions').addClass('d-none');
-            $('#editBtn, #deleteBtnHeader').removeClass('d-none');
-        }
-    };
+
+//    window.toggleEdit = function (enable) {
+//        if (enable) {
+//            $('.editable-field').not('#statusSelect').prop('readonly', false)
+//                    .addClass('active-edit')
+//                    .css('pointer-events', 'auto');
+//            
+//            $('#projNameInput').css({'border': '', 'padding-left': '0.75rem'});
+//            $('#statusView').addClass('d-none');
+//            $('#statusSelect').removeClass('d-none').addClass('active-edit');
+//            $('#editActions').removeClass('d-none');
+//            $('#editBtn, #deleteBtnHeader').addClass('d-none'); // Hide Delete button while editing
+//        } else {
+//            $('.editable-field').prop('readonly', true)
+//                    .removeClass('active-edit')
+//                    .css('pointer-events', 'none');
+//            $('#projNameInput').css({'border': '1px solid transparent', 'padding-left': '0'});
+//            $('#statusView').removeClass('d-none');
+//            $('#statusSelect').addClass('d-none').removeClass('active-edit');
+//            $('#editActions').addClass('d-none');
+//            $('#editBtn, #deleteBtnHeader').removeClass('d-none');
+//        }
+//    };
     $('#editBtn').click(() => toggleEdit(true));
 
     $('#uploadModal').on('shown.bs.modal', function () {
@@ -36,6 +38,56 @@ $(document).ready(function () {
             containment: "window"
         });
     });
+
+    window.toggleEdit = function (enable) {
+        const editableFields = document.querySelectorAll('.editable-field');
+        const projNameInput = document.getElementById('projName');
+        const editActions = document.getElementById('editActions');
+        const editBtn = document.getElementById('editBtn');
+        const deleteBtnHeader = document.getElementById('deleteBtnHeader');
+
+        if (enable) {
+            // Handle all editable fields except statusSelect
+            editableFields.forEach(field => {
+                if (field.id !== 'projStatus' && field.id !== 'projDate') {
+                    field.readOnly = false;
+                    field.classList.add('active-edit');
+                    field.style.pointerEvents = 'auto';
+                    console.log("Reached");
+                }
+            });
+
+            // UI Adjustments for "Edit Mode"
+            projNameInput.style.border = '';
+            projNameInput.style.paddingLeft = '0.75rem';
+            console.log("Reached2");
+
+
+            editActions.classList.remove('d-none');
+
+            // Hide primary buttons
+            editBtn.classList.add('d-none');
+            deleteBtnHeader.classList.add('d-none');
+
+        } else {
+            // Handle all editable fields (resetting)
+            editableFields.forEach(field => {
+                field.readOnly = true;
+                field.classList.remove('active-edit');
+                field.style.pointerEvents = 'none';
+            });
+
+            // UI Adjustments for "View Mode"
+            projNameInput.style.border = '1px solid transparent';
+            projNameInput.style.paddingLeft = '0';
+
+            editActions.classList.add('d-none');
+
+            // Show primary buttons
+            editBtn.classList.remove('d-none');
+            deleteBtnHeader.classList.remove('d-none');
+        }
+    };
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('actualFile');
@@ -82,7 +134,6 @@ $(document).ready(function () {
     }
 
     window.executeFolderDeletion = function (btn) {
-        const projectId = "${project.projectId}";
         // 1. Loading State on button
         const originalContent = btn.innerHTML;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
@@ -151,6 +202,17 @@ $(document).ready(function () {
             notice.classList.add('d-none');
         }
     };
+
+    const tx = document.getElementsByTagName("textarea");
+    for (let i = 0; i < tx.length; i++) {
+        tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
+        tx[i].addEventListener("input", OnInput, false);
+    }
+
+    function OnInput() {
+        this.style.height = "auto";
+        this.style.height = (this.scrollHeight) + "px";
+    }
 });
 
 

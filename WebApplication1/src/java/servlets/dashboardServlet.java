@@ -85,16 +85,16 @@ public class dashboardServlet extends HttpServlet {
                 // DISPLAY ALL PROJECT FOLDER
                 profileInfo = projectDao.projectInfo(user_id);
                 session.setAttribute("profileInfo", profileInfo);
-            }else{
-                
+            } else {
+
                 profileInfo = projectDao.getProjectsByNonPMUserId(user.getUser_id());
                 session.setAttribute("profileInfo", profileInfo);
             }
-            
+
             //GET PROFILE INFO
             user = userDao.profileInformation(user_id);
             session.setAttribute("user", user);
-            
+
             request.getRequestDispatcher("dashboard.jsp").forward(request, response);
 
         } else if ("achivedProject".equalsIgnoreCase(processType)) {
@@ -122,7 +122,7 @@ public class dashboardServlet extends HttpServlet {
         int user_id;
         List<Project> profileInfo;
         int created_key;
-        boolean assigned;
+        boolean assigned = false;
         LocalDate ProjStart, ProjEnd;
 
         //RETRIEVE PROJECT INFO
@@ -138,24 +138,28 @@ public class dashboardServlet extends HttpServlet {
         ProjStart = LocalDate.parse(request.getParameter("ProjStart"));
         ProjEnd = LocalDate.parse(request.getParameter("ProjEnd"));
 
-        Project project = new Project(ProjName, ProjDesc, "Active", ProjType, ProjClient, ProjStart, ProjEnd, user_id);
-
         ProjectDAO projectDao = new ProjectDAO();
 
-        created_key = projectDao.createProject(project);
+        try {
+            // Create Obj and INSERT proj data
+            Project project = new Project(ProjName, ProjDesc, "Active", ProjType, ProjClient, ProjStart, ProjEnd, user_id);
+            created_key = projectDao.createProject(project);
 
-        if (created_key > -1) {
+            //Craete obj and INSERT assignment project Manager role (auto)
             ProjectTeamAssignment projectTeamAssignmentObj = new ProjectTeamAssignment(created_key, user_id, user_id);
             projectTeamDAO projectTeamDao = new projectTeamDAO();
 
             assigned = projectTeamDao.assignTeamMember(projectTeamAssignmentObj);
-            if (assigned) {
-                profileInfo = projectDao.projectInfo(user_id);
-                session.setAttribute("profileInfo", profileInfo);
-                request.getRequestDispatcher("dashboard.jsp").forward(request, response);
-            }
-        } else {
-            System.out.println("error");
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        if (assigned) {
+            profileInfo = projectDao.projectInfo(user_id);
+            session.setAttribute("processStatus", assigned);
+            session.setAttribute("profileInfo", profileInfo);
+            request.getRequestDispatcher("dashboard.jsp").forward(request, response);
         }
     }
 

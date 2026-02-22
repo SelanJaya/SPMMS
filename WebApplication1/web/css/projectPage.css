@@ -26,7 +26,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 .editable-field {
     border: 1px solid transparent !important;
     background: transparent !important;
-    padding: 0 !important;
+    padding: 3px 6px !important;
     color: #475569;
     width: 100%;
     outline: none !important;
@@ -121,6 +121,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     color: white;
     border-color: #be123c;
 }
+
 /* Professional Dropzone for SPMMS - Fixed Sizing & Overflow */
 #dropZone {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -167,4 +168,54 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     max-width: 60px; /* Limits icon size */
     height: auto;
     display: block;
+}
+/* --- HEADER ALIGNMENT --- */
+.project-header-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Container for Name + ID + Status */
+.header-main-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px; /* Space between Name, ID, and Status */
+}
+
+.project-header-mini h1 {
+    font-size: 2rem;
+    margin-bottom: 0; /* Prevents push-down */
+    color: #1e293b;
+}
+
+/* Modern Subtle Badges */
+.id-badge {
+    background-color: #e0f2fe; /* Light Blue */
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+    font-weight: 600;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+}
+
+.input-badge {
+    display: inline;
+}
+.status-badge {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+}
+
+/* Custom Success (Active) Color */
+.status-active {
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
 }

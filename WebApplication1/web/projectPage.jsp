@@ -40,7 +40,7 @@
                 <a href="sprint.jsp" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
 
 
-                <a href="backlog.jsp" class="nav-link">
+                <a href="BacklogServlet?action=redirect&project_id=${project.projectId}" class="nav-link">
                     <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                 </a>
 
@@ -57,6 +57,35 @@
 
         <div id="content-wrapper">
             <nav class="top-nav">
+
+                <c:if test="${processStatus == true}">
+                    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm m-3 mb-0 d-flex align-items-center" role="alert" id="successProcessTab">
+                        <div class="bg-success text-white rounded-circle p-1 me-3 d-flex align-items-center justify-content-center" style="width: 25px; height: 25px;">
+                            <i class="fas fa-check small"></i>
+                        </div>
+                        <div>
+                            <span class="fw-bold text-success" style="font-size: 0.85rem;">Success!</span>
+                            <div class="small text-muted">${sessionScope.successMessage}</div>
+                        </div>
+                        <button type="button" class="btn-close small" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <%-- Clear message after displaying --%>
+                    <c:remove var="processStatus" scope="session" />
+                </c:if>
+                <c:if test="${processStatus == false}">
+                    <div id="successProcessTab" class="alert alert-danger alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                        <div class="icon-container me-3">
+                            <i class="fas fa-times-circle fa-lg"></i>
+                        </div>
+                        <div class="message-content">
+                            <h6 class="alert-danger mb-0 fw-bold" style="font-size: 0.9rem;">Project Creation Failed</h6>
+                            <p class="mb-0 small">${sessionScope.successMessage}</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <c:remove var="processStatus" scope="session" />
+                </c:if>
+
                 <div class="small text-muted">Management / <span class="fw-semibold text-dark">Project Console</span></div>
                 <div class="user-info">
                     <div class="user-details d-none d-sm-block">
@@ -70,9 +99,18 @@
 
             <div class="container-fluid p-4">
 
-                <div class="project-header-mini">
-                    <h1>${project.projectName}</h1>
-                    <span class="status-badge" id="headerStatusBadge">${project.projectStatus}</span>
+                <div class="project-header-mini mb-4">
+                    <div class="header-main-row">
+                        <h1>${project.projectName}</h1>
+
+                        <div class="id-badge">
+                            <i class="fas fa-fingerprint me-1"></i> ID: ${project.projectId}
+                        </div>
+
+                        <span class="status-badge status-active">
+                            ${project.projectStatus}
+                        </span>
+                    </div>
                 </div>
 
                 <div class="row">
@@ -99,28 +137,39 @@
                                     <div class="row g-4">
                                         <div class="col-md-4">
                                             <span class="label-style">Project Name</span>
-                                            <input type="text" name="projectName" id="projName"
-                                                   class="form-control editable-field fw-bold" value="${project.projectName}"
-                                                   readonly>
+                                            <div class="input-group input-group-text bg-light">
+                                                <span class="me-2">
+                                                    <i class="fas fa-folder text-muted"></i>
+                                                </span>
+
+                                                <input  type="text" name="projectName" id="projName"
+                                                        class="form-control editable-field fw-bold" value="${project.projectName}"
+                                                        readonly>
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
                                             <span class="label-style">Project Type</span>
-                                            <select name="projectType" id="projectType" 
-                                                    class="form-select editable-field">
-                                                <option value="Finance" ${project.projectType == 'Finance' ? 'selected' : ''}>Finance</option>
-                                                <option value="Academic" ${project.projectType == 'Academic' ? 'selected' : ''}>Academic</option>
-                                                <option value="Student" ${project.projectType == 'Student' ? 'selected' : ''}>Student</option>
-                                                <option value="PTJ" ${project.projectType == 'PTJ' ? 'selected' : ''}>PTJ</option>
-                                            </select>
+                                            <div class="input-group input-group-text bg-light">
+                                                <span class="me-2">
+                                                    <i class="fas fa-briefcase text-muted"></i>
+                                                </span>
+                                                <select name="projectType" id="projectType" 
+                                                        class="form-select editable-field">
+                                                    <option value="Finance" ${project.projectType == 'Finance' ? 'selected' : ''}>Finance</option>
+                                                    <option value="Academic" ${project.projectType == 'Academic' ? 'selected' : ''}>Academic</option>
+                                                    <option value="Student" ${project.projectType == 'Student' ? 'selected' : ''}>Student</option>
+                                                    <option value="PTJ" ${project.projectType == 'PTJ' ? 'selected' : ''}>PTJ</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
                                             <span class="label-style">Client Name</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light border-end-0">
+                                            <div class="input-group input-group-text bg-light">
+                                                <span class="me-2">
                                                     <i class="fas fa-user-tie text-muted"></i>
                                                 </span>
-                                                <input type="text" name="projClient" id="projClient" 
-                                                       class="form-control editable-field border-start-0" 
+                                                <input type="text"  name="projClient" id="projClient" 
+                                                       class="form-control editable-field" 
                                                        value="${project.projectClient}" 
                                                        placeholder="Enter client or stakeholder name" readonly>
                                             </div>
@@ -128,51 +177,71 @@
 
                                         <div class="col-12">
                                             <span class="label-style">Project Description</span>
-                                            <textarea name="projectDesc" id="projDesc" class="form-control editable-field" rows="2"
-                                                      readonly>${project.projectDesc}</textarea>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <span class="label-style">Project Status</span>
-                                            <div id="statusView" class="fw-semibold" style="font-size: 0.9rem;">${project.projectStatus}</div>
-
-                                            <select id="statusSelect" name="projectStatus" 
-                                                    class="form-select form-select-sm editable-field d-none" 
-                                                    onchange="toggleArchiveWarning(this.value)" >
-                                                <option value="Active" ${project.projectStatus == 'Active' ? 'selected' : ''}>Active</option>
-                                                <option value="Completed" ${project.projectStatus == 'Completed' ? 'selected' : ''}>Completed</option>
-                                                <option value="On Hold" ${project.projectStatus == 'On Hold' ? 'selected' : ''}>On Hold</option>
-                                                <option value="Archive" ${project.projectStatus == 'Archive' ? 'selected' : ''}>Archived</option>
-                                            </select>
-
-                                            <div id="archiveNotice" class="alert alert-warning mt-2 d-none">
-                                                <small><i class="fas fa-info-circle me-1"></i> 
-                                                    Note: Setting status to <strong>Archived</strong> will hide this project from your main dashboard.
-                                                </small>
+                                            <div class="input-group input-group-text bg-light border-end-0">
+                                                <span class="me-2 align-items-start pt-2">
+                                                    <i class="fas fa-align-left text-muted"></i>
+                                                </span>
+                                                <textarea name="projectDesc" id="projDesc" class=" px-2 form-control editable-field" rows="2"
+                                                          readonly>${project.projectDesc}</textarea>
                                             </div>
                                         </div>
+
                                         <div class="col-md-4">
-                                            <span class="label-style">Start Date</span>
-                                            <input type="date" name="projStartDate" id="projStart" class="form-control editable-field"
-                                                   value="${project.projStartDate}" readonly>
+                                            <span class="label-style">Project Status</span>
+                                            <div class="input-group input-group-text bg-light  ">
+                                                <span class="me-2">
+                                                    <i class="fas fa-circle-dot text-muted"></i> </span>
+
+
+                                                <input type="text"  name="projStatus" id="projStatus" 
+                                                       class="form-control editable-field" 
+                                                       value="${project.projectStatus}" 
+                                                       placeholder="Enter client or stakeholder name">
+                                            </div>
                                         </div>
+
+
+                                        <div class="col-md-4 position-relative">
+                                            <span class="label-style">Start Date</span>
+                                            <div class="input-group input-group-text bg-light  ">
+                                                <span class="me-2">
+                                                    <i class="fas fa-calendar-days text-muted"></i>
+                                                </span>
+                                                <input type="date" name="projStartDate" id="ProjStart" class="form-control editable-field"
+                                                       value="${project.projStartDate}" readonly>
+                                            </div> <span class=" position-absolute start-0 ms-3"><p id="errorMsgStartDate"></p></span>
+                                        </div>
+
                                         <div class="col-md-4">
                                             <span class="label-style">Deadline</span>
-                                            <input type="date" name="projEndDate" id="projEnd" class="form-control editable-field"
-                                                   value="${project.projEndDate}" readonly>
+                                            <div class="input-group input-group-text bg-light ">
+                                                <span class="me-2">
+                                                    <i class="fas fa-calendar-check text-muted"></i>
+                                                </span>
+                                                <input type="date" name="projEndDate" id="ProjEnd" class="form-control editable-field"
+                                                       value="${project.projEndDate}" readonly>
+                                            </div>
                                         </div>
-                                        <div class="col-md-3">
+
+                                        <div class="col-md-4">
                                             <span class="label-style">Date Created</span>
-                                            <div class="text-muted py-1" style="font-size: 0.9rem;">
-                                                <i class="far fa-calendar-check me-1"></i>
-                                                <span id="displayCreatedAt">${project.projCreatedAt}</span>
+                                            <div class="input-group input-group-text bg-light">
+                                                <span class="me-2">
+                                                    <i class="fas fa-calendar-plus text-muted"></i>
+                                                </span>
+
+
+                                                <input type="text" name="projDate" id="projDate" class="form-control editable-field"
+                                                       value="${project.projCreatedAt}" readonly>
+
                                             </div>
                                         </div>
                                     </div>
 
                                     <div id="editActions" class="d-none mt-4 pt-3 border-top text-end">
-                                        <button type="button" class="btn btn-sm btn-light px-3 me-2 fw-bold"
+                                        <button id="formCanbtn" type="button" class="btn btn-sm btn-light px-3 me-2 fw-bold"
                                                 style="font-size: 0.8rem;" onclick="toggleEdit(false)">Cancel</button>
-                                        <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold"
+                                        <button id="formSubbtn" type="submit" class="btn btn-sm btn-primary px-4 fw-bold"
                                                 style="font-size: 0.8rem;" >Save Changes</button>
                                     </div>
                                 </form>
@@ -244,7 +313,7 @@
                                                          class="form-control form-control-sm" placeholder="Label"></div>
                             <div class="col-md-5"><input type="file" id="actualFile"
                                                          class="form-control form-control-sm"></div>
-
+    
                             <div class="col-md-3"><button class="btn btn-sm btn-primary w-100 fw-bold"
                                                           onclick="addFile()">Upload</button></div>
                     </c:if>
@@ -282,18 +351,18 @@
                             class="btn btn-sm btn-light border p-1 px-2 ms-1"><i
                             class="fas fa-trash-alt text-danger"></i></button>
                     </c:if>
-
+    
             </td>
         </tr>
     </tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>-->
+    </table>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>-->
 
 
                     <div class="modal fade" id="deleteFolderModal" tabindex="-1" aria-hidden="true">
@@ -337,59 +406,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!--                    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered">
-                                                <div class="modal-content border-0 shadow">
-                                                    <div class="modal-header bg-primary text-white">
-                                                        <h5 class="modal-title fw-bold" id="uploadModalLabel" style="font-size: 1rem;">
-                                                            <i class="fas fa-file-upload me-2"></i>Upload New Document
-                                                        </h5>
-                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body p-4">
-                                                        <form id="uploadForm">
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-bold text-muted small">Document Name</label>
-                                                                <input type="text" id="docLabel" class="form-control" placeholder="e.g. Project Charter">
-                                                            </div>
-                    
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-bold text-muted small">Document Category</label>
-                                                                <select id="docType" class="form-select">
-                                                                    <option value="" selected disabled>Select Category...</option>
-                                                                    <option value="Charter">Project Charter</option>
-                                                                    <option value="SRS">Requirements (SRS)</option>
-                                                                    <option value="Design">Design Document (SDD)</option>
-                                                                    <option value="Testing">Test Plan</option>
-                                                                </select>
-                                                            </div>
-                    
-                                                            <div class="mb-3">
-                                                                <label class="form-label fw-bold text-muted small">Attachment</label>
-                                                                <div id="dropZone" class="border border-2 border-dashed rounded-3 p-4 text-center bg-light transition" style="cursor: pointer;">
-                                                                    <input type="file" id="actualFile" class="d-none">
-                                                                    <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
-                                                                    <p class="mb-1 fw-bold">Drag and drop file here</p>
-                                                                    <p class="text-muted small mb-0">or click to browse from computer</p>
-                                                                    <div id="fileInfo" class="mt-3 d-none">
-                                                                        <span class="badge bg-primary rounded-pill py-2 px-3">
-                                                                            <i class="fas fa-file me-2"></i><span id="selectedFileName"></span>
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer bg-light">
-                                                        <button type="button" class="btn btn-sm btn-secondary fw-bold px-3" data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="button" class="btn btn-sm btn-primary fw-bold px-4" onclick="handleModalUpload()">
-                                                            Confirm Upload
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>-->
 
                     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-backdrop="false">
                         <div class="modal-dialog modal-dialog-centered">
@@ -448,8 +464,11 @@
                             </div>
                         </div>
                     </div>
-
-                    <script src="js\projectPage.js"></script>
+                    <script>
+                        const projectId = "${project.projectId}";
+                    </script>
+                    <script src="js/common.js"></script>
+                    <script src="js/projectPage.js"></script>
                     </body>
 
                     </html>

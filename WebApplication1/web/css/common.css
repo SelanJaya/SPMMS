@@ -137,3 +137,38 @@ body {
     vertical-align: middle;
     margin-left: 10px;
 }
+
+#successProcessTab {
+    position: fixed;    
+    top: 20px;          
+    left: 50%; 
+    /* We don't put transform here because the animation will override it */
+    
+    z-index: 9999;      
+    min-width: 350px;
+    max-width: 450px;
+/*    border-left: 5px solid #198754; 
+    background-color: #d1e7dd;  Bootstrap success green light */
+/*    color: #0f5132;             Dark green text for readability */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+
+    /* Matches the name in @keyframes below */
+    animation: slideDownBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+@keyframes slideDownBounce {
+    from {
+        /* Keep -50% horizontal to stay centered while moving -150% vertical */
+       transform: translateY(-20px);
+        opacity: 0; 
+    }
+    to { 
+        /* Final state: centered and visible */
+       transform: translateY(0);
+        opacity: 1; 
+    }
+}
+
+.alert-dismissible .btn-close {
+    padding: 1.25rem;
+}

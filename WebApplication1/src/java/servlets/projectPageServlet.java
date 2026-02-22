@@ -15,6 +15,8 @@ import beans.User;
 import DAO.ProjectDAO;
 import DAO.projectTeamDAO;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 
@@ -127,11 +129,11 @@ public class projectPageServlet extends HttpServlet {
             throws ServletException, IOException {
 
         int projectId, user_id;
-        String processType;
         List<Project> projectInfo;
         boolean status;
-        String projectName, projectDesc, projectStatus,projectType,projClient, startStr, endStr;
+        String projectName, projectDesc, projectStatus, projectType, processType, projClient, startStr, endStr, projDateStr;
         LocalDate projStartDate, projEndDate;
+        LocalDateTime projDate = null;
 
         processType = request.getParameter("processType");
 
@@ -147,29 +149,36 @@ public class projectPageServlet extends HttpServlet {
                 projectDesc = request.getParameter("projectDesc");
                 projectType = request.getParameter("projectType");
                 projClient = request.getParameter("projClient");
-                
 
                 // Safety check for dates
                 startStr = request.getParameter("projStartDate");
                 endStr = request.getParameter("projEndDate");
+                projDateStr = request.getParameter("projDate");
                 projStartDate = (startStr != null && !startStr.isEmpty()) ? LocalDate.parse(startStr) : null;
                 projEndDate = (endStr != null && !endStr.isEmpty()) ? LocalDate.parse(endStr) : null;
+                
+                if (projDateStr != null && !projDateStr.isEmpty()) {
+                    // 1. Replace all whitespace (tabs, double spaces, etc) with one single space
+                    String normalized = projDateStr.trim().replaceAll("\\s+", " ");
 
-                Project project = new Project(projectId, projectName, projectDesc, "Active", projectType, projClient, projStartDate, projEndDate);
+                    // 2. Parse using the standard single-space pattern
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy MM dd HH:mm");
+                    projDate = LocalDateTime.parse(normalized, formatter);
+                }
+
+                Project project = new Project(projectId, projectName, projectDesc, "Active", projectType, projClient, projStartDate, projEndDate, projDate);
 
                 status = projectDao.updateProject(project);
 
                 if (status == true) {
                     HttpSession session = request.getSession();
 
-                 
-                        user_id = (int) session.getAttribute("userId");
-                        projectInfo = projectDao.projectInfo(user_id);
-                        session.setAttribute("projectInfo", projectInfo);
-                    
+                    user_id = (int) session.getAttribute("userId");
+//                    projectInfo = projectDao.projectInfo(user_id);
+//                    session.setAttribute("projectInfo", projectInfo);
 
                     session.setAttribute("project", project);
-                    session.setAttribute("successMsg", "Project updated successfully!");
+                    session.setAttribute("processStatus", status);
 
                     request.getRequestDispatcher("projectPage.jsp").forward(request, response);
                 } else {
@@ -181,7 +190,7 @@ public class projectPageServlet extends HttpServlet {
                 e.printStackTrace();
                 response.sendRedirect("error.jsp");
             }
-        } 
+        }
 //         else if ("updateStatus".equalsIgnoreCase(processType)) {
 //
 //            // 1. Set the response type to JSON

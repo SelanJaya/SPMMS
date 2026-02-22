@@ -92,23 +92,23 @@
                     </div>
                     <div class="row g-3 mb-4">
                         <c:forEach var="user" items="${projectTeamAssignmentData}">
-                            <c:if test="${user1.user_role == 'Project Manager'}">
+                            <c:if test="${user.user_role == 'Project Manager'}">
 
                                 <div class="col-xl-3 col-md-6">
                                     <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user1.username}&background=eff6ff&color=2563eb"
+                                        <img src="https://ui-avatars.com/api/?name=${user.username}&background=eff6ff&color=2563eb"
                                              class="avatar-md me-3" />
 
                                         <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user1.username} HAHA </div>
-                                            <div class="text-muted" style="font-size: 11px;">${user1.email}</div>
+                                            <div class="fw-bold text-dark small">${user.username}</div>
+                                            <div class="text-muted" style="font-size: 11px;">${user.email}</div>
                                         </div>
 
                                         <c:if test="${user.user_role == 'Project Manager'}">
                                             <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
                                                     data-bs-target="#deleteMemberModal" 
                                                     data-project-id="${project.projectId}"
-                                                    data-user-id="${user1.user_id}"
+                                                    data-user-id="${user.user_id}"
                                                     name="Delete" value="Delete"
                                                     > Delete
                                             </button>

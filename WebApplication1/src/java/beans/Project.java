@@ -36,7 +36,7 @@ public class Project {
     }
     
     //Contructor for update project
-    public Project(int projectId, String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, LocalDate projStartDate, LocalDate projEndDate) {
+    public Project(int projectId, String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, LocalDate projStartDate, LocalDate projEndDate, LocalDateTime projCreatedAt) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDesc = projectDesc;
@@ -45,6 +45,7 @@ public class Project {
         this.projectClient = projectClient;
         this.projStartDate = projStartDate;
         this.projEndDate = projEndDate;
+        this.projCreatedAt = this.projCreatedAt;
     }
     
      //Contructor for update project
@@ -52,7 +53,6 @@ public class Project {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDesc = projectDesc;
-        this.projectStatus = projectStatus;
         this.projectType = projectType;
         this.projectClient = projectClient;
         this.projStartDate = projStartDate;
