@@ -117,7 +117,14 @@ $(document).ready(function () {
         order: [[1, 'asc']],
         paging: false, info: false, searching: true,
         columnDefs: [{targets: 'no-sort', orderable: false}]
+
     });
+
+    if (userRole !== "Product Owner") {
+//        table.column(0).visible(false); // drag column
+//        table.column(7).visible(false); // action column
+        table.column('.action-col').visible(false);
+    }
 
     const sidebar = document.getElementById('sidebar');
     // 1. Sidebar Toggle
@@ -439,7 +446,7 @@ function addbacklogToTable(data) {
 
     const newRow = table.row.add([
         dragAndDropSymbol,
-        `<div  class="${editableClass}" ${editableAttr} data-field="backlogI_priority">${data.backlogI_priority}</div>`,
+        `<div  data-field="backlogI_priority">${data.backlogI_priority}</div>`,
         `<div  class="${editableClass}" ${editableAttr} data-field="backlogI_title">${data.backlogI_title}</div>`,
         `<div  class="${editableClass}" ${editableAttr} data-field="backlogI_desc">${data.backlogI_desc}</div>`,
         `<div  class="${editableClass}" ${editableAttr} data-field="acceptance_cri">${data.acceptance_cri}</div>`,
@@ -473,7 +480,8 @@ function getExistingPriorities() {
 
     return priorities;
 }
-//
+
+
 //async function handleAddBacklog() {
 //
 //    const enteredPriority = Number($('#backlog_priority').val());
@@ -499,19 +507,58 @@ function getExistingPriorities() {
 //        alert("Failed to save backlog");
 //    }
 //}
+//
+//
+//$('#backlog_priority').on('input', function () {
+//
+//    const enteredPriority = parseInt($(this).val());
+//    const existingPriorities = getExistingPriorities();
+//    var formSubbtn = document.getElementById("formSubbtn");
+// 
+//    if (existingPriorities.includes(enteredPriority)) {
+//
+////        $('#alertPriority').text("Priority already exists. Please choose another.");
+//        $(this).addClass('is-invalid');
+//        $('#alertPriority').text("Priority already exists.");
+//        formSubbtn.disabled = true;
+////        alert("Priority already exists.");
+//
+//    } else {
+//        document.getElementById("alertPriority").innerHTML = "";
+//        formSubbtn.disabled = false;
+//    }
+//
+//});
 
-$('#backlog_priority').on('blur', function () {
+$('#backlog_priority').on('input', function () {
 
-    const enteredPriority = Number($(this).val());
+    const enteredPriority = parseInt($(this).val());
     const existingPriorities = getExistingPriorities();
+    const confirmAddBtn = document.getElementById("confirmAddBtn");
+
+    // If empty or not number → reset state
+    if (isNaN(enteredPriority)) {
+        $(this).removeClass('is-invalid');
+        $('#alertPriority').text('');
+        if (confirmAddBtn) confirmAddBtn.disabled = false;
+        return;
+    }
 
     if (existingPriorities.includes(enteredPriority)) {
-        document.getElementById("alertPriority").innerHTML("Priority already exists. Please choose another.");
-        alert("Priority already exists.");
-        $(this).val('');
-        $(this).focus();
-    }
-});
 
+        $(this).addClass('is-invalid');
+        $('#alertPriority').text("Priority already exists.");
+
+        if (confirmAddBtn) confirmAddBtn.disabled = true;
+
+    } else {
+
+        $(this).removeClass('is-invalid');
+        $('#alertPriority').text('');
+
+        if (confirmAddBtn) confirmAddBtn.disabled = false;
+    }
+
+});
 
 

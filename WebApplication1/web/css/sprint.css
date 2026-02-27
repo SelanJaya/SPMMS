@@ -152,6 +152,35 @@ body {
     border: 2px dashed var(--primary-blue);
 }
 
+/* Container to align buttons to the right */
+.text-end .d-flex {
+    margin-top: 5px;
+}
+
+/* Base style for both action buttons */
+.btn-sm {
+    border-radius: 6px; /* Matching the slight curve of your card elements */
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+}
+
+/* Specific styling for the Delete button to match the theme */
+.btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+}
+
+/* Optional: Slight spacing for the icons */
+.btn-sm i {
+    font-size: 0.85rem;
+}
+
 #content-wrapper {
     display: flex;
     flex-direction: column;
@@ -185,3 +214,63 @@ body {
 .bg-light {
     background-color: #f1f5f9 !important;
 }
+
+.modal-content {
+    border-radius: 20px;
+}
+
+.form-control,
+.form-select {
+    background-color: #f8f9fa;
+    border: 1px solid #eaeaea;
+}
+
+.modal-body h3 {
+    letter-spacing: 0.5px;
+}
+
+/* Make Select2 match Bootstrap input */
+.select2-container--default .select2-selection--multiple {
+    background-color: #f8f9fa;
+    min-height: 38px;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 4px 6px;
+}
+
+/* align tags vertically */
+.select2-container .select2-selection--multiple {
+    display: flex;
+    align-items: center;
+}
+
+/* remove ugly focus glow mismatch */
+.select2-container--default.select2-container--focus
+.select2-selection--multiple {
+    background-color: #fff;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+}
+
+.select2-container--default
+.select2-search--inline
+.select2-search__field {
+    margin-top: 2px;
+}
+
+/* remove (×) alignment fix */
+.select2-container--default 
+.select2-selection--multiple 
+.select2-selection__choice__remove {
+
+    margin-right: 6px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* hover delete icon */
+.select2-container--default 
+.select2-selection__choice__remove:hover {
+    color: #dc3545;
+}
+

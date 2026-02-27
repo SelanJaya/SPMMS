@@ -159,7 +159,8 @@ public class BacklogServlet extends HttpServlet {
             String action = jsonObject.get("action").getAsString();
 
             System.out.println("Action : " + action);
-
+            
+            
             if (!"Reorder".equalsIgnoreCase(action)) {
                 //Convert the Json strings to bean variable
                 backlog = gson.fromJson(json, Backlog.class);

@@ -257,7 +257,7 @@
                     $('#createProjectModal').modal('hide');
                     this.reset();
                 });
-            }
+            };
 
         </script>
     </body>

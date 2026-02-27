@@ -37,7 +37,7 @@
                 <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
                 <a href="projectPage.jsp" class="nav-link active"><i class="fas fa-briefcase me-3"></i> Projects</a>
 
-                <a href="sprint.jsp" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
+                <a href="SprintServlet?action=redirect&project_id=${project.projectId}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
 
 
                 <a href="BacklogServlet?action=redirect&project_id=${project.projectId}" class="nav-link">

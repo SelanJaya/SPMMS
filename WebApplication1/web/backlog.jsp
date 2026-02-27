@@ -65,7 +65,7 @@
                                 style="font-size: 1.2rem;">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <div class="small text-muted">Management / <span class="fw-bold text-dark">Product Backlog</span>
+                        <div class="small text-muted">Management / <span class="fw-semibold text-dark">Product Backlog</span>
                         </div>
                     </div>
                     <div class="user-info d-flex align-items-center">
@@ -100,49 +100,10 @@
                                     <th>ACCEPTANCE CRITERIA</th>
                                     <th>Mandays</th>
                                     <th>POINTS</th>
-                                    <th class="no-sort">ACTION</th>
+                                    <th class="no-sort action-col">ACTION</th>
                                 </tr>
                             </thead>
                             <tbody id="sortableBody">
-                                <!--                                <tr>
-                                                                    <td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
-                                                                    <td class="priority-rank">1</td>
-                                                                    <td>
-                                                                        <div class="editable-cell" contenteditable="true">Initial Database Schema</div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="editable-cell" contenteditable="true">Create tables for backlog and
-                                                                            users.</div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="editable-cell" contenteditable="true">MySQL scripts verified.</div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="editable-cell" contenteditable="true">3</div>
-                                                                    </td>
-                                                                    <td>
-                                                                        <div class="editable-cell" contenteditable="true">3</div>
-                                                                    </td>
-                                                                    
-                                                                        <td class="text-center">
-                                                                            <div class="d-flex justify-content-center align-items-center gap-2">
-                                                                                <button type="button" 
-                                                                                        class="btn btn-sm btn-outline-primary shadow-sm" 
-                                                                                        data-bs-toggle="modal" 
-                                                                                        data-bs-target="#backlogDocModal"
-                                                                                        title="Manage Documents">
-                                                                                    <i class="fas fa-file-alt"></i>
-                                                                                </button>
-                                
-                                                                                <button type="button" 
-                                                                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete" 
-                                                                                        title="Delete Item">
-                                                                                    <i class="fas fa-trash-alt"></i>
-                                                                                </button>
-                                                                            </div>
-                                                                        </td>
-                                                                    
-                                                                </tr>-->
                             </tbody>
                         </table>
                     </div>
@@ -170,39 +131,39 @@
                                 <textarea id="backlog_description" class="form-control" rows="3" placeholder="Describe the task... example:
                                           As a [role],
                                           I want [feature],
-                                          So that [business value]." style="border-radius: 8px; border: 1px solid #e2e8f0;"></textarea>
+                                          So that [business value]." style="border-radius: 8px; border: 1px solid #e2e8f0;" required></textarea>
                             </div>
 
                             <div class="mb-3">
                                 <label class="label-style d-block mb-2">Acceptance Criteria</label>
                                 <textarea id="backlog_ACriteria" class="form-control" rows="2"
                                           placeholder="Conditions for completion..."
-                                          style="border-radius: 8px; border: 1px solid #e2e8f0;"></textarea>
+                                          style="border-radius: 8px; border: 1px solid #e2e8f0;" required></textarea>
                             </div>
 
                             <div class="row mb-4">
                                 <div class="col-md-4">
                                     <label class="label-style d-block mb-2">Story Points</label>
                                     <input type="number" id="backlog_SPts" class="form-control" value="0" min="0" max="10"
-                                           style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;">
+                                           style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="label-style d-block mb-2">Mandays</label>
                                     <input type="number" id="backlog_Mdys" class="form-control" value="0" min="0" max="10"
-                                           style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;">
+                                           style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="label-style d-block mb-2">Priority Rank</label>
                                     <input type="number" id="backlog_priority" class="form-control" placeholder="e.g. 1"
-                                           style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;">
-                                    <span id="alertPriority"></span>
+                                           style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
+                                    <div id="alertPriority" class="invalid-feedback"></div>
                                 </div>
                             </div>
 
                             <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary fw-bold py-2" id="confirmAddBtn"
+                                <button type="button" class="btn btn-primary fw-bold py-2 " id="confirmAddBtn"
                                         style="background-color: #2563eb; border-radius: 25px; border: none;">
                                     Create Item
                                 </button>
@@ -216,7 +177,8 @@
                 </div>
             </div>
         </div>
-
+        
+        <!--Backlog level document pop up tab -->
         <div class="modal fade" id="backlogDocModal" tabindex="-1" data-bs-backdrop="false">
             <div class="modal-dialog">
                 <div class="modal-content shadow-lg">
@@ -243,6 +205,7 @@
                             </li>
                         </ul>
 
+
                         <div class="tab-content">
                             <div class="tab-pane fade show active p-4" id="viewPane">
                                 <div class="table-responsive">
@@ -252,7 +215,7 @@
                                                 <th style="width: 30%;">Document Name</th>
                                                 <th style="width: 15%;">Type</th>
                                                 <th style="width: 35%;">Path</th>
-                                                <th style="width: 20%;" class="text-end">Actions</th>
+                                                <th class="action-col no-sort" style="width: 20%;" class="text-end">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody id="backlogFileRegistry">
@@ -345,6 +308,7 @@
             </div>
         </div>
 
+        <!-- Deletion pop up tab -->
         <div class="modal fade" id="deleteBacklogModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow">
@@ -391,17 +355,6 @@
             var projectId = ${project.projectId};
             var userRole = "${user.user_role}";
             let table;
-
-//            table = $('#backlogTable').DataTable({
-//                order: [[1, 'asc']],
-//                paging: false, info: false, searching: true,
-//                columnDefs: [{targets: 'no-sort', orderable: false}]
-//            });
-
-            if (userRole !== "Product Owner") {
-                table.column(0).visible(false); // drag column
-                table.column(7).visible(false); // action column
-            }
         </script>
         <script src="js/backlog.js"></script>
     </body>

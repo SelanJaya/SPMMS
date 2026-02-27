@@ -114,33 +114,32 @@ public class BacklogDAO {
         }
 
     }
-    
-    public void reorderBacklogItem(int backlogI_priority ,int backlogI_id) {
+
+    public void reorderBacklogItem(int backlogI_priority, int backlogI_id) {
         boolean status = false;
         String sql = "UPDATE backlog_items SET backlog_item_priority = ? "
                 + "where backlog_item_id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            
-            ps.setInt(1,backlogI_priority );
-            ps.setInt(2, backlogI_id );
+            ps.setInt(1, backlogI_priority);
+            ps.setInt(2, backlogI_id);
 
             status = ps.executeUpdate() > 1;
-           
+
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Exception from DAO :" + e );
+            System.out.println("Exception from DAO :" + e);
         }
-        
+
         System.out.println("Status from DAO " + status);
     }
-    
-     public void deleteBacklogItem(int backlogId) {
+
+    public void deleteBacklogItem(int backlogId) {
         String sql = "DELETE FROM backlog_items WHERE backlog_item_id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-           
+
             ps.setInt(1, backlogId);
 
             ps.executeUpdate();
@@ -148,5 +147,39 @@ public class BacklogDAO {
             e.printStackTrace();
         }
 
+    }
+
+    public List getHighPriorityBacklog(int project_id) {
+        List<Backlog> backlogList = new ArrayList<>();
+
+        String sql = """
+            SELECT b.*
+            FROM backlog_items b
+            LEFT JOIN sprint_backlog_link sbl
+                ON b.backlog_item_id = sbl.link_backlog_item_id
+            WHERE b.project_id = ?
+            AND sbl.link_backlog_item_id IS NULL
+            ORDER BY b.backlog_item_priority ASC
+            LIMIT 5
+            """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, project_id);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Backlog backlog = new Backlog();
+                backlog.setBacklogI_id(rs.getInt("backlog_item_id"));
+                System.out.println("Data in DAO " + rs.getInt("backlog_item_id"));
+                backlog.setBacklogI_title(rs.getString("backlog_item_title"));
+                backlogList.add(backlog);
+            }
+            return backlogList;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
