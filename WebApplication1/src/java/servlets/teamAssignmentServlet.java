@@ -68,92 +68,113 @@ public class teamAssignmentServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        PrintWriter out = response.getWriter(); // Get this AFTER setting content type
-
-        String URLRole, decodedRole, role;
-
-        List<User> users = new ArrayList<>();
-
-        UserDAO userDao = new UserDAO();
-
-        // To carry (Box) the List<User> and status - reduce the number of HTTP response
-        Map<String, Object> jsonResponse = new HashMap<>();
-
-        try {
-            URLRole = request.getParameter("roleType");
-
-            // URL decoding converts %20 back into a real space
-            decodedRole = java.net.URLDecoder.decode(URLRole, "UTF-8");
-
-            System.out.println("Cleaned Role for DB: [" + decodedRole + "]");
-
-            // Check if parameter is missing or empty
-            if (decodedRole == null || decodedRole.trim().isEmpty()) {
-
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // Error 400
-
-                jsonResponse.put("success", false);
-                jsonResponse.put("message", "Role parameter is required.");
-            } else {
-                users = userDao.getUsersByRole(decodedRole);
-
-                if (users == null) {
-                    users = new ArrayList<>(); // Return empty list instead of null
-                }
-
-                System.out.println("======= START DAO CONTENT LOG =======");
-                if (users != null && !users.isEmpty()) {
-                    for (User u : users) {
-                        // This prints the specific fields of each User object
-                        System.out.println("ID: " + u.getUser_id()
-                                + " | Name: " + u.getUsername()
-                                + " | Email: " + u.getEmail());
-                    }
-                } else {
-                    System.out.println("No data inside the list.");
-                }
-                System.out.println("======== END DAO CONTENT LOG ========");
-
-                jsonResponse.put("success", true);
-                jsonResponse.put("data", users);
-                jsonResponse.put("count", users.size());
-
+        String action = (String) request.getParameter("action");
+        
+        if ("fetchTeamAssignment".equalsIgnoreCase(action)) {
+            List<User> projectTeamAssignmentArr;
+            
+            int projectId = Integer.parseInt(request.getParameter("project_id"));
+                        
+            projectTeamDAO projectTeamDao = new projectTeamDAO();
+            
+            projectTeamAssignmentArr = projectTeamDao.getAssignedMembers(projectId);
+            for (User member : projectTeamAssignmentArr) {
+                System.out.println("User: " + member.getUsername() + " | Email: " + member.getEmail() + " | Role: " + member.getUser_role());
             }
-        } catch (Throwable t) {
 
-            System.err.println("!!! FATAL ERROR CAUGHT !!!");
-            t.printStackTrace(); // This WILL print even if a library is missing
+            request.setAttribute("projectTeamAssignmentData", projectTeamAssignmentArr);
+            
+            System.out.println("in teamAssignment Servlet" + projectTeamAssignmentArr);
+            request.getRequestDispatcher("teamMembersPage.jsp").forward(request, response);
+        } else if ("fetchUsers".equalsIgnoreCase(action)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
 
-            System.err.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            jsonResponse.put("success", false);
-//            jsonResponse.put("message", "Internal Server Error: " + e.getMessage());
-        } finally {
+            PrintWriter out = response.getWriter(); // Get this AFTER setting content type
+
+            String URLRole, decodedRole, role;
+
+            List<User> users = new ArrayList<>();
+
+            UserDAO userDao = new UserDAO();
+
+            // To carry (Box) the List<User> and status - reduce the number of HTTP response
+            Map<String, Object> jsonResponse = new HashMap<>();
+
             try {
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
+                URLRole = request.getParameter("roleType");
 
-                // 1. Use GsonBuilder to exclude "problem" fields or complex internals
-                // This prevents the "Failed making field accessible" error
-                Gson gson = new GsonBuilder()
-                        .setPrettyPrinting()
-                        .create();
+                // URL decoding converts %20 back into a real space
+                decodedRole = java.net.URLDecoder.decode(URLRole, "UTF-8");
 
-                // 2. Generate the JSON
-                String jsonOutput = gson.toJson(jsonResponse);
+                System.out.println("Cleaned Role for DB: [" + decodedRole + "]");
 
-                System.out.println("DEBUG - FINAL JSON CARGO: " + jsonOutput);
+                // Check if parameter is missing or empty
+                if (decodedRole == null || decodedRole.trim().isEmpty()) {
 
-                out.print(jsonOutput);
-                out.flush();
-            } catch (Exception e) {
-                System.err.println("JSON Error: " + e.getMessage());
-                e.printStackTrace();
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // Error 400
+
+                    jsonResponse.put("success", false);
+                    jsonResponse.put("message", "Role parameter is required.");
+                } else {
+                    users = userDao.getUsersByRole(decodedRole);
+
+                    if (users == null) {
+                        users = new ArrayList<>(); // Return empty list instead of null
+                    }
+
+                    System.out.println("======= START DAO CONTENT LOG =======");
+                    if (users != null && !users.isEmpty()) {
+                        for (User u : users) {
+                            // This prints the specific fields of each User object
+                            System.out.println("ID: " + u.getUser_id()
+                                    + " | Name: " + u.getUsername()
+                                    + " | Email: " + u.getEmail());
+                        }
+                    } else {
+                        System.out.println("No data inside the list.");
+                    }
+                    System.out.println("======== END DAO CONTENT LOG ========");
+
+                    jsonResponse.put("success", true);
+                    jsonResponse.put("data", users);
+                    jsonResponse.put("count", users.size());
+
+                }
+
+            } catch (Throwable t) {
+
+                System.err.println("!!! FATAL ERROR CAUGHT !!!");
+                t.printStackTrace(); // This WILL print even if a library is missing
+
+                System.err.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                jsonResponse.put("success", false);
+//            jsonResponse.put("message", "Internal Server Error: " + e.getMessage());
+            } finally {
+                try {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+
+                    // 1. Use GsonBuilder to exclude "problem" fields or complex internals
+                    // This prevents the "Failed making field accessible" error
+                    Gson gson = new GsonBuilder()
+                            .setPrettyPrinting()
+                            .create();
+
+                    // 2. Generate the JSON
+                    String jsonOutput = gson.toJson(jsonResponse);
+
+                    System.out.println("DEBUG - FINAL JSON CARGO: " + jsonOutput);
+
+                    out.print(jsonOutput);
+                    out.flush();
+                } catch (Exception e) {
+                    System.err.println("JSON Error: " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
-        }
 
+        }
     }
 
     /**

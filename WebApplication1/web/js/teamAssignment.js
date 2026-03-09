@@ -16,28 +16,11 @@ $(document).ready(function () {
                     .attr('placeholder', 'Search ' + selectedRole + 's...');
         }
     });
-//    // 2. The Engine to fetch users
-//    async function loadUsersByRole(roleName) {
-//        try {
-//            // FIX: Added '?' and 'userRole='
-////                        const response = await fetch(`projectAssignmentServlet?userRole=`);
-//            const response = await fetch(`teamAssignmentServlet?roleType=${encodeURIComponent(roleName)}`);
-//            const result = await response.json();
-//            if (result.success) {
-//                employeeData = result.data; // Update cache
-//                displayUsers(result.data); // Render table
-//                console.log(`Cargo Arrived: ${result.count} users.`);
-//            } else {
-//                alert("Error: " + result.message);
-//            }
-//        } catch (error) {
-//            console.error("Network/System Error:", error);
-//        }
-//    }
+
 
     async function loadUsersByRole(roleName) {
         try {
-            const response = await fetch(`teamAssignmentServlet?roleType=${encodeURIComponent(roleName)}`);
+            const response = await fetch(`teamAssignmentServlet?action=fetchUsers&roleType=${encodeURIComponent(roleName)}`);
 
             if (!response.ok)
                 throw new Error("Network response was not ok");
@@ -187,44 +170,4 @@ $(document).on('click', '.btn-delete-member', function () {
     // 4. Update the text in the modal to show the name
     $('#displayUserName').text(userName);
 });
-
-
-
-
-//
-//document.addEventListener('DOMContentLoaded', function () {
-//    // 1. Select all delete buttons
-//    const deleteButtons = document.querySelectorAll('.btn-delete-member');
-//    console.log("ATACHED");
-//
-//    deleteButtons.forEach(button => {
-//        button.addEventListener('click', function () {
-//            // 2. Extract data from the clicked button's data attributes
-//            const userId = this.getAttribute('data-user-id');
-//            const projectId = this.getAttribute('data-project-id');
-//
-//            console.log("UserId : " + userId);
-//            // 3. Populate the Modal form fields
-//            document.getElementById('modalUserId').value = userId;
-//            document.getElementById('modalProjectId').value = projectId;
-//        });
-//    });
-//});
-
-// Add this to your teamAssignment.js
-//    $(document).on('click', '.btn-delete-member', function () {
-//        console.log("ATTACHED");
-//        // Extract data from button attributes
-//        const userId = $(this).data('user-id');
-//        const projectId = $(this).data('project-id');
-//
-//        // Find the username in the card to show a confirmation message
-//        const userName = $(this).closest('.team-card').find('.fw-bold').text();
-//
-//        // Inject data into the Modal's hidden inputs
-//        $('#modalUserId').val(userId);
-//        $('#modalProjectId').val(projectId);
-//        $('#displayUserName').text(userName);
-//    });
-
 

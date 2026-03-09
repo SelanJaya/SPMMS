@@ -35,7 +35,7 @@
             <div class="nav flex-column mt-3">
                 <a href="dashboard.jsp" class="nav-link"><i class="fas fa-grid-2 me-3 fa-chart-pie"></i> Dashboard</a>
                 <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
-                <a href="projectPage.jsp" class="nav-link active"><i class="fas fa-briefcase me-3"></i> Projects</a>
+                <a href="projectPageServlet?projectId=${project.projectId}" class="nav-link active"><i class="fas fa-briefcase me-3"></i> Projects</a>
 
                 <a href="SprintServlet?action=redirect&project_id=${project.projectId}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
 
@@ -44,7 +44,7 @@
                     <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                 </a>
 
-                <a href="teamMembersPage.jsp" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
+                <a href="teamAssignmentServlet?action=fetchTeamAssignment&project_id=${project.projectId}" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
                 <a href="projectAnalytics.jsp" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                 <div class="mt-auto">
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>

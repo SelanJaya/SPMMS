@@ -7,6 +7,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     Author     : HP
 */
 
+body.modal-open {
+    overflow-y: auto !important;
+    padding-right: 0 !important;
+}
+
 :root {
     --primary-blue: #2563eb;
     --bg-gray: #f8fafc;
@@ -227,9 +232,21 @@ body {
 
 .modal-body h3 {
     letter-spacing: 0.5px;
+    overflow: visible !important;
 }
 
-/* Make Select2 match Bootstrap input */
+.modal-dialog-centered {
+    min-height: calc(100% - 3.5rem);
+}
+
+
+
+#s_backlog_links {
+    visibility: hidden;
+}
+
+/*
+ Make Select2 match Bootstrap input 
 .select2-container--default .select2-selection--multiple {
     background-color: #f8f9fa;
     min-height: 38px;
@@ -238,13 +255,13 @@ body {
     padding: 4px 6px;
 }
 
-/* align tags vertically */
+ align tags vertically 
 .select2-container .select2-selection--multiple {
     display: flex;
     align-items: center;
 }
 
-/* remove ugly focus glow mismatch */
+ remove ugly focus glow mismatch 
 .select2-container--default.select2-container--focus
 .select2-selection--multiple {
     background-color: #fff;
@@ -258,7 +275,7 @@ body {
     margin-top: 2px;
 }
 
-/* remove (×) alignment fix */
+ remove (×) alignment fix 
 .select2-container--default 
 .select2-selection--multiple 
 .select2-selection__choice__remove {
@@ -268,9 +285,111 @@ body {
     color: #6c757d;
 }
 
-/* hover delete icon */
+ hover delete icon 
 .select2-container--default 
 .select2-selection__choice__remove:hover {
     color: #dc3545;
 }
+*/
 
+/* Bootstrap-like Select2 */
+.select2-container--default .select2-selection--multiple {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    min-height: 38px;
+    padding: 2px 6px;
+}
+
+/* keep text vertically nice */
+.select2-container--default
+.select2-selection--multiple
+.select2-selection__rendered {
+    line-height: 28px;
+}
+
+/* search input alignment */
+.select2-container--default
+.select2-search--inline
+.select2-search__field {
+    margin-top: 0;
+    height: 24px;
+}
+
+/* bootstrap focus */
+.select2-container--default.select2-container--focus
+.select2-selection--multiple {
+    background-color: #fff;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+}
+
+/*task form*/
+/* tag remove icon */
+.select2-container--default
+.select2-selection__choice__remove {
+    margin-right: 6px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* hover remove */
+.select2-container--default
+.select2-selection__choice__remove:hover {
+    color: #dc3545;
+}
+
+.task-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px;
+}
+
+.section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #2563eb;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    letter-spacing: .05em;
+}
+
+/* Make backlog container match note boxes */
+.sprint-backlog-box {
+    padding: 20px;
+}
+
+/* backlog chips */
+.backlog-chip {
+    background: #e9edf3;          /* SAME tone family */
+    border: 1px solid #d6dde6;
+    border-radius: 18px;
+
+    padding: 4px 12px;
+    margin: 4px 6px 4px 0;
+
+    font-size: 0.9rem;            /* smaller text */
+    font-weight: 500;
+
+    display: inline-flex;
+    align-items: center;
+    
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+/* story point badge resize */
+.backlog-chip .badge {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+}
+
+.backlog-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.backlog-chip:hover {
+    background:#dde6f7;
+}

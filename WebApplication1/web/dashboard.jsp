@@ -76,8 +76,8 @@
                     <div class="small text-muted">Management / <span class="fw-semibold text-dark">Dashboard</span></div>
                     <div class="user-info">
                         <div class="user-details d-none d-sm-block">
-                            <span class="user-name">${user.username}</span>
-                            <span class="user-role">${user.user_role}</span>
+                            <span class="user-name">${userInfo.username}</span>
+                            <span class="user-role">${userInfo.user_role}</span>
                         </div>
                         <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
                              class="rounded-circle border" width="34">
@@ -261,6 +261,4 @@
 
         </script>
     </body>
-
-
 </html>

@@ -59,7 +59,7 @@ public class BacklogDAO {
 
         String sql = "SELECT backlog_item_id, backlog_item_title, backlog_item_desc, "
                 + "acceptance_criteria, story_points, mandays, backlog_item_priority, "
-                + "backlog_item_added_at FROM backlog_items WHERE project_id = ?";
+                + "backlog_item_added_at FROM backlog_items WHERE project_id = ? ORDER BY backlog_item_priority ASC";
 
         List<Backlog> backlogItemArr = new ArrayList<>();
 
@@ -153,12 +153,12 @@ public class BacklogDAO {
         List<Backlog> backlogList = new ArrayList<>();
 
         String sql = """
-            SELECT b.*
+            SELECT b.backlog_item_id, b.backlog_item_title
             FROM backlog_items b
-            LEFT JOIN sprint_backlog_link sbl
-                ON b.backlog_item_id = sbl.link_backlog_item_id
+            LEFT JOIN sprint_backlog_links sbl
+                ON b.backlog_item_id = sbl.backlog_item_id
             WHERE b.project_id = ?
-            AND sbl.link_backlog_item_id IS NULL
+            AND sbl.backlog_item_id IS NULL
             ORDER BY b.backlog_item_priority ASC
             LIMIT 5
             """;
@@ -172,7 +172,6 @@ public class BacklogDAO {
             while (rs.next()) {
                 Backlog backlog = new Backlog();
                 backlog.setBacklogI_id(rs.getInt("backlog_item_id"));
-                System.out.println("Data in DAO " + rs.getInt("backlog_item_id"));
                 backlog.setBacklogI_title(rs.getString("backlog_item_title"));
                 backlogList.add(backlog);
             }
@@ -182,4 +181,42 @@ public class BacklogDAO {
         }
         return null;
     }
+
+    public List getHighPriorityBacklog_Edit(int project_id, int sprint_id) {
+        List<Backlog> backlogList = new ArrayList<>();
+
+        String sql = """
+                        SELECT b.backlog_item_id, b.backlog_item_title
+                        FROM backlog_items b
+                        LEFT JOIN sprint_backlog_links sbl
+                            ON b.backlog_item_id = sbl.backlog_item_id
+                        WHERE b.project_id = ?
+                        AND (
+                                sbl.backlog_item_id IS NULL
+                                OR sbl.sprint_id = ?
+                            )
+                        ORDER BY b.backlog_item_priority ASC
+                        LIMIT 5;
+                     """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, project_id);
+            ps.setInt(2, sprint_id);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Backlog backlog = new Backlog();
+                backlog.setBacklogI_id(rs.getInt("backlog_item_id"));
+                backlog.setBacklogI_title(rs.getString("backlog_item_title"));
+                backlogList.add(backlog);
+            }
+            return backlogList;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

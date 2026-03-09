@@ -14,6 +14,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import beans.Sprint;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
@@ -23,47 +25,146 @@ import beans.Sprint;
  */
 public class SprintDAO {
 
-    public List getSprintsData(int project_id) throws Exception{
+    public List<Sprint> getSprintsData(int project_id) throws Exception {
 
-        List<Sprint> sprintList = new ArrayList<>();
+        Map<Integer, Sprint> sprintMap = new LinkedHashMap<>();
 
         String sql = """
-                    SELECT sprint_id, sprint_name, sprint_start_date, sprint_end_date, 
-                    sprint_goal, sprint_status, restrospective_notes, review_notes
-                    FROM sprints WHERE project_id = ?
+                        SELECT s.sprint_id, s.sprint_name,
+                               s.sprint_start_date, s.sprint_end_date,
+                               s.sprint_goal, s.sprint_status,
+                               s.restrospective_notes, s.review_notes,
+                               b.backlog_item_id,
+                               b.backlog_item_title,
+                               b.story_points
+                        FROM sprints s
+                        LEFT JOIN sprint_backlog_links sbl
+                            ON s.sprint_id = sbl.sprint_id
+                        LEFT JOIN backlog_items b
+                            ON sbl.backlog_item_id = b.backlog_item_id
+                        WHERE s.project_id = ?
+                        ORDER BY s.sprint_id;
                     """;
+
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, project_id);
-
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Sprint sprint = new Sprint();
-                sprint.setSprint_id(rs.getInt("sprint_id"));
-                sprint.setSprint_name(rs.getString("sprint_name"));
-                sprint.setSprint_start_date(rs.getString("sprint_start_date"));
-                sprint.setSprint_end_date(rs.getString("sprint_end_date"));
-                sprint.setSprint_goal(rs.getString("sprint_goal"));
-                sprint.setSprint_status(rs.getString("sprint_status"));
-                sprint.setRestrospective_notes(rs.getString("restrospective_notes"));
-                sprint.setReview_notes(rs.getString("review_notes"));
 
-                sprintList.add(sprint);
+                int sprintId = rs.getInt("sprint_id");
+
+                // ✅ create sprint once
+                Sprint sprint = sprintMap.get(sprintId);
+
+                if (sprint == null) {
+
+                    sprint = new Sprint();
+                    sprint.setSprint_id(sprintId);
+                    sprint.setSprint_name(rs.getString("sprint_name"));
+                    sprint.setSprint_start_date(rs.getString("sprint_start_date"));
+                    sprint.setSprint_end_date(rs.getString("sprint_end_date"));
+                    sprint.setSprint_goal(rs.getString("sprint_goal"));
+                    sprint.setSprint_status(rs.getString("sprint_status"));
+                    sprint.setRestrospective_notes(rs.getString("restrospective_notes"));
+                    sprint.setReview_notes(rs.getString("review_notes"));
+
+                    sprint.setBacklog(new ArrayList<>());
+
+                    sprintMap.put(sprintId, sprint);
+                }
+
+                // ✅ backlog may be NULL because LEFT JOIN
+                int backlogId = rs.getInt("backlog_item_id");
+
+                if (!rs.wasNull()) {
+
+                    Backlog backlog = new Backlog();
+                    backlog.setBacklogI_id(backlogId);
+                    backlog.setBacklogI_title(
+                            rs.getString("backlog_item_title"));
+                    backlog.setStory_point(
+                            rs.getInt("story_points"));
+
+                    sprint.getBacklog().add(backlog);
+                }
             }
-            return sprintList;
+
+            return new ArrayList<>(sprintMap.values());
+
         } catch (Exception e) {
-            System.out.println("Exception Ocurr:" + e);
             throw e;
         }
     }
 
-    public int insertSprintDetails(Sprint sprint) throws Exception{
+//    public List getSprintsData(int project_id) throws Exception {
+//
+//        List<Sprint> sprintList = new ArrayList<>();
+//
+//        String sql = """
+//                     SELECT s.sprint_id, s.sprint_name, s.sprint_start_date, s.sprint_end_date,
+//                     s.sprint_goal, s.sprint_status, s.restrospective_notes, s.review_notes, 
+//                     sbl.backlog_item_id, b.backlog_item_title, b.story_points
+//                                 FROM sprints s
+//                                 LEFT JOIN sprint_backlog_links sbl
+//                                     ON s.sprint_id = sbl.sprint_id
+//                                 LEFT JOIN backlog_items b
+//                                 	USING (backlog_item_id)
+//                                 WHERE s.project_id = ?;
+//                    """;
+//        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+//
+//            ps.setInt(1, project_id);
+//
+//            ResultSet rs = ps.executeQuery();
+//            List<Backlog> backlogArr = new ArrayList<>();
+//
+//            while (rs.next()) {
+//
+//                Sprint sprint = new Sprint();
+//
+//                int sprint_id = rs.getInt("sprint_id");
+//
+//                sprint.setSprint_id(sprint_id);
+//                sprint.setSprint_name(rs.getString("sprint_name"));
+//                sprint.setSprint_start_date(rs.getString("sprint_start_date"));
+//                sprint.setSprint_end_date(rs.getString("sprint_end_date"));
+//                sprint.setSprint_goal(rs.getString("sprint_goal"));
+//                sprint.setSprint_status(rs.getString("sprint_status"));
+//                sprint.setRestrospective_notes(rs.getString("restrospective_notes"));
+//                sprint.setReview_notes(rs.getString("review_notes"));
+//
+//                do {
+//                    Backlog backlog = new Backlog();
+//                    backlog.setBacklogI_id(rs.getInt("backlog_item_id"));
+//                    backlog.setBacklogI_title(rs.getString("backlog_item_title"));
+//                    backlog.setStory_point(rs.getInt("story_points"));
+//                    backlogArr.add(backlog);
+//                } while (rs.next() && sprint_id == rs.getInt("sprint_id"));
+//
+//                rs.previous();
+//
+//                sprint.setBacklog(backlogArr);
+//
+//                sprintList.add(sprint);
+//            }
+//            return sprintList;
+//        } catch (Exception e) {
+//            System.out.println("Exception Ocurr:" + e);
+//            throw e;
+//        }
+//    }
+//     SELECT sprint_id, sprint_name, sprint_start_date, sprint_end_date, 
+//                    sprint_goal, sprint_status, restrospective_notes, review_notes
+//                    FROM sprints WHERE project_id = ?
+    public int insertSprintDetails(Sprint sprint) throws Exception {
 
         String sql = "INSERT INTO sprints (project_id, sprint_name, sprint_start_date, "
                 + "sprint_end_date, sprint_goal, sprint_status, "
                 + "restrospective_notes, review_notes, sprint_created_at)"
                 + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, sprint.getProject_id());
@@ -93,7 +194,7 @@ public class SprintDAO {
         return -1;
     }
 
-    public void updateSprintDetails(Sprint sprint) throws Exception{
+    public void updateSprintDetails(Sprint sprint) throws Exception {
 
         String sql = """
                      UPDATE sprints
@@ -108,7 +209,6 @@ public class SprintDAO {
                      """;
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-      
             ps.setString(1, sprint.getSprint_name());
             System.out.println("IN DAO : " + sprint.getSprint_name());
             ps.setObject(2, sprint.getSprint_start_date());
@@ -119,15 +219,15 @@ public class SprintDAO {
             ps.setString(7, sprint.getReview_notes());
             ps.setInt(8, sprint.getSprint_id());
 
-            ps.executeUpdate() ;
-               
+            ps.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
-            throw  e;
+            throw e;
         }
     }
-    
-    public void deleteSprintDetails(int sprint_id) throws Exception{
+
+    public void deleteSprintDetails(int sprint_id) throws Exception {
 
         String sql = """
                      DELETE FROM sprints
@@ -137,11 +237,11 @@ public class SprintDAO {
 
             ps.setInt(1, sprint_id);
 
-            ps.executeUpdate() ;
-               
+            ps.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
-            throw  e;
+            throw e;
         }
     }
 

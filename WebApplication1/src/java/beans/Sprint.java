@@ -8,13 +8,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import beans.Backlog;
+import java.util.List;
 
 /**
  *
  * @author HP
  */
 public class Sprint {
-    private int sprint_id, project_id, backlogI_id;
+    private int sprint_id, project_id;
+    private List<Backlog> backlog;
     private String sprint_name, sprint_goal, sprint_status, restrospective_notes, review_notes, sprint_start_date, sprint_end_date;
 //    LocalDateTime sprint_created_at;
 
@@ -38,6 +41,10 @@ public class Sprint {
 
     public void setProject_id(int project_id) {
         this.project_id = project_id;
+    }
+
+    public void setBacklog(List<Backlog> backlog) {
+        this.backlog = backlog;
     }
 
     public void setSprint_name(String sprint_name) {
@@ -80,6 +87,10 @@ public class Sprint {
         return project_id;
     }
 
+    public List<Backlog> getBacklog() {
+        return backlog;
+    }
+   
     public String getSprint_name() {
         return sprint_name;
     }

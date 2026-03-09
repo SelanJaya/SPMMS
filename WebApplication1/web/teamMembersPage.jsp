@@ -36,16 +36,16 @@
 
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
 
-                    <a href="projectPage.jsp" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
+                    <a href="projectPageServlet?projectId=${project.projectId}" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
 
-                    <a href="sprint.jsp" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
+                    <a href="SprintServlet?action=redirect&project_id=${project.projectId}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
 
 
-                    <a href="backlog.jsp" class="nav-link">
+                    <a href="BacklogServlet?action=redirect&project_id=${project.projectId}" class="nav-link">
                         <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                     </a>
 
-                    <a href="teamMembersPage.jsp" class="nav-link active"><i class="fas fa-users-gear me-3"></i> Team</a>
+                    <a href="teamAssignmentServlet?action=fetchTeamAssignment&project_id=${project.projectId}" class="nav-link active"><i class="fas fa-users-gear me-3"></i> Team</a>
                     <a href="projectAnalytics.jsp" .html" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                     <div class="mt-auto">
                         <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>

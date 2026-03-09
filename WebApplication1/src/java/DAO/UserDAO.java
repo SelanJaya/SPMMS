@@ -213,26 +213,72 @@ public class UserDAO {
 
         return userList;
     }
+    
+     public List<User> getUsersByRole(String role, int project_id) {
+        List<User> userList = new ArrayList<>();
+        // Use a placeholder '?' for the role parameter
+        String sql = """
+                     SELECT user_id, `username`, `phone_number`, `email`, `password_hash`, `user_role`, `created_at`
+                     FROM users u
+                     LEFT JOIN project_assignments pa
+                     ON u.user_id = pa.proj_assign_to
+                     WHERE u.user_role = ? AND pa.project_id = ?;
+                     """;
 
-    public String getUserRoleById(int userId) {
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // Set the role parameter before executing
+            ps.setString(1, role);
+            ps.setInt(2, project_id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    // Matching your schema columns: user_id, username, email
+                    user.setUser_id(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+
+                    userList.add(user);
+                }
+            }
+
+            System.out.println("DAO Log: " + userList.size() + " users found for role: " + role);
+
+        } catch (SQLException e) {
+            System.err.println("SQL Error in getUsersByRole: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return userList;
+    }
+    
+    
+
+    public User getUserSessionDataRoleById(int userId) {
         String role = null;
         // Note: Table name in your schema is 'user' (singular)
-        String sql = "SELECT user_role FROM users WHERE user_id = ?";
-
+        String sql = "SELECT username, user_role FROM users WHERE user_id = ?";
+        User user = new User();
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    role = rs.getString("user_role");
+                    
+                    user.setUsername(rs.getString("username"));
+                    user.setUser_role(rs.getString("user_role"));
+                    
                 }
             }
+            
+            return user;
         } catch (SQLException e) {
             System.err.println("Error fetching user role: " + e.getMessage());
             e.printStackTrace();
         }
-        return role;
+        return null;
     }
 
 }

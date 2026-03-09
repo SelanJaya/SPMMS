@@ -119,8 +119,33 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- ================= SPRINT BACKLOG ================= -->
+                        <div class="note-box sprint-backlog-box">
 
-                        <div class="board-layout">
+                            <span class="info-label">Sprint Backlog</span>
+
+                            <div class="backlog-list mt-2">
+
+                                <span class="backlog-chip">
+                                    User Login Feature
+                                    <span class="badge bg-secondary ms-2">5 SP</span>
+                                </span>
+
+                                <span class="backlog-chip">
+                                    Registration Module
+                                    <span class="badge bg-secondary ms-2">8 SP</span>
+                                </span>
+
+                                <span class="backlog-chip">
+                                    Role Management
+                                    <span class="badge bg-secondary ms-2">3 SP</span>
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="board-layout mt-4">
                             <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
                                 <h3>To Do</h3>
                                 <c:if test="${user.user_role == 'Scrum Master'}">
@@ -148,7 +173,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="sprintModal" tabindex="-1">
+        <div class="modal" id="sprintModal" tabindex="-1">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4">
 
@@ -211,7 +236,7 @@
                             <select class="form-select rounded-3"
                                     id="s_backlog_links"
                                     multiple
-                                    style="height:100px;">
+                                    >
 
                             </select>
                         </div>
@@ -233,82 +258,288 @@
             </div>
         </div>
 
+        <!--        <div class="modal fade" id="taskModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-body p-4">
+                            <input type="hidden" id="editBoardId">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h3 class="h3 fw-bold mb-0">Add New Task</h3>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+        
+                            <input type="hidden" id="t_board_id">
+                            <input type="hidden" id="t_column_id">
+        
+                            <div class="mb-4">
+                                <label class="info-label text-muted fw-bold small mb-2">TASK NAME</label>
+                                <input type="text" class="form-control bg-light border-0 py-2" id="t_name"
+                                       placeholder="e.g., Design Login Page">
+                            </div>
+        
+                            <div class="mb-4">
+                                <label class="info-label text-muted fw-bold small mb-2">TASK DESCRIPTION</label>
+                                <textarea class="form-control bg-light border-0" id="t_desc" rows="3"
+                                          placeholder="Briefly describe the task..."></textarea>
+                            </div>
+        
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <label class="info-label text-muted fw-bold small mb-2">ASSIGNEE ROLE</label>
+                                    <select class="form-select bg-light border-0 py-2" id="t_user_role">
+                                        <option value="Developer">Developer</option>
+                                        <option value="Designer">Designer</option>
+                                        <option value="QA Tester">QA Tester</option>
+                                        <option value="Manager">Manager</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="info-label text-muted fw-bold small mb-2">ASSIGNEE NAME</label>
+                                    <input type="text" class="form-control bg-light border-0 py-2" id="t_user_name"
+                                           placeholder="e.g., John Doe">
+                                </div>
+                            </div>
+        
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <label class="info-label text-muted fw-bold small mb-2">TASK START DATE</label>
+                                    <input type="date" class="form-control bg-light border-0 py-2" id="t_start">
+                                </div>
+                                <div class="col-6">
+                                    <label class="info-label text-muted fw-bold small mb-2">TASK END DATE</label>
+                                    <input type="date" class="form-control bg-light border-0 py-2" id="t_end">
+                                </div>
+                            </div>
+        
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <label class="info-label text-muted fw-bold small mb-2">STATUS</label>
+                                    <select class="form-select bg-light border-0 py-2" id="t_status">
+                                        <option value="To Do">To Do</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Done">Done</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="info-label text-muted fw-bold small mb-2">DEPENDENCY (ID)</label>
+                                    <input type="number" class="form-control bg-light border-0 py-2" id="t_dep"
+                                           placeholder="Optional Task ID">
+                                </div>
+                            </div>
+        
+                            <div class="d-flex gap-3 mt-4">
+                                <button class="btn btn-primary w-100 py-2 rounded-pill fw-bold" onclick="confirmAddTask()">
+                                    <i class="fas fa-plus me-2"></i> Add Task to Board
+                                </button>
+                                <button class="btn btn-outline-secondary px-5 py-2 rounded-pill fw-bold"
+                                        data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+        <!--        <div class="modal fade" id="taskModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg rounded-4">
+        
+                            <div class="modal-body p-5">
+        
+                                <div class="text-center mb-4">
+                                    <h3 class="fw-bold mb-0">Add New Task</h3>
+                                </div>
+        
+                                <input type="hidden" id="t_board_id">
+                                <input type="hidden" id="t_column_id">
+        
+                                 TASK NAME 
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2">TASK NAME</label>
+                                    <input type="text"
+                                           class="form-control rounded-3"
+                                           id="t_name"
+                                           placeholder="e.g., Design Login Page">
+                                </div>
+        
+                                 DESCRIPTION 
+                                <div class="mb-4">
+                                    <label class="fw-bold small mb-2">TASK DESCRIPTION</label>
+                                    <textarea class="form-control rounded-3"
+                                              id="t_desc"
+                                              rows="3"
+                                              placeholder="Briefly describe the task..."></textarea>
+                                </div>
+        
+                                 ROLE + NAME 
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <label class="fw-bold small mb-2">ASSIGNEE ROLE</label>
+                                        <select class="form-select rounded-3" id="t_user_role">
+                                            <option>Developer</option>
+                                            <option>Designer</option>
+                                            <option>QA Tester</option>
+                                            <option>Manager</option>
+                                        </select>
+                                    </div>
+        
+                                    <div class="col-6">
+                                        <label class="fw-bold small mb-2">ASSIGNEE NAME</label>
+                                        <input type="text"
+                                               class="form-control rounded-3"
+                                               id="t_user_name"
+                                               placeholder="e.g., John Doe">
+                                    </div>
+                                </div>
+        
+                                 DATES 
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <label class="fw-bold small mb-2">TASK START DATE</label>
+                                        <input type="date"
+                                               class="form-control rounded-3"
+                                               id="t_start">
+                                    </div>
+        
+                                    <div class="col-6">
+                                        <label class="fw-bold small mb-2">TASK END DATE</label>
+                                        <input type="date"
+                                               class="form-control rounded-3"
+                                               id="t_end">
+                                    </div>
+                                </div>
+        
+                                 STATUS + DEP 
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6">
+                                        <label class="fw-bold small mb-2">STATUS</label>
+                                        <select class="form-select rounded-3" id="t_status">
+                                            <option>To Do</option>
+                                            <option>In Progress</option>
+                                            <option>Done</option>
+                                        </select>
+                                    </div>
+        
+                                    <div class="col-6">
+                                        <label class="fw-bold small mb-2">DEPENDENCY (ID)</label>
+                                        <input type="number"
+                                               class="form-control rounded-3"
+                                               id="t_dep"
+                                               placeholder="Optional Task ID">
+                                    </div>
+                                </div>
+        
+                                 BUTTONS 
+                                <div class="mt-4 d-grid gap-2">
+                                    <button class="btn btn-primary rounded-pill py-2 fw-bold"
+                                            onclick="confirmAddTask()">
+                                        Add Task to Board
+                                    </button>
+        
+                                    <button class="btn btn-link text-secondary"
+                                            data-bs-dismiss="modal">
+                                        Cancel
+                                    </button>
+                                </div>
+        
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+
         <div class="modal fade" id="taskModal" tabindex="-1">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-body p-4">
-                    <input type="hidden" id="editBoardId">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3 class="h3 fw-bold mb-0">Add New Task</h3>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
+                <div class="modal-content border-0 shadow-lg rounded-4">
 
-                    <input type="hidden" id="t_board_id">
-                    <input type="hidden" id="t_column_id">
+                    <div class="modal-body p-4">
 
-                    <div class="mb-4">
-                        <label class="info-label text-muted fw-bold small mb-2">TASK NAME</label>
-                        <input type="text" class="form-control bg-light border-0 py-2" id="t_name"
-                               placeholder="e.g., Design Login Page">
-                    </div>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 id="taskModel_title"  class="fw-bold text-center flex-grow-1 m-0">Add Task</h4>
 
-                    <div class="mb-4">
-                        <label class="info-label text-muted fw-bold small mb-2">TASK DESCRIPTION</label>
-                        <textarea class="form-control bg-light border-0" id="t_desc" rows="3"
-                                  placeholder="Briefly describe the task..."></textarea>
-                    </div>
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
-                            <label class="info-label text-muted fw-bold small mb-2">ASSIGNEE ROLE</label>
-                            <select class="form-select bg-light border-0 py-2" id="t_user_role">
-                                <option value="Developer">Developer</option>
-                                <option value="Designer">Designer</option>
-                                <option value="QA Tester">QA Tester</option>
-                                <option value="Manager">Manager</option>
-                            </select>
+                            <button id="deleteTaskBtn"
+                                    class="btn btn-outline-danger btn-sm"
+                                    style="display:none;">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </div>
-                        <div class="col-6">
-                            <label class="info-label text-muted fw-bold small mb-2">ASSIGNEE NAME</label>
-                            <input type="text" class="form-control bg-light border-0 py-2" id="t_user_name"
-                                   placeholder="e.g., John Doe">
-                        </div>
-                    </div>
+                        <input type="hidden" id="t_board_id">
+                        <input type="hidden" id="t_column_id" >
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
-                            <label class="info-label text-muted fw-bold small mb-2">TASK START DATE</label>
-                            <input type="date" class="form-control bg-light border-0 py-2" id="t_start">
+                        <!-- TASK NAME -->
+                        <div class="mb-3">
+                            <label class="fw-bold small mb-2">TASK NAME</label>
+                            <input type="text"
+                                   class="form-control rounded-3"
+                                   id="t_name">
                         </div>
-                        <div class="col-6">
-                            <label class="info-label text-muted fw-bold small mb-2">TASK END DATE</label>
-                            <input type="date" class="form-control bg-light border-0 py-2" id="t_end">
-                        </div>
-                    </div>
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
-                            <label class="info-label text-muted fw-bold small mb-2">STATUS</label>
-                            <select class="form-select bg-light border-0 py-2" id="t_status">
-                                <option value="To Do">To Do</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Done">Done</option>
-                            </select>
+                        <!-- DESCRIPTION -->
+                        <div class="mb-3">
+                            <label class="fw-bold small mb-2">DESCRIPTION</label>
+                            <textarea class="form-control rounded-3"
+                                      id="t_desc"
+                                      rows="2"></textarea>
                         </div>
-                        <div class="col-6">
-                            <label class="info-label text-muted fw-bold small mb-2">DEPENDENCY (ID)</label>
-                            <input type="number" class="form-control bg-light border-0 py-2" id="t_dep"
-                                   placeholder="Optional Task ID">
-                        </div>
-                    </div>
 
-                    <div class="d-flex gap-3 mt-4">
-                        <button class="btn btn-primary w-100 py-2 rounded-pill fw-bold" onclick="confirmAddTask()">
-                            <i class="fas fa-plus me-2"></i> Add Task to Board
-                        </button>
-                        <button class="btn btn-outline-secondary px-5 py-2 rounded-pill fw-bold"
-                                data-bs-dismiss="modal">
-                            Cancel
-                        </button>
+                        <!-- ROLE + USER -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="fw-bold small mb-2">ROLE</label>
+                                <select class="form-select rounded-3"
+                                        id="t_user_role">
+                                    <option id="Developer">Developer</option>
+                                    <option id="Designer">Designer</option>
+                                    <option id="QA Tester">QA Tester</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold small mb-2">ASSIGNEE</label>
+                                <select class="form-select rounded-3"
+                                        id="assignee">
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- DATES + DEPENDENCY -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-2">START</label>
+                                <input type="date"
+                                       class="form-control rounded-3"
+                                       id="t_start">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-2">END</label>
+                                <input type="date"
+                                       class="form-control rounded-3"
+                                       id="t_end">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="fw-bold small mb-2">
+                                    DEPENDENCY
+                                </label>
+                                <input type="number"
+                                       class="form-control rounded-3"
+                                       id="t_dep"
+                                       placeholder="Task ID">
+                            </div>
+                        </div>
+
+                        <!-- BUTTONS -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary rounded-pill py-2 fw-bold" id="taskModel_Sbt"
+                                    onclick="confirmAddTask()">
+                                Add Task
+                            </button>
+
+                            <button class="btn btn-link text-secondary"
+                                    data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -373,25 +604,25 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="h3 fw-bold mb-0" id="v_modal_title">Task Details</h2>
                         <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold"
-                              id="v_badge_id">Task ID: 5021</span>
+                              id="t_badge_id">Task ID: 5021</span>
                     </div>
 
                     <div class="mb-4">
                         <label class="info-label text-muted fw-bold small mb-2">TASK NAME</label>
-                        <input type="text" id="v_name"
+                        <input type="text" id="t_name"
                                class="form-control form-control-lg bg-light border-0 py-3 task-input view-mode" readonly>
                     </div>
 
                     <div class="mb-4">
                         <label class="info-label text-muted fw-bold small mb-2">DESCRIPTION</label>
-                        <textarea id="v_desc" class="form-control bg-light border-0 task-input view-mode" rows="4"
+                        <textarea id="t_desc" class="form-control bg-light border-0 task-input view-mode" rows="4"
                                   readonly></textarea>
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-6">
                             <label class="info-label text-muted fw-bold small mb-2">Assignee Role</label>
-                            <select class="form-select bg-light border-0 py-2 task-input view-mode" id="v_user_role"
+                            <select class="form-select bg-light border-0 py-2 task-input view-mode" id="t_user_role"
                                     disabled>
                                 <option value="Developer">Developer</option>
                                 <option value="Designer">Designer</option>
@@ -401,7 +632,7 @@
                         </div>
                         <div class="col-6">
                             <label class="info-label text-muted fw-bold small mb-2">Assignee Name</label>
-                            <input type="text" id="v_user_name"
+                            <input type="text" id="t_user_name"
                                    class="form-control bg-light border-0 py-2 task-input view-mode" readonly>
                         </div>
                     </div>
@@ -409,12 +640,12 @@
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <label class="info-label text-muted fw-bold small mb-2">START DATE</label>
-                            <input type="date" id="v_start"
+                            <input type="date" id="t_start"
                                    class="form-control bg-light border-0 py-2 task-input view-mode" readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="info-label text-muted fw-bold small mb-2">END DATE</label>
-                            <input type="date" id="v_end"
+                            <input type="date" id="t_end"
                                    class="form-control bg-light border-0 py-2 task-input view-mode" readonly>
                         </div>
                     </div>
@@ -422,7 +653,7 @@
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <label class="info-label text-muted fw-bold small mb-2">CURRENT STATUS</label>
-                            <select id="v_status" class="form-select bg-light border-0 py-2 task-input view-mode"
+                            <select id="t_status" class="form-select bg-light border-0 py-2 task-input view-mode"
                                     disabled>
                                 <option value="To Do">To Do</option>
                                 <option value="In Progress">In Progress</option>
@@ -432,7 +663,7 @@
                         <div class="col-md-6">
                             <label class="info-label text-muted fw-bold small mb-2">DEPENDENCY (PREREQUISITE TASK
                                 ID)</label>
-                            <input type="number" id="v_dep"
+                            <input type="number" id="t_dep"
                                    class="form-control bg-light border-0 py-2 task-input view-mode" readonly>
                         </div>
                     </div>
@@ -457,7 +688,10 @@
         </div>
     </div>
     <script>
-            var project_id = ${projectId != null ? projectId : "null"};
+        var project_id = ${projectId != null ? projectId : "null"};
+        var user_id = ${userInfo.user_id}
+        console.log("User id", user_id);
+
     </script>
 
     <script src="js/sprint.js"></script>

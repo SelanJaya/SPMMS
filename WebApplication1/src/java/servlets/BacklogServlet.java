@@ -89,6 +89,7 @@ public class BacklogServlet extends HttpServlet {
                 Map<String, Object> backlogData = new HashMap<>();
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
+                
                 backlogData.put("data", backlogArr);
                 backlogData.put("status", "Success");
 

@@ -63,7 +63,7 @@ public class login_signUpServlet extends HttpServlet {
         
         String processType = request.getParameter("processType");
         
-        if (processType.equalsIgnoreCase("logOut")) {
+        if ("logOut".equalsIgnoreCase(processType)) {
             session.invalidate();
             response.sendRedirect("login.jsp");
         }
@@ -100,11 +100,17 @@ public class login_signUpServlet extends HttpServlet {
             statusUserID = userDao.login(user);
 
             if (statusUserID > 0) {
-                session.setAttribute("userId", statusUserID);
                 
-                role = userDao.getUserRoleById(statusUserID);
-                User userObj= new User(statusUserID, role);               
+//                session.setAttribute("userId", statusUserID);
+                
+                System.out.println("statusUserID :" + statusUserID);
+                
+                 User userObj = userDao.getUserSessionDataRoleById(statusUserID);
+                 userObj.setUser_id(statusUserID);
+                
                 session.setAttribute("userInfo", userObj);
+                
+                System.out.println("data in userObj " + userObj.getUser_id());
                 
                 // Store the specific Login Time
                 long loginMillis = System.currentTimeMillis();

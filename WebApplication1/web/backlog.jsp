@@ -39,14 +39,14 @@
 
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
 
-                    <a href="projectPage.jsp" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
+                    <a href="projectPageServlet?projectId=${project.projectId}" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
 
-                    <a href="sprint.jsp" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
+                    <a href="SprintServlet?action=redirect&project_id=${project.projectId}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
 
-                    <a href="backlog.jsp" class="nav-link active text-white">
+                    <a href="BacklogServlet?action=redirect&project_id=${project.projectId}" class="nav-link active text-white">
                         <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                     </a>
-                    <a href="teamMembersPage.jsp" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
+                    <a href="teamAssignmentServlet?action=fetchTeamAssignment&project_id=${project.projectId}" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
                     <a href="projectAnalytics.jsp" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                     <div class="mt-auto">
                         <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
@@ -142,24 +142,24 @@
                             </div>
 
                             <div class="row mb-4">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label class="label-style d-block mb-2">Story Points</label>
                                     <input type="number" id="backlog_SPts" class="form-control" value="0" min="0" max="10"
                                            style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <label class="label-style d-block mb-2">Mandays</label>
                                     <input type="number" id="backlog_Mdys" class="form-control" value="0" min="0" max="10"
                                            style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
                                 </div>
 
-                                <div class="col-md-4">
+<!--                                <div class="col-md-4">
                                     <label class="label-style d-block mb-2">Priority Rank</label>
                                     <input type="number" id="backlog_priority" class="form-control" placeholder="e.g. 1"
                                            style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
                                     <div id="alertPriority" class="invalid-feedback"></div>
-                                </div>
+                                </div>-->
                             </div>
 
                             <div class="d-grid gap-2">
@@ -355,6 +355,7 @@
             var projectId = ${project.projectId};
             var userRole = "${user.user_role}";
             let table;
+            let lowestPriority;
         </script>
         <script src="js/backlog.js"></script>
     </body>

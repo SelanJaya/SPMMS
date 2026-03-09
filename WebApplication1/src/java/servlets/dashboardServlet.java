@@ -72,9 +72,9 @@ public class dashboardServlet extends HttpServlet {
         processType = request.getParameter("processType");
 
         HttpSession session = request.getSession();
-        user_id = (int) session.getAttribute("userId");
-
         user = (User) session.getAttribute("userInfo");
+
+
 
         ProjectDAO projectDao = new ProjectDAO();
         UserDAO userDao = new UserDAO();
@@ -83,7 +83,7 @@ public class dashboardServlet extends HttpServlet {
 
             if ("Project Manager".equalsIgnoreCase(user.getUser_role())) {
                 // DISPLAY ALL PROJECT FOLDER
-                profileInfo = projectDao.projectInfo(user_id);
+                profileInfo = projectDao.projectInfo(user.getUser_id());
                 session.setAttribute("profileInfo", profileInfo);
             } else {
 
@@ -92,14 +92,14 @@ public class dashboardServlet extends HttpServlet {
             }
 
             //GET PROFILE INFO
-            user = userDao.profileInformation(user_id);
+            user = userDao.profileInformation(user.getUser_id());
             session.setAttribute("user", user);
 
             request.getRequestDispatcher("dashboard.jsp").forward(request, response);
 
         } else if ("achivedProject".equalsIgnoreCase(processType)) {
 
-            profileInfo = projectDao.getArchivedProjectsByUserId(user_id);
+            profileInfo = projectDao.getArchivedProjectsByUserId(user.getUser_id());
 
             session.setAttribute("profileInfo", profileInfo);
             request.getRequestDispatcher("projectArchive.jsp").forward(request, response);

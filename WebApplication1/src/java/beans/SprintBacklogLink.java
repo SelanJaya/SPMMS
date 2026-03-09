@@ -5,49 +5,43 @@
 package beans;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 /**
  *
  * @author HP
  */
 public class SprintBacklogLink {
-    int link_sprint_id, link_backlog_item_id, link_Backlogitem_story_points;
+    int sprint_id, link_Backlogitem_story_points;
+    ArrayList<Integer> backlog_item_id;
     String link_added_at;
 
     public SprintBacklogLink() {
     }
 
-    public SprintBacklogLink(int link_sprint_id, int link_backlog_item_id) {
-        this.link_sprint_id = link_sprint_id;
-        this.link_backlog_item_id = link_backlog_item_id;
+    public SprintBacklogLink(int sprint_id, ArrayList<Integer> link_backlog_item_id) {
+        this.sprint_id = sprint_id;
+        this.backlog_item_id = link_backlog_item_id;
     }
 
-    public void setLink_sprint_id(int link_sprint_id) {
-        this.link_sprint_id = link_sprint_id;
+    public void setSprint_id(int link_sprint_id) {
+        this.sprint_id = link_sprint_id;
     }
 
-    public void setLink_backlog_item_id(int link_backlog_item_id) {
-        this.link_backlog_item_id = link_backlog_item_id;
+    public void setBacklog_item_id(ArrayList<Integer> link_backlog_item_id) {
+        this.backlog_item_id = link_backlog_item_id;
     }
-
-    public void setLink_Backlogitem_story_points(int link_Backlogitem_story_points) {
-        this.link_Backlogitem_story_points = link_Backlogitem_story_points;
-    }
-
+    
     public void setLink_added_at(String link_added_at) {
         this.link_added_at = link_added_at;
     }
 
-    public int getLink_sprint_id() {
-        return link_sprint_id;
+    public int getSprint_id() {
+        return sprint_id;
     }
 
-    public int getLink_backlog_item_id() {
-        return link_backlog_item_id;
-    }
-
-    public int getLink_Backlogitem_story_points() {
-        return link_Backlogitem_story_points;
+    public ArrayList<Integer> getBacklog_item_id() {
+        return backlog_item_id;
     }
     
     // retrurn in LOCALDATETIME

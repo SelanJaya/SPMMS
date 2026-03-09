@@ -66,7 +66,6 @@ public class projectPageServlet extends HttpServlet {
             throws ServletException, IOException {
         String ProIdParam;
         int projectId, userId;
-        List<User> projectTeamAssignment;
         boolean status;
         Project project;
 
@@ -102,16 +101,16 @@ public class projectPageServlet extends HttpServlet {
         project = projectDao.ProjectInfoById(projectId);
         session.setAttribute("project", project);
 
-        userId = (int) session.getAttribute("userId");
+//        userId = (int)session.getAttribute("userId");
 
-        projectTeamDAO projectTeamDao = new projectTeamDAO();
-        projectTeamAssignment = projectTeamDao.getAssignedMembers(projectId);
+//        projectTeamDAO projectTeamDao = new projectTeamDAO();
+//        projectTeamAssignment = projectTeamDao.getAssignedMembers(projectId);
+//
+//        for (User member : projectTeamAssignment) {
+//            System.out.println("User: " + member.getUsername() + " | Email: " + member.getEmail() + " | Role: " + member.getUser_role());
+//        }
 
-        for (User member : projectTeamAssignment) {
-            System.out.println("User: " + member.getUsername() + " | Email: " + member.getEmail() + " | Role: " + member.getUser_role());
-        }
-
-        session.setAttribute("projectTeamAssignmentData", projectTeamAssignment);
+//        session.setAttribute("projectTeamAssignmentData", projectTeamAssignment);
         request.getRequestDispatcher("projectPage.jsp").forward(request, response);
 
     }

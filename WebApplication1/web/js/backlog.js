@@ -15,6 +15,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     const response = await fetch(`BacklogServlet?project_id=${projectId}&action=fetchData`);
     const result = await response.json();
 
+
+    if (result.data.length > 0) {
+
+        const lastItem = result.data[result.data.length - 1];
+        lowestPriority = Number(lastItem.backlogI_priority);
+
+    } else {
+        lowestPriority = 0;
+    }
+
     for (const item of result.data) {
         addbacklogToTable(item);
     }
@@ -243,20 +253,18 @@ $(document).ready(function () {
 
     // START INSET ADD listener to the form submit button
     document.getElementById('confirmAddBtn').addEventListener('click', handleAddBacklog);
-
-    async function handleAddBacklog() {
-
-        console.log("handleAddBacklog 1");
-
-        try {
-            // Call Server API
-            const result = await sendBacklog(getBacklogData());
-            console.log("Server response:", result);
-        } catch (err) {
-            console.error("Save Failed", err);
-            alert("Failed to save backlog");
-        }
-    }
+//
+//                console.log("handleAddBacklog 1");
+//
+//                try {
+//                    // Call Server API
+//                    const result = await sendBacklog(getBacklogData());
+//                    console.log("Server response:", result);
+//                } catch (err) {
+//                    console.error("Save Failed", err);
+//                    alert("Failed to save backlog");
+//                }
+//            });
 
 //    // 5. Add New Row (Logic preserved and optimized)
 //    $('#confirmAddBtn').on('click', function () {
@@ -322,7 +330,8 @@ $(document).ready(function () {
         // Iterate through DataTables rows properly
         table.rows().every(function () {
 
-            const rowId = $(this.node()).data('id');
+            const rowId = Number($(this.node()).attr('data-id'));
+            //const rowId = $(this.node()).data('id');
 
             if (rowId === idNum) {
                 this.remove();   // remove correct row
@@ -355,13 +364,16 @@ function getBacklogData(key) {
         //get the vales form the backlog form
         action: "Create",
         project_id: projectId,
-        backlogI_priority: $('#backlog_priority').val(),
         backlogI_title: $('#backlog_title').val(),
         backlogI_desc: $('#backlog_description').val(),
         acceptance_cri: $('#backlog_ACriteria').val(),
         mandays: $('#backlog_Mdys').val(),
         story_point: $('#backlog_SPts').val()
     };
+
+    lowestPriority = lowestPriority + 1;
+    data.backlogI_priority = lowestPriority;
+
 
     if (key !== null) {
         data.backlogI_id = key;
@@ -375,9 +387,19 @@ async function handleAddBacklog() {
     console.log("handleAddBacklog 1");
 
     try {
+
+        const backlogData = getBacklogData();
+
         // Call Server API
-        const result = await sendBacklog(getBacklogData());
+        const result = await sendBacklog(backlogData);
         console.log("Server response:", result);
+
+
+        if (result.status === "Success") {
+            backlogData.backlogI_id = result.key;
+            addbacklogToTable(backlogData);
+        }
+
     } catch (err) {
         console.error("Save Failed", err);
         alert("Failed to save backlog");
@@ -404,15 +426,15 @@ async function sendBacklog(data) {
         throw new Error("Server returned error");
     }
 
-    const result = await response.json();
+    return await response.json();
 
 
-    if (result.status === "Success") {
-        const key = result.key;
-        addbacklogToTable(getBacklogData(key));
-    } else {
-        console.log("Error");
-    }
+//    if (result.status === "Success") {
+//        const key = result.key;
+//        addbacklogToTable(getBacklogData(key));
+//    } else {
+//        console.log("Error");
+//    }
 }
 
 function addbacklogToTable(data) {
@@ -540,7 +562,8 @@ $('#backlog_priority').on('input', function () {
     if (isNaN(enteredPriority)) {
         $(this).removeClass('is-invalid');
         $('#alertPriority').text('');
-        if (confirmAddBtn) confirmAddBtn.disabled = false;
+        if (confirmAddBtn)
+            confirmAddBtn.disabled = false;
         return;
     }
 
@@ -549,14 +572,16 @@ $('#backlog_priority').on('input', function () {
         $(this).addClass('is-invalid');
         $('#alertPriority').text("Priority already exists.");
 
-        if (confirmAddBtn) confirmAddBtn.disabled = true;
+        if (confirmAddBtn)
+            confirmAddBtn.disabled = true;
 
     } else {
 
         $(this).removeClass('is-invalid');
         $('#alertPriority').text('');
 
-        if (confirmAddBtn) confirmAddBtn.disabled = false;
+        if (confirmAddBtn)
+            confirmAddBtn.disabled = false;
     }
 
 });
