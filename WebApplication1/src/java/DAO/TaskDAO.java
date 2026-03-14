@@ -15,7 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import beans.Task;
 import beans.TaskAssignment;
+import beans.TaskDependency;
 import DAO.TaskAssignmentDAO;
+import DAO.TaskDependencyDAO;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
@@ -27,8 +32,8 @@ public class TaskDAO {
 
         String sql = """
                      INSERT INTO tasks(task_id, task_name, task_description, task_start_date, 
-                     task_end_date, task_status, task_dependency, sprint_id) 
-                     VALUES (?,?,?,?,?,?,?,?)
+                     task_end_date, task_status, sprint_id) 
+                     VALUES (?,?,?,?,?,?,?)
                      """;
 
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
@@ -39,12 +44,8 @@ public class TaskDAO {
             ps.setObject(4, task.getTask_start_date());
             ps.setObject(5, task.getTask_end_date());
             ps.setString(6, task.getTask_status());
-            if (task.getTask_dependency() != null) {
-                ps.setInt(7, task.getTask_dependency());
-            } else {
-                ps.setNull(7, java.sql.Types.INTEGER);
-            }
-            ps.setInt(8, task.getSprint_Id());
+            
+            ps.setInt(7, task.getSprint_Id());
 
             if (ps.executeUpdate() > 0) {
                 // 2. Retrieve the generated keys
@@ -65,14 +66,74 @@ public class TaskDAO {
 
     public List<Task> getTasksBySprintId(int sprint_id) throws Exception {
 
-        List<Task> taskArr = new ArrayList<>();
+        Map<Integer, Task> taskMap = new LinkedHashMap<>();
 
         String sql = """
-                     SELECT task_id, task_name, task_start_date, task_end_date, task_status, task_dependency
-                     FROM tasks WHERE sprint_id = ?;
+                     SELECT t.task_id, t.task_name, t.task_start_date, t.task_end_date, t.task_status, td.depends_on_task_id
+                     FROM tasks t
+                     LEFT JOIN task_dependencies td
+                     USING(task_id)
+                     WHERE t.sprint_id = ?;
                      """;
 
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql);) {
+
+            ps.setInt(1, sprint_id);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                int taskId = rs.getInt("task_id");
+
+                // Check the task IDin the taskMap                 
+                Task task = taskMap.get(taskId);
+
+                // Create a new task obj only if the task return null (Not created yet)
+                if (task == null) {
+
+                    task = new Task();
+                    task.setTask_id(taskId);
+                    task.setTask_name(rs.getString("task_name"));
+                    task.setTask_start_date(rs.getString("task_start_date"));
+                    task.setTask_end_date(rs.getString("task_end_date"));
+                    task.setTask_status(rs.getString("task_status"));
+
+                    //creata an aaray list
+                    task.setTaskDepedencies(new ArrayList<>());
+
+                    taskMap.put(taskId, task);
+                }
+                //get the depends on task id
+                Integer depId = rs.getObject("depends_on_task_id", Integer.class);
+
+                // null checker
+                if (depId != null) {
+                    // add to the taskdependecy arrayList
+                    TaskDependency taskDependency = new TaskDependency();
+                    taskDependency.setDepend_on_task_id(depId);
+                   
+                    task.getTaskDepedencies().add(taskDependency);
+                }
+            }
+
+            return new ArrayList<>(taskMap.values());
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public List<Task> getLiteTasksBySprintID(int sprint_id) throws Exception {
+
+        List<Task> taskArr = new ArrayList<>();
+
+        String sql = """
+                    SELECT task_id, task_name
+                    FROM tasks WHERE sprint_id = ?;
+                    """;
+
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, sprint_id);
 
             ResultSet rs = ps.executeQuery();
@@ -81,12 +142,7 @@ public class TaskDAO {
                 Task task = new Task();
                 task.setTask_id(rs.getInt("task_id"));
                 task.setTask_name(rs.getString("task_name"));
-                task.setTask_start_date(rs.getString("task_start_date"));
-                task.setTask_end_date(rs.getString("task_end_date"));
-                task.setTask_status(rs.getString("task_status"));
 
-                //to get null instead of zero
-                task.setTask_dependency(rs.getObject("task_dependency", Integer.class));
                 taskArr.add(task);
             }
 
@@ -98,8 +154,8 @@ public class TaskDAO {
 
     public void updateTaskStatus(int task_id, String task_status) throws Exception {
         String sql = """
-                         UPDATE tasks SET task_status = ? WHERE task_id = ?;
-                         """;
+                     UPDATE tasks SET task_status = ? WHERE task_id = ?;
+                     """;
 
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, task_status);
@@ -113,49 +169,80 @@ public class TaskDAO {
         }
     }
 
-    public List<Task> getTaskByTaskId(int task_id) {
+    public Task getTaskByTaskId(int task_id) throws Exception {
+
         String sql = """
-                         SELECT t.task_id, t.task_name, t.task_description, t.task_start_date,
-                         t.task_end_date, t.task_dependency, ta.task_assigned_to, u.username, u.user_role
+                         SELECT t.task_id, 
+                                t.task_name, 
+                                t.task_description, 
+                                t.task_start_date,
+                                t.task_end_date, 
+                                td.depends_on_task_id,
+                                dt.task_name AS dependency_name,
+                                ta.task_assigned_to, 
+                                u.username, 
+                                u.user_role
                          FROM tasks t
+                         LEFT JOIN task_dependencies td
+                         ON t.task_id = td.task_id
+                         LEFT JOIN tasks dt
+                             ON td.depends_on_task_id = dt.task_id
                          LEFT JOIN task_assignments ta
-                         USING(task_id)
+                         ON t.task_id = ta.task_id
                          LEFT JOIN users u
-                         ON ta.task_assigned_to = u.user_id
+                             ON ta.task_assigned_to = u.user_id
                          WHERE t.task_id = ?;
                          """;
 
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, task_id);
 
             ResultSet rs = ps.executeQuery();
 
-            List<Task> taskArr = new ArrayList<>();
-
+            Task task = null;
             while (rs.next()) {
-                Task task = new Task();
 
-                task.setTask_id(rs.getInt("task_id"));
-                task.setTask_name(rs.getString("task_name"));
-                task.setTask_desc(rs.getString("task_description"));
-                task.setTask_start_date(rs.getObject("task_start_date", String.class));
-                task.setTask_end_date(rs.getObject("task_end_date", String.class));
-                task.setTask_dependency(rs.getObject("task_dependency", Integer.class));
+                if (task == null) {
 
-                TaskAssignment taskAssignment = new TaskAssignment();
-                taskAssignment.setTask_assigned_to(rs.getInt("task_assigned_to"));
-                taskAssignment.setUser_name(rs.getString("username"));
-                taskAssignment.setTask_assigned_to_Role(rs.getString("user_role"));
+                    task = new Task();
+                    task.setTask_id(rs.getInt("task_id"));
+                    task.setTask_name(rs.getString("task_name"));
+                    task.setTask_desc(rs.getString("task_description"));
+                    task.setTask_start_date(rs.getObject("task_start_date", String.class));
+                    task.setTask_end_date(rs.getObject("task_end_date", String.class));
+                    task.setTaskDepedencies(new ArrayList<>());
 
-                task.setTaskAssignment(taskAssignment);
+                    TaskAssignment taskAssignment = new TaskAssignment();
+                    taskAssignment.setTask_assigned_to(rs.getInt("task_assigned_to"));
+                    taskAssignment.setUser_name(rs.getString("username"));
+                    taskAssignment.setTask_assigned_to_Role(rs.getString("user_role"));
 
-                taskArr.add(task);
+                    task.setTaskAssignment(taskAssignment);
+                    System.out.println("Task data : " + task.getTask_name() + " " + task.getTask_desc());
+                }
+
+                //get the depends on task id
+                Integer depId = rs.getObject("depends_on_task_id", Integer.class);
+
+                // null checker
+                if (depId != null) {
+                    TaskDependency taskDependency = new TaskDependency();
+                    taskDependency.setDepend_on_task_id(depId);
+                    taskDependency.setDepend_on_task_Name(rs.getString("dependency_name"));
+                   // add to the taskdependecy arrayList
+                    task.getTaskDepedencies().add(taskDependency);
+                }
             }
-            return taskArr;
-        } catch (Exception e) {
-        }
 
-        return null;
+            if (task == null) {
+                throw new Exception("Task not found");
+            }
+
+            return task;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     public void updateTaskDetails(Connection con, Task task) throws Exception {
@@ -165,8 +252,7 @@ public class TaskDAO {
                      SET task_name = ?, 
                          task_description = ?, 
                          task_start_date = ?, 
-                         task_end_date = ?, 
-                         task_dependency = ?
+                         task_end_date = ?
                      WHERE task_id = ?
                      """;
 
@@ -175,13 +261,8 @@ public class TaskDAO {
             ps.setString(2, task.getTask_desc());
             ps.setObject(3, task.getTask_start_date());
             ps.setObject(4, task.getTask_end_date());
-            if (task.getTask_dependency() != null) {
-                ps.setInt(5, task.getTask_dependency());
-            } else {
-                ps.setNull(5, java.sql.Types.INTEGER);
-            }
-
-            ps.setInt(6, task.getTask_id());
+            
+            ps.setInt(5, task.getTask_id());
             ps.executeUpdate();
         } catch (Exception e) {
             System.out.println("Exception in task : " + e);
@@ -204,49 +285,42 @@ public class TaskDAO {
         }
     }
 
-    public void updateTaskDetails_Assignment(Task task) throws Exception {
-
-        Connection con = DBConnection.getConnection();
-        con.setAutoCommit(false);
-
-        try {
-            updateTaskDetails(con, task);
-
-            TaskAssignment taskAssignment = new TaskAssignment();
-            taskAssignment = task.getTaskAssignment();
-
-            TaskAssignmentDAO taskAssignmentDAO = new TaskAssignmentDAO();
-            taskAssignmentDAO.updateTaskAssignment(con, taskAssignment);
-
-            con.commit();
-
-        } catch (Exception e) {
-            con.rollback();
-            System.out.println("Exception Occurs" + e);
+    
+    
+    public List getTask_edit(int sprint_id, int task_id) throws Exception{
+        
+        List<Task> taskArr = new ArrayList<>();
+        
+        String sql = """
+                     SELECT task_id, task_name
+                     FROM tasks t
+                     WHERE t.sprint_id = ?
+                     AND t.task_id != ?
+                     AND t.task_id NOT IN (
+                         SELECT depends_on_task_id
+                         FROM task_dependencies
+                         WHERE task_id = ?
+                     );
+                     """;
+        
+        try(Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql);){
+            
+            ps.setInt(1, sprint_id);
+            ps.setInt(2, task_id);
+            ps.setInt(3, task_id);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                Task task = new Task();
+                task.setTask_id(rs.getInt("task_id"));
+                task.setTask_name(rs.getString("task_name"));
+                taskArr.add(task);
+            }
+            
+            return taskArr;
+        } catch(Exception e){
             throw e;
-        } finally {
-            con.close();
-        }
-    }
-
-    public void deleteTaskDetails_Assignment(int task_id) throws Exception {
-
-        Connection con = DBConnection.getConnection();
-        con.setAutoCommit(false);
-
-        try {
-            deleteTask(con, task_id);
-
-            TaskAssignmentDAO taskAssignmentDAO = new TaskAssignmentDAO();
-            taskAssignmentDAO.deleteTaskAssignment(con, task_id);
-
-            con.commit();
-        } catch (Exception e) {
-            con.rollback();
-            System.out.println("Exception Occurs" + e);
-            throw e;
-        } finally {
-            con.close();
         }
     }
 

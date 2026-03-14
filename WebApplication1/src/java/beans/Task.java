@@ -6,6 +6,7 @@ package beans;
 
 import java.time.LocalDate;
 import beans.TaskAssignment;
+import java.util.List;
 
 /**
  *
@@ -13,17 +14,18 @@ import beans.TaskAssignment;
  */
 public class Task {
 
-    private int task_id,sprint_Id;
-    private Integer task_dependency;
-    private String task_name, task_desc, task_status, task_start_date,task_end_date ;
+    private int task_id, sprint_Id;
+    //private Integer task_dependency;
+    private String task_name, task_desc, task_status, task_start_date, task_end_date;
     private TaskAssignment taskAssignment;
+    private List<TaskDependency> taskDependencies;
 
     public Task() {
     }
 
-    public Task(int task_id, Integer task_dependency, int sprint_Id, String task_name, String task_desc, String task_status, String task_start_date, String task_end_date) {
+    public Task(int task_id, int sprint_Id, String task_name, String task_desc, String task_status, String task_start_date, String task_end_date) {
         this.task_id = task_id;
-        this.task_dependency = task_dependency;
+        //this.task_dependency = task_dependency;
         this.sprint_Id = sprint_Id;
         this.task_name = task_name;
         this.task_desc = task_desc;
@@ -36,10 +38,9 @@ public class Task {
         this.task_id = task_id;
     }
 
-    public void setTask_dependency(Integer task_dependency) {
-        this.task_dependency = task_dependency;
-    }
-
+//    public void setTask_dependency(Integer task_dependency) {
+//        this.task_dependency = task_dependency;
+//    }
     public void setSprint_Id(int sprint_Id) {
         this.sprint_Id = sprint_Id;
     }
@@ -67,15 +68,18 @@ public class Task {
     public void setTaskAssignment(TaskAssignment taskAssignment) {
         this.taskAssignment = taskAssignment;
     }
-    
+
+    public void setTaskDepedencies(List<TaskDependency> taskDependencies) {
+        this.taskDependencies = taskDependencies;
+    }
+
     public int getTask_id() {
         return task_id;
     }
 
-    public Integer getTask_dependency() {
-        return task_dependency;
-    }
-
+//    public Integer getTask_dependency() {
+//        return task_dependency;
+//    }
     public int getSprint_Id() {
         return sprint_Id;
     }
@@ -93,7 +97,7 @@ public class Task {
     }
 
     public LocalDate getTask_start_date() {
-        return  LocalDate.parse(task_start_date);
+        return LocalDate.parse(task_start_date);
     }
 
     public LocalDate getTask_end_date() {
@@ -103,5 +107,8 @@ public class Task {
     public TaskAssignment getTaskAssignment() {
         return taskAssignment;
     }
-    
+
+    public List<TaskDependency> getTaskDepedencies() {
+        return taskDependencies;
+    }
 }

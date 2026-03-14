@@ -37,7 +37,7 @@ public class DBConnection {
 
             // Check if connection was successful
             if (connection != null) {
-                System.out.println("Database connection successful.");
+                //System.out.println("Database connection successful.");
             } else {
                 System.out.println("Database connection failed: Connection object is null.");
             }

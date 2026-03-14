@@ -15,10 +15,13 @@ import DAO.TaskDAO;
 import beans.User;
 import beans.Task;
 import beans.TaskAssignment;
+import Service.TaskServices;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import java.io.BufferedReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -72,7 +75,7 @@ public class TaskServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
-        System.out.println("Action in Task " + action);
+//        System.out.println("Action in Task " + action);
         Gson gson = new Gson();
 
         Map<String, Object> result = new HashMap<>();
@@ -88,7 +91,7 @@ public class TaskServlet extends HttpServlet {
                 String user_role = request.getParameter("user_role");
                 int project_id = Integer.parseInt(request.getParameter("project_id"));
 
-                System.out.println("Role : " + user_role);
+//                System.out.println("Role : " + user_role);
 
                 UserDAO userDao = new UserDAO();
                 userList = userDao.getUsersByRole(user_role, project_id);
@@ -101,7 +104,7 @@ public class TaskServlet extends HttpServlet {
                 result.put("userData", userList);
             } else if ("fetchTasks_Sprint".equalsIgnoreCase(action)) {
 
-                System.out.println("Start fetchTask");
+                //System.out.println("Start fetchTask");
                 List<Task> tasksArr = new ArrayList<>();
 
                 int sprint_id = Integer.parseInt(request.getParameter("sprint_id"));
@@ -110,23 +113,36 @@ public class TaskServlet extends HttpServlet {
                 tasksArr = taskDao.getTasksBySprintId(sprint_id);
 
                 result.put("tasks", tasksArr);
-                
-                
+
             } else if ("fetchTask_Edit".equalsIgnoreCase(action)) {
-                 int task_id = Integer.parseInt(request.getParameter("task_id"));
-                 TaskDAO taskDAO = new TaskDAO();
-                 List<Task> taskArr = taskDAO.getTaskByTaskId(task_id);
-                 
-                 result.put("taskData", taskArr);   
+                int task_id = Integer.parseInt(request.getParameter("task_id"));
+                TaskDAO taskDAO = new TaskDAO();
+                Task task = taskDAO.getTaskByTaskId(task_id);
+
+                result.put("taskData", task);
+            } else if ("fetchTask_dependency".equalsIgnoreCase(action)) {
+                int sprint_id = Integer.parseInt(request.getParameter("sprint_id"));
+
+                String task_idStr = request.getParameter("task_id");
+                Integer task_id = task_idStr != null ? Integer.valueOf(task_idStr) : null;
+
+                TaskDAO taskDAO = new TaskDAO();
+                List<Task> taskArr = null;
+                if (task_id == null) {
+                    taskArr = taskDAO.getLiteTasksBySprintID(sprint_id);
+                } else {
+                    taskArr = taskDAO.getTask_edit(sprint_id, task_id);
+                }
+
+                result.put("taskData", taskArr);
             }
-            
+
             result.put("status", "Success");
         } catch (Exception e) {
             e.printStackTrace();
             result.put("status", "Failed " + e);
 
         }
-
         response.getWriter().write(gson.toJson(result));
     }
 
@@ -168,21 +184,24 @@ public class TaskServlet extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
 
             if ("Insert".equalsIgnoreCase(action)) {
-
+                System.out.println("Task Inserted");
                 Task task = gson.fromJson(json, Task.class);
 
-                System.out.println("Dependency received: " + task.getTask_dependency());
+                // System.out.println("Dependency received: " + task.getTask_dependency());
 
-                TaskDAO taskDao = new TaskDAO();
-                int task_id = taskDao.insertTask(task);
-
+//                int task_id = taskDao.insertTask(task);
                 TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
-                taskAssignment.setTask_id(task_id);
+                task.setTaskAssignment(taskAssignment);
                 
-                request.setAttribute("action", "Insert");
-                request.setAttribute("taskAssignment", taskAssignment);
-                request.getRequestDispatcher("/TaskAssignmentServlet").include(request, response);
+                Type type = new TypeToken<List<Integer>>(){}.getType();
+                List<Integer> dependencyArr = gson.fromJson(jsonObject.get("taskDepedencies"),type);
+                
+                TaskServices taskServices = new TaskServices();
+                int task_id = taskServices.insertTaskDetails_Assignment(task, dependencyArr);
 
+//                request.setAttribute("action", "Insert");
+//                request.setAttribute("taskAssignment", taskAssignment);
+//                request.getRequestDispatcher("/TaskAssignmentServlet").include(request, response);
                 System.out.println("task Id return " + task_id);
                 result.put("task_id", task_id);
                 result.put("status", "Success");
@@ -196,22 +215,25 @@ public class TaskServlet extends HttpServlet {
 
                 result.put("status", "Success");
             } else if ("UpdateTaskDetials".equalsIgnoreCase(action)) {
-                
+
                 Task task = gson.fromJson(json, Task.class);
-                
+
                 TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
                 task.setTaskAssignment(taskAssignment);
                 
-                TaskDAO taskDAO = new TaskDAO();
-                taskDAO.updateTaskDetails_Assignment(task);
-                
+                Type type = new TypeToken<List<Integer>>(){}.getType();
+                List<Integer> dependencyArr = gson.fromJson(jsonObject.get("taskDepedencies"),type);
+
+                TaskServices taskServices = new TaskServices();
+                taskServices.updateTaskDetails_Assignment(task, dependencyArr);
+                result.put("task_id", task.getTask_id());
                 result.put("status", "Success");
-            } else if("deleteTask".equalsIgnoreCase(action)){
+            } else if ("deleteTask".equalsIgnoreCase(action)) {
                 int task_id = jsonObject.get("task_id").getAsInt();
-                
-                TaskDAO taskDAO = new TaskDAO();
-                taskDAO.deleteTaskDetails_Assignment(task_id);
-                
+
+                TaskServices taskServices = new TaskServices();
+                taskServices.deleteTaskDetails_Assignment(task_id);
+
                 result.put("status", "Success");
             }
 

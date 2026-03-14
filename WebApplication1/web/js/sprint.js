@@ -44,6 +44,7 @@ function editBoard(boardId) {
     isEditMode = true;
     const board = document.getElementById(boardId);
 
+    console.log("Board :", board);
 
     // load options first
 //    await loadBacklogOptions(board._backlogData);
@@ -201,7 +202,6 @@ document.addEventListener("DOMContentLoaded",
 //Function to create the Scrum board
 async function saveBoard() {
     let sprint_id = null;
-
 
     const data = {
         action: "Insert",
@@ -367,12 +367,13 @@ async function insertTask_Board(sprint_id) {
     console.log(result.tasks);
 
     result.tasks.forEach((item) => {
+        let i = 0;
         // 3. Create the task card visually
         const task = document.createElement('div');
         task.className = 'task';
         task.draggable = true;
-        task.id = item.task_id;
-        task.dataset.dependency = item.task_dependency || "";
+        task.id = "task-" + item.task_id;
+        task.dataset.dependency = (item.taskDepedencies || []).join(",");
         // 4. Set InnerHTML with Hyperlink
         // Note: draggable="false" on the <a> tag prevents drag conflict
         task.innerHTML = `
@@ -424,6 +425,64 @@ async function sendData_Task(data) {
 }
 ;
 
+
+const bsTaskModal = new bootstrap.Modal(document.getElementById('taskModal'));
+function addTask(btn) {
+
+    isTaskEdit = false;
+    // Identify the target column and board
+    const taskModel = document.querySelector("#taskModal");
+    taskModel.querySelector("#taskModel_title").innerText = "Add Task";
+
+    const subBtn = taskModel.querySelector("#taskModel_Sbt");
+    document.getElementById("deleteTaskBtn").style.display = "none";
+
+    boardId = btn.closest('.scrum-board-card').id;
+    console.log("ID IN ADDTASK()", boardId);
+    const columnHeader = btn.closest('.column').querySelector('h3').innerText;
+
+    // Reset modal and set hidden context
+    document.querySelectorAll('#taskModal input, #taskModal textarea').forEach(el => el.value = '');
+    document.getElementById('t_board_id').value = boardId;
+    document.getElementById('t_column_id').value = columnHeader;
+
+    loadTaskDepenecy();
+
+    bsTaskModal.show();
+}
+
+
+
+async function loadTaskDepenecy() {
+
+    const sprint_id = document.getElementById("t_board_id").value;
+    console.log("Board id : " + sprint_id);
+    const response = await fetch(`TaskServlet?action=fetchTask_dependency&sprint_id=${sprint_id}`);
+    const result = await response.json();
+
+
+    const select = $('#t_dependency');
+    select.empty();
+
+    if (!select.hasClass("select2-hidden-accessible")) {
+        select.select2({
+            placeholder: "Select task dependency",
+            width: '100%',
+            dropdownParent: $('#taskModal')
+        });
+    }
+    console.log(result);
+
+    result.taskData.forEach(item => {
+        select.append(new Option(`TASK-${item.task_id} | ${item.task_name}`, item.task_id));
+        console.log("Apended");
+    });
+
+    select.trigger('change');
+}
+;
+
+
 // Get assignee details after user selected role
 document.getElementById("assignee").addEventListener("focus", async function () {
 
@@ -466,11 +525,9 @@ document.getElementById("assignee").addEventListener("focus", async function () 
 
 
 async function confirmAddTask() {
-
-    const task_dependency = document.getElementById('t_dep').value === ""
-            ? null
-            : document.getElementById('t_dep').value;
-
+    
+    console.log("confirmAddTask");
+    
     const data = {
         action: "Insert",
         task_name: document.getElementById('t_name').value,
@@ -478,22 +535,24 @@ async function confirmAddTask() {
         assignee: document.getElementById('assignee').value,
         task_start_date: document.getElementById('t_start').value,
         task_end_date: document.getElementById('t_end').value,
-        task_dependency: task_dependency,
         sprint_Id: document.getElementById('t_board_id').value,
         task_status: document.getElementById('t_column_id').value,
         task_assigned_to: document.getElementById('assignee').value,
-        task_assigned_by: user_id
+        task_assigned_by: user_id,
+        taskDepedencies: $('#t_dependency').val().map(Number) || null
     };
-
+   
+    console.log("Task dependency :" + data.taskDepedencies);
     let task_id = null;
     if (isTaskEdit) {
         data.action = "UpdateTaskDetials";
 
-        task_id = document.getElementById("task_id").value;
+        task_id = document.getElementById("task_id").value.replace("task-", "");
+        ;
         console.log("Task id", task_id);
         data.task_id = task_id;
 
-        const oldTask = document.getElementById(task_id);
+        const oldTask = document.getElementById("task-" + task_id);
         console.log("Task old :", oldTask);
         if (oldTask)
             oldTask.remove();
@@ -501,20 +560,25 @@ async function confirmAddTask() {
 
     const result = await sendData_Task(data);
 
+    if (result.status !== "Success") {
+        bsTaskModal.hide();
+        return;
+    }
+
 
     // 3. Create the task card visually
     const task = document.createElement('div');
     task.className = 'task';
     task.draggable = true;
-    task.id = result.task_id;
-    task.dataset.dependency = task_dependency;
+    task.id = "task-" + result.task_id;
+    task.dataset.dependency = data.taskDepedencies;
 
     // 4. Set InnerHTML with Hyperlink
     // Note: draggable="false" on the <a> tag prevents drag conflict
     task.innerHTML = `
 
     <a href="javascript:void(0)" 
-       onclick="getTaskDetails('${data.task_id}')"
+       onclick="getTaskDetails('${result.task_id}')"
        draggable="false" 
        class="fw-bold text-decoration-none text-primary task-link">
             ${data.task_name}
@@ -569,51 +633,6 @@ function viewTaskDetails(taskId) {
     bsTaskViewModal.show();
 }
 
-// Edit for task
-function switchToEditMode() {
-    document.getElementById('v_modal_title').innerText = "Update Task";
-
-    // Enable all inputs
-    document.querySelectorAll('.view-mode').forEach(el => {
-        el.removeAttribute('readonly');
-        el.removeAttribute('disabled'); // For the select dropdown
-        el.classList.replace('bg-light', 'bg-white');
-        el.classList.add('border'); // Give visual cue it's editable
-    });
-
-    // Swap Buttons
-    document.getElementById('viewActions').classList.add('d-none');
-    document.getElementById('editActions').classList.remove('d-none');
-}
-
-
-function switchToViewMode() {
-    document.getElementById('v_modal_title').innerText = "Task Details";
-
-    document.querySelectorAll('.view-mode').forEach(el => {
-        el.setAttribute('readonly', true);
-        el.setAttribute('disabled', true);
-        el.classList.replace('bg-white', 'bg-light');
-        el.classList.remove('border');
-    });
-    document.getElementById('viewActions').classList.remove('d-none');
-    document.getElementById('editActions').classList.add('d-none');
-}
-
-
-
-function disableTaskEdit() {
-    // Restore readonly state
-    document.querySelectorAll('#viewTaskModal .form-control').forEach(el => {
-        el.setAttribute('readonly', true);
-        el.classList.add('border-0', 'bg-light');
-    });
-    document.getElementById('viewModeButtons').classList.remove('d-none');
-    document.getElementById('editModeButtons').classList.add('d-none');
-}
-
-
-
 function allowDrop(ev) {
     ev.preventDefault();
 }
@@ -629,8 +648,9 @@ async function drop(ev) {
 
     ev.preventDefault();
 
-    const taskId = ev.dataTransfer.getData("taskId");
-    const task = document.getElementById(taskId);
+    const taskId = ev.dataTransfer.getData("taskId").replace("task-", "");
+    ;
+    const task = document.getElementById("task-" + taskId);
 
     console.log("Task :", task);
 
@@ -672,30 +692,8 @@ async function drop(ev) {
         if (oldColumn) {
             oldColumn.appendChild(task);
         }
-
         alert("Update failed, reverting change");
     }
-}
-
-const bsTaskModal = new bootstrap.Modal(document.getElementById('taskModal'));
-function addTask(btn) {
-
-    isTaskEdit = false;
-    // Identify the target column and board
-    const taskModel = document.querySelector("#taskModal");
-    taskModel.querySelector("#taskModel_title").innerText = "Add Task";
-
-    const subBtn = taskModel.querySelector("#taskModel_Sbt");
-    document.getElementById("deleteTaskBtn").style.display = "none";
-
-    const boardId = btn.closest('.scrum-board-card').id;
-    const columnHeader = btn.closest('.column').querySelector('h3').innerText;
-
-    // Reset modal and set hidden context
-    document.querySelectorAll('#taskModal input, #taskModal textarea').forEach(el => el.value = '');
-    document.getElementById('t_board_id').value = boardId;
-    document.getElementById('t_column_id').value = columnHeader;
-    bsTaskModal.show();
 }
 
 async function getTaskDetails(task_id) {
@@ -707,23 +705,23 @@ async function getTaskDetails(task_id) {
 
     const result = await response.json();
 
-    console.log(result);
+    console.log("Result : ", result);
     console.log(typeof result);
 
     const taskModel = document.querySelector("#taskModal");
 
-    taskModel.querySelector("#taskModel_title").innerText = "Edit Task";
+    taskModel.querySelector("#taskModel_title").innerText = "Task Information";
     const subBtn = taskModel.querySelector("#taskModel_Sbt");
     subBtn.innerText = "Edit Task";
+    subBtn.onclick = () => editTask();
 
-//    Set Delete Btn
+//   Set Delete Btn
     const deletebtn = document.getElementById("deleteTaskBtn");
     deletebtn.style.display = "none";
     deletebtn.onclick = () => deleteTask(task_id);
 
-    isTaskEdit = true;
-
-    const task = document.getElementById(task_id);
+    const task = document.getElementById("task-" + task_id);
+    console.log("task during edit : " , task);
     const taskStatus = task.closest('.column').dataset.status;
     console.log("Task Status :", taskStatus);
 
@@ -739,26 +737,72 @@ async function getTaskDetails(task_id) {
     input.id = "task_id";
     taskModel.append(input);
 
-    taskModel.querySelector("#t_name").value = result.taskData[0].task_name;
-    taskModel.querySelector("#t_desc").value = result.taskData[0].task_desc;
-    taskModel.querySelector("#t_user_role").value = result.taskData[0].task_assigned_to_Role;
+    taskModel.querySelector("#t_name").value = result.taskData.task_name;
+    taskModel.querySelector("#t_desc").value = result.taskData.task_desc;
+    taskModel.querySelector("#t_user_role").value = result.taskData.task_assigned_to_Role;
 
     const role = taskModel.querySelector("#t_user_role");
-    role.value = result.taskData[0].taskAssignment.task_assigned_to_Role;
+    role.value = result.taskData.taskAssignment.task_assigned_to_Role;
 
     const assignee = taskModel.querySelector("#assignee");
     const option = document.createElement("option");
-    option.value = result.taskData[0].taskAssignment.task_assigned_to;
-    option.textContent = result.taskData[0].taskAssignment.user_name;
+    option.value = result.taskData.taskAssignment.task_assigned_to;
+    option.textContent = result.taskData.taskAssignment.user_name;
 
     assignee.append(option);
 
 //    board.querySelector("#assignee").value = ;
-    taskModel.querySelector("#t_start").value = result.taskData[0].task_start_date;
-    taskModel.querySelector("#t_end").value = result.taskData[0].task_end_date;
-    taskModel.querySelector("#t_dep").value = result.taskData[0].task_dependency;
+    taskModel.querySelector("#t_start").value = result.taskData.task_start_date;
+    taskModel.querySelector("#t_end").value = result.taskData.task_end_date;
 
-    document.getElementById("deleteTaskBtn").style.display = "block";
+
+    const select = $('#t_dependency');
+    select.empty(); // clear previous selections
+
+    if (!select.hasClass("select2-hidden-accessible")) {
+        select.select2({
+            placeholder: "Select task dependency",
+            width: '100%',
+            dropdownParent: $('#taskModal')
+        });
+    }
+
+    console.log("task dependency :", result.taskData.taskDependencies);
+
+    const response2 = await fetch(`TaskServlet?action=fetchTask_dependency&sprint_id=${sprint_id}&task_id=${task_id}`);
+    const result2 = await response2.json();
+
+    console.log("result2 : ", result2.taskData);
+
+    result.taskData.taskDependencies.forEach(item => {
+
+        const option = new Option(
+                `TASK-${item.depend_on_task_id} | ${item.depend_on_task_Name}`,
+                item.depend_on_task_id,
+                true,
+                true
+                );
+
+        select.append(option);
+    });
+
+    result2.taskData.forEach(item => {
+
+        const option = new Option(
+                `TASK-${item.task_id} | ${item.task_name}`,
+                item.task_id, );
+
+        select.append(option);
+    });
+
+    select.trigger('change');
+
+    $('#taskDependency').trigger('change');
+
+    document.querySelectorAll("#taskModal input, #taskModal textarea, #taskModal select")
+            .forEach(el => el.disabled = true);
+
+    document.getElementById("deleteTaskBtn").style.display = "none";
     bsTaskModal.show();
 }
 
@@ -773,10 +817,72 @@ async function deleteTask(task_id) {
     const result = await sendData_Task(data);
 
     if (result.status === "Success") {
-        const oldTask = document.getElementById(task_id);
+        const oldTask = document.getElementById("task-" + task_id);
         console.log("Task old :", oldTask);
         if (oldTask)
             oldTask.remove();
     }
+    
+    
     bsTaskModal.hide();
 }
+
+function editTask() {
+
+    document.querySelectorAll("#taskModal input, #taskModal textarea, #taskModal select")
+            .forEach(el => el.disabled = false);
+
+    const taskModel = document.querySelector("#taskModal");
+    taskModel.querySelector("#taskModel_title").innerText = " Edit Task";
+    const subBtn = taskModel.querySelector("#taskModel_Sbt");
+    subBtn.innerText = "Edit Task";
+    subBtn.onclick = () => confirmAddTask();
+
+    document.getElementById("deleteTaskBtn").style.display = "block";
+
+
+    isTaskEdit = true;
+}
+
+
+//
+//// Edit for task
+//function switchToEditMode() {
+//    document.getElementById('v_modal_title').innerText = "Update Task";
+//
+//    // Enable all inputs
+//    document.querySelectorAll('.view-mode').forEach(el => {
+//        el.removeAttribute('readonly');
+//        el.removeAttribute('disabled'); // For the select dropdown
+//        el.classList.replace('bg-light', 'bg-white');
+//        el.classList.add('border'); // Give visual cue it's editable
+//    });
+//
+//    // Swap Buttons
+//    document.getElementById('viewActions').classList.add('d-none');
+//    document.getElementById('editActions').classList.remove('d-none');
+//}
+
+//
+//function switchToViewMode() {
+//    document.getElementById('v_modal_title').innerText = "Task Details";
+//
+//    document.querySelectorAll('.view-mode').forEach(el => {
+//        el.setAttribute('readonly', true);
+//        el.setAttribute('disabled', true);
+//        el.classList.replace('bg-white', 'bg-light');
+//        el.classList.remove('border');
+//    });
+//    document.getElementById('viewActions').classList.remove('d-none');
+//    document.getElementById('editActions').classList.add('d-none');
+//}
+//
+//function disableTaskEdit() {
+//    // Restore readonly state
+//    document.querySelectorAll('#viewTaskModal .form-control').forEach(el => {
+//        el.setAttribute('readonly', true);
+//        el.classList.add('border-0', 'bg-light');
+//    });
+//    document.getElementById('viewModeButtons').classList.remove('d-none');
+//    document.getElementById('editModeButtons').classList.add('d-none');
+//}

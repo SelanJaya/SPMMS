@@ -98,66 +98,6 @@ public class SprintDAO {
         }
     }
 
-//    public List getSprintsData(int project_id) throws Exception {
-//
-//        List<Sprint> sprintList = new ArrayList<>();
-//
-//        String sql = """
-//                     SELECT s.sprint_id, s.sprint_name, s.sprint_start_date, s.sprint_end_date,
-//                     s.sprint_goal, s.sprint_status, s.restrospective_notes, s.review_notes, 
-//                     sbl.backlog_item_id, b.backlog_item_title, b.story_points
-//                                 FROM sprints s
-//                                 LEFT JOIN sprint_backlog_links sbl
-//                                     ON s.sprint_id = sbl.sprint_id
-//                                 LEFT JOIN backlog_items b
-//                                 	USING (backlog_item_id)
-//                                 WHERE s.project_id = ?;
-//                    """;
-//        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
-//
-//            ps.setInt(1, project_id);
-//
-//            ResultSet rs = ps.executeQuery();
-//            List<Backlog> backlogArr = new ArrayList<>();
-//
-//            while (rs.next()) {
-//
-//                Sprint sprint = new Sprint();
-//
-//                int sprint_id = rs.getInt("sprint_id");
-//
-//                sprint.setSprint_id(sprint_id);
-//                sprint.setSprint_name(rs.getString("sprint_name"));
-//                sprint.setSprint_start_date(rs.getString("sprint_start_date"));
-//                sprint.setSprint_end_date(rs.getString("sprint_end_date"));
-//                sprint.setSprint_goal(rs.getString("sprint_goal"));
-//                sprint.setSprint_status(rs.getString("sprint_status"));
-//                sprint.setRestrospective_notes(rs.getString("restrospective_notes"));
-//                sprint.setReview_notes(rs.getString("review_notes"));
-//
-//                do {
-//                    Backlog backlog = new Backlog();
-//                    backlog.setBacklogI_id(rs.getInt("backlog_item_id"));
-//                    backlog.setBacklogI_title(rs.getString("backlog_item_title"));
-//                    backlog.setStory_point(rs.getInt("story_points"));
-//                    backlogArr.add(backlog);
-//                } while (rs.next() && sprint_id == rs.getInt("sprint_id"));
-//
-//                rs.previous();
-//
-//                sprint.setBacklog(backlogArr);
-//
-//                sprintList.add(sprint);
-//            }
-//            return sprintList;
-//        } catch (Exception e) {
-//            System.out.println("Exception Ocurr:" + e);
-//            throw e;
-//        }
-//    }
-//     SELECT sprint_id, sprint_name, sprint_start_date, sprint_end_date, 
-//                    sprint_goal, sprint_status, restrospective_notes, review_notes
-//                    FROM sprints WHERE project_id = ?
     public int insertSprintDetails(Sprint sprint) throws Exception {
 
         String sql = "INSERT INTO sprints (project_id, sprint_name, sprint_start_date, "
