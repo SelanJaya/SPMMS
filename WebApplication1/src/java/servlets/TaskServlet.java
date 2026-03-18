@@ -118,7 +118,7 @@ public class TaskServlet extends HttpServlet {
                 int task_id = Integer.parseInt(request.getParameter("task_id"));
                 TaskDAO taskDAO = new TaskDAO();
                 Task task = taskDAO.getTaskByTaskId(task_id);
-
+                
                 result.put("taskData", task);
             } else if ("fetchTask_dependency".equalsIgnoreCase(action)) {
                 int sprint_id = Integer.parseInt(request.getParameter("sprint_id"));
@@ -184,6 +184,7 @@ public class TaskServlet extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
 
             if ("Insert".equalsIgnoreCase(action)) {
+                
                 System.out.println("Task Inserted");
                 Task task = gson.fromJson(json, Task.class);
 
@@ -203,8 +204,11 @@ public class TaskServlet extends HttpServlet {
 //                request.setAttribute("taskAssignment", taskAssignment);
 //                request.getRequestDispatcher("/TaskAssignmentServlet").include(request, response);
                 System.out.println("task Id return " + task_id);
+                
                 result.put("task_id", task_id);
+                result.put("message", "Task Saved");
                 result.put("status", "Success");
+                
             } else if ("updateTaskStatus".equalsIgnoreCase(action)) {
 
                 int task_id = jsonObject.get("task_id").getAsInt();
@@ -212,8 +216,10 @@ public class TaskServlet extends HttpServlet {
 
                 TaskDAO taskDao = new TaskDAO();
                 taskDao.updateTaskStatus(task_id, task_status);
-
+                
+                result.put("message", "Task Status Updated");
                 result.put("status", "Success");
+                
             } else if ("UpdateTaskDetials".equalsIgnoreCase(action)) {
 
                 Task task = gson.fromJson(json, Task.class);
@@ -227,19 +233,23 @@ public class TaskServlet extends HttpServlet {
                 TaskServices taskServices = new TaskServices();
                 taskServices.updateTaskDetails_Assignment(task, dependencyArr);
                 result.put("task_id", task.getTask_id());
+                result.put("message", "Task Details Updated");
                 result.put("status", "Success");
+                
             } else if ("deleteTask".equalsIgnoreCase(action)) {
+                
                 int task_id = jsonObject.get("task_id").getAsInt();
 
                 TaskServices taskServices = new TaskServices();
                 taskServices.deleteTaskDetails_Assignment(task_id);
-
+                
+                result.put("message", "Task Deleted");
                 result.put("status", "Success");
             }
-
         } catch (Exception e) {
             System.out.println("Exception in task : " + e);
-            result.put("status", "Failed" + e);
+            result.put("message", e.getMessage());
+            result.put("status", "Failed");
         }
 
         response.getWriter().write(gson.toJson(result));

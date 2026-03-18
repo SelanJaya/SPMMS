@@ -51,6 +51,8 @@
         </nav>
 
         <div id="content-wrapper">
+            
+            <div id="statusTab"></div>
             <nav class="top-nav px-4 d-flex justify-content-between align-items-center">
                 <div class="small text-muted">Management / <span class="fw-semibold text-dark">Project Console</span></div>
                 <div class="d-flex align-items-center">

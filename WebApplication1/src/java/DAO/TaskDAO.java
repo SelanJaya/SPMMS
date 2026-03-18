@@ -192,7 +192,7 @@ public class TaskDAO {
                          LEFT JOIN users u
                              ON ta.task_assigned_to = u.user_id
                          WHERE t.task_id = ?;
-                         """;
+                     """;
 
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 

@@ -373,7 +373,9 @@ async function insertTask_Board(sprint_id) {
         task.className = 'task';
         task.draggable = true;
         task.id = "task-" + item.task_id;
-        task.dataset.dependency = (item.taskDepedencies || []).join(",");
+        task.dataset.dependency = (item.taskDependencies || [])
+                .map(dep => dep.depend_on_task_id)
+                .join(",");
         // 4. Set InnerHTML with Hyperlink
         // Note: draggable="false" on the <a> tag prevents drag conflict
         task.innerHTML = `
@@ -525,9 +527,9 @@ document.getElementById("assignee").addEventListener("focus", async function () 
 
 
 async function confirmAddTask() {
-    
+
     console.log("confirmAddTask");
-    
+
     const data = {
         action: "Insert",
         task_name: document.getElementById('t_name').value,
@@ -541,7 +543,7 @@ async function confirmAddTask() {
         task_assigned_by: user_id,
         taskDepedencies: $('#t_dependency').val().map(Number) || null
     };
-   
+
     console.log("Task dependency :" + data.taskDepedencies);
     let task_id = null;
     if (isTaskEdit) {
@@ -565,6 +567,7 @@ async function confirmAddTask() {
         return;
     }
 
+    displayMessage(result.status, result.message);
 
     // 3. Create the task card visually
     const task = document.createElement('div');
@@ -640,6 +643,7 @@ function allowDrop(ev) {
 function drag(ev) {
 
     const task = ev.target;
+    console.log("task drag ", task);
     ev.dataTransfer.setData("taskId", task.id);
     task.dataset.oldStatus = task.closest('.column').dataset.status;
 }
@@ -649,19 +653,18 @@ async function drop(ev) {
     ev.preventDefault();
 
     const taskId = ev.dataTransfer.getData("taskId").replace("task-", "");
-    ;
     const task = document.getElementById("task-" + taskId);
 
-    console.log("Task :", task);
+    const board = task.closest('.scrum-board-card');
+    console.log("board :", board);
 
     const newColumn = ev.target.closest('.column');
     if (!newColumn)
         return;
 
     const newStatus = newColumn.dataset.status;
-    console.log(newStatus);
     const oldStatus = task.dataset.oldStatus;
-    console.log(oldStatus);
+
 
     // optimistic UI move
     newColumn.querySelector('.task-list').appendChild(task);
@@ -670,7 +673,51 @@ async function drop(ev) {
         return;
 
     try {
+        // get dependency
+        const deps = task.dataset.dependency
+                ? task.dataset.dependency.split(",").map(Number).filter(n => n > 0)
+                : [];
+                
+        console.log("Dependency : ", deps);
 
+        if (deps.length > 0) {
+            // map to numberic to compare
+            const statusMap = {
+                "TO DO": 1,
+                "IN PROGRESS": 2,
+                "DONE": 3
+            };
+
+
+            for (const item of deps) {
+
+                const depTask = document.getElementById("task-" + item);
+                if (!depTask) {
+                    throw new Error(`Dependency task ${item} not found`);
+                }
+
+                const column = depTask.closest('.column');
+
+                if (!column) {
+                    throw new Error(`Column not found for task ${item}`);
+                }
+
+                const depStatus = column.dataset.status;
+                const depStatusNum = statusMap[depStatus];
+
+                if (depStatusNum !== 3) {
+
+                    const depTaskName = depTask.textContent.trim();
+                    console.log("Task Name : ", depTaskName);
+
+                    throw new Error(`${depTaskName} is not completed`);
+
+
+                }
+            }
+        }
+
+        // ✅ only runs if all dependencies are DONE
         const data = {
             action: "updateTaskStatus",
             task_id: taskId,
@@ -683,16 +730,26 @@ async function drop(ev) {
             throw new Error("Update failed");
         }
 
+        displayMessage(result.status, result.message);
+
     } catch (err) {
 
-        const oldColumn = document.querySelector(
+        const oldColumn = board.querySelector(
                 `[data-status="${oldStatus}"] .task-list`
                 );
+
+        console.log("OLD STATUS:", oldStatus);
+        console.log("TASK:", task);
+        console.log("OLD COLUMN:", oldColumn);
 
         if (oldColumn) {
             oldColumn.appendChild(task);
         }
-        alert("Update failed, reverting change");
+
+        console.error(err);
+        //alert("Update failed, reverting change");
+
+        displayMessage("Failed", err.message);
     }
 }
 
@@ -721,7 +778,7 @@ async function getTaskDetails(task_id) {
     deletebtn.onclick = () => deleteTask(task_id);
 
     const task = document.getElementById("task-" + task_id);
-    console.log("task during edit : " , task);
+    console.log("task during edit : ", task);
     const taskStatus = task.closest('.column').dataset.status;
     console.log("Task Status :", taskStatus);
 
@@ -751,7 +808,6 @@ async function getTaskDetails(task_id) {
 
     assignee.append(option);
 
-//    board.querySelector("#assignee").value = ;
     taskModel.querySelector("#t_start").value = result.taskData.task_start_date;
     taskModel.querySelector("#t_end").value = result.taskData.task_end_date;
 
@@ -822,9 +878,10 @@ async function deleteTask(task_id) {
         if (oldTask)
             oldTask.remove();
     }
-    
-    
+
+
     bsTaskModal.hide();
+    displayMessage(result.status, result.message);
 }
 
 function editTask() {
@@ -840,9 +897,49 @@ function editTask() {
 
     document.getElementById("deleteTaskBtn").style.display = "block";
 
-
     isTaskEdit = true;
 }
+
+function displayMessage(status, msg) {
+
+    let alertClass = "alert-success";
+    let icon = "fa-check-circle";
+
+    if (status === "Failed") {
+        alertClass = "alert-danger";
+        icon = "fa-circle-xmark";
+    }
+
+
+    const messageDiv = document.getElementById("statusTab");
+
+    messageDiv.innerHTML = `<div id="successProcessTab" class="alert ${alertClass} alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                        <div class="icon-container me-3">
+                            <i class="fas ${icon} fa-lg"></i>
+                        </div>
+                        <div class="message-content">
+                            <h6 class="alert-heading mb-0 fw-bold" style="font-size: 0.9rem;">${msg}</h6>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>`;
+
+
+    setTimeout(() => {
+        messageDiv.innerHTML = "";
+    }, 5000);
+
+    return;
+}
+;
+
+
+
+
+
+
+
+
+
 
 
 //

@@ -13,6 +13,7 @@ import beans.TaskAssignment;
 import beans.TaskDependency;
 import java.sql.Connection;
 import java.util.List;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 /**
  *
@@ -31,10 +32,10 @@ public class TaskServices {
             int task_id = taskDAO.insertTask(task);
 
             System.out.println("Task Id return" + task_id);
-            
+
             //Task dependences
             TaskDependencyDAO taskDependencyDAO = new TaskDependencyDAO();
-            if ( dependencyArr != null) {
+            if (dependencyArr != null) {
                 for (int item : dependencyArr) {
                     TaskDependency taskDependency = new TaskDependency(task_id, item);
 
@@ -56,7 +57,9 @@ public class TaskServices {
             return task_id;
         } catch (Exception e) {
             con.rollback();
-            throw e;
+            throw new Exception("Task insertion Failed", e);
+        } finally {
+            con.close();
         }
     }
 
@@ -75,22 +78,22 @@ public class TaskServices {
 
             TaskAssignmentDAO taskAssignmentDAO = new TaskAssignmentDAO();
             taskAssignmentDAO.updateTaskAssignment(con, taskAssignment);
-            
+
             // Delete task dependecy 
             TaskDependencyDAO taskDependencyDAO = new TaskDependencyDAO();
             taskDependencyDAO.deleteTaskDependency(con, task.getTask_id());
-            
+
             //form New Dependecy
             for (int item : dependencyArr) {
                 TaskDependency taskDependency = new TaskDependency(task.getTask_id(), item);
                 taskDependencyDAO.insertTaskDependency(con, taskDependency);
             }
-            con.commit();
 
+            con.commit();
         } catch (Exception e) {
             con.rollback();
             System.out.println("Exception Occurs" + e);
-            throw e;
+            throw new Exception("Task Update Unsucessfull", e);
         } finally {
             con.close();
         }
@@ -102,7 +105,7 @@ public class TaskServices {
         con.setAutoCommit(false);
 
         try {
-            
+
             TaskDAO taskDAO = new TaskDAO();
             taskDAO.deleteTask(con, task_id);
 
@@ -110,10 +113,13 @@ public class TaskServices {
             taskAssignmentDAO.deleteTaskAssignment(con, task_id);
 
             con.commit();
+        } catch (SQLIntegrityConstraintViolationException e) {
+            con.rollback();
+            throw new Exception("Cannot delete this task because other tasks depend on it.");
         } catch (Exception e) {
             con.rollback();
             System.out.println("Exception Occurs" + e);
-            throw e;
+            throw new Exception("Task Deletion Failed", e);
         } finally {
             con.close();
         }
