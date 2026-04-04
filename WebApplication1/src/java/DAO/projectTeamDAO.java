@@ -18,9 +18,9 @@ import java.util.List;
  *
  * @author HP
  */
-public class projectTeamDAO {
+public class ProjectTeamDAO {
 
-    public projectTeamDAO() {
+    public ProjectTeamDAO() {
     }
 
     public boolean createProject(Project project) {

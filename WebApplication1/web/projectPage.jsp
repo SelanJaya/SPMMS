@@ -119,14 +119,19 @@
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6 class="m-0 fw-bold text-primary" style="font-size: 0.9rem;">General Information</h6>
                                 <div class="d-flex gap-2">
+                                    <button id="manageDocBtn" 
+                                            class="btn btn-sm btn-primary px-2 rounded-pill fw-bold"
+                                            <!--                                            data-bs-toggle="modal" 
+                                                                                        data-bs-target="#projectDocModal">-->>
+                                            <i class="fas fa-folder-open me-1"></i> Documents
+                                    </button>
                                     <c:if test="${user.user_role == 'Project Manager'}">
+                                        <button id="editBtn" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-bold"
+                                                style="font-size: 0.75rem;">Edit Details</button>
                                         <button id="deleteBtnHeader" class="btn btn-sm btn-delete-folder px-3 rounded-pill fw-bold" 
                                                 data-bs-toggle="modal" data-bs-target="#deleteFolderModal">
                                             <i class="fas fa-folder-minus me-1"></i> Delete Project Folder
                                         </button>
-
-                                        <button id="editBtn" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-bold"
-                                                style="font-size: 0.75rem;">Edit Details</button>
                                     </c:if>
                                 </div>
                             </div>
@@ -230,7 +235,6 @@
                                                     <i class="fas fa-calendar-plus text-muted"></i>
                                                 </span>
 
-
                                                 <input type="text" name="projDate" id="projDate" class="form-control editable-field"
                                                        value="${project.projCreatedAt}" readonly>
 
@@ -249,7 +253,6 @@
                         </div>
                     </div>
 
-
                     <div class="col-lg-12">
                         <div class="card shadow-sm border-0">
                             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
@@ -263,6 +266,7 @@
                                     </button>
                                 </c:if>
                             </div>
+
                             <div class="card-body p-0">
                                 <div class="table-responsive">
                                     <table class="table align-middle mb-0" style="font-size: 0.85rem;">
@@ -286,10 +290,14 @@
                                                 <td><code>/uploads/p01/arch.pdf</code></td>
                                                 <td class="text-end pe-4">
                                                     <button class="btn btn-sm btn-light border p-1 px-2"><i class="fas fa-eye text-muted"></i></button>
-                                                        <c:if test="${user.user_role == 'Project Manager'}">
-                                                        <button onclick="deleteFile(this)" class="btn btn-sm btn-light border p-1 px-2 ms-1">
+                                                    <button class="btn btn-sm btn-light border p-1 px-2">
+                                                        <i class="fas fa-download text-muted"></i>
+                                                    </button>
+                                                    <c:if test="${user.user_role == 'Project Manager'}">
+                                                        <button id="docDeleteBtn" class="btn btn-sm btn-light border p-1 px-2 ms-1">
                                                             <i class="fas fa-trash-alt text-danger"></i>
                                                         </button>
+
                                                     </c:if>
                                                 </td>
                                             </tr>
@@ -299,70 +307,6 @@
                             </div>
                         </div>
                     </div>                        
-
-                    <!--                    <div class="col-lg-12">
-                                            <div class="card">
-                                                <div class="card-header border-0">
-                                                    <h6 class="m-0 fw-bold" style="font-size: 0.9rem;">Attachments</h6>
-                                                </div>
-                                                <div class="card-body p-0">
-                                                    <div class="p-3 bg-light border-bottom">
-                    <c:if test="${user.user_role == 'Project Manager'}">
-                        <div class="row g-2">
-                            <div class="col-md-4"><input type="text" id="docLabel"
-                                                         class="form-control form-control-sm" placeholder="Label"></div>
-                            <div class="col-md-5"><input type="file" id="actualFile"
-                                                         class="form-control form-control-sm"></div>
-    
-                            <div class="col-md-3"><button class="btn btn-sm btn-primary w-100 fw-bold"
-                                                          onclick="addFile()">Upload</button></div>
-                    </c:if>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="table align-middle mb-0" style="font-size: 0.85rem;">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4">Document</th>
-                        <th>Type</th>
-                        <th>Path</th>
-                        <th class="text-end pe-4">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="fileRegistry">
-                    <tr>
-                        <td class="ps-4">
-                            <div class="d-flex align-items-center">
-                                <div class="file-icon-box bg-pdf"><i class="fas fa-file-pdf"></i>
-                                </div>
-                                <div>
-                                    <div class="fw-bold">Architecture.pdf</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-danger-subtle text-danger"
-                                  style="font-size: 0.65rem;">PDF</span></td>
-                        <td><code>/uploads/p01/arch.pdf</code></td>
-                        <td class="text-end pe-4">
-                            <a href="#" class="btn btn-sm btn-light border p-1 px-2" title="View"><i
-                                    class="fas fa-eye text-muted"></i></a>
-                    <c:if test="${user.user_role == 'Project Manager'}">
-                    <button onclick="deleteFile(this)"
-                            class="btn btn-sm btn-light border p-1 px-2 ms-1"><i
-                            class="fas fa-trash-alt text-danger"></i></button>
-                    </c:if>
-    
-            </td>
-        </tr>
-    </tbody>
-    </table>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>-->
 
 
                     <div class="modal fade" id="deleteFolderModal" tabindex="-1" aria-hidden="true">
@@ -407,7 +351,7 @@
                         </div>
                     </div>
 
-                    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-backdrop="false">
+<!--                    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-backdrop="false">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content border-0 shadow-lg">
                                 <div class="modal-header bg-primary text-white py-3" style="cursor: move;">
@@ -421,17 +365,19 @@
                                     <form id="uploadForm">
                                         <div class="mb-3">
                                             <label class="form-label fw-bold text-muted small">Document Name</label>
-                                            <input type="text" id="docLabel" class="form-control shadow-sm" placeholder="e.g. Project Charter">
+                                            <input type="text" id="docLabel" class="form-control shadow-sm" placeholder="Select Document Category first" readonly>
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label fw-bold text-muted small">Document Category</label>
                                             <select id="docType" class="form-select shadow-sm">
                                                 <option value="" selected disabled>Select Category...</option>
-                                                <option value="Charter">Project Charter</option>
-                                                <option value="SRS">Requirements (SRS)</option>
-                                                <option value="Design">Design Document (SDD)</option>
-                                                <option value="Testing">Test Plan</option>
+                                                <option value="Project Charter">Project Charter</option>
+                                                <option value="Project Plan">Project Plan</option>
+                                                <option value="Requirement Specification">Requirement Specification</option>
+                                                <option value="System Architecture Document">System Architecture Document</option>
+                                                <option value="Risk Register">Risk Register</option>
+                                                <option value="Stakeholder Register">Stakeholder Register</option>
                                             </select>
                                         </div>
 
@@ -453,8 +399,8 @@
                                             </div>
                                         </div>
                                     </form>
-                                </div>
-
+                                </div>-->
+<!--
                                 <div class="modal-footer bg-light border-top">
                                     <button type="button" class="btn btn-sm btn-secondary fw-bold px-3" data-bs-dismiss="modal">Cancel</button>
                                     <button type="button" class="btn btn-sm btn-primary fw-bold px-4 shadow-sm" onclick="handleModalUpload()">
@@ -462,13 +408,172 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>-->
+                    </div>
+
+                    <!--Backlog level document pop up tab -->
+                    <div class="modal fade" id="projectDocModal" tabindex="-1" data-bs-backdrop="false">
+                        <div class="modal-dialog">
+                            <div class="modal-content shadow-lg">
+
+                                <div class="modal-header bg-primary text-white py-3 shadow-sm" style="cursor: move;">
+                                    <h5 class="modal-title fw-bold">
+                                        <i class="fas fa-folder-open me-2"></i>Documents: <span id="modalBacklogTitle">Initial Database
+                                            Schema</span>
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <div class="modal-body p-0">
+                                    <ul class="nav nav-tabs nav-fill bg-white border-bottom" id="docTabs" role="tablist">
+                                        <li class="nav-item">
+                                            <button class="nav-link active" id="viewNavBtn" data-bs-toggle="tab" data-bs-target="#viewPane">
+                                                <i class="fas fa-th-list me-2"></i>View Files
+                                            </button>
+                                        </li>
+                                        <li class="nav-item">
+                                            <button class="nav-link" data-bs-toggle="tab" id="uploadNavBtn" data-bs-target="#uploadModal">
+                                                <i class="fas fa-plus-circle me-2"></i>Upload New
+                                            </button>
+                                        </li>
+                                    </ul>
+
+
+                                    <div class="tab-content">
+                                        <div class="tab-pane fade show active p-4" id="viewPane">
+                                            <div class="table-responsive">
+                                                <table class="table align-middle table-hover">
+                                                    <thead class="text-muted">
+                                                        <tr>
+                                                            <th style="width: 30%;">Document Name</th>
+                                                            <th style="width: 15%;">Type</th>
+                                                            <th class="action-col no-sort text-center" style="width: 20%;" class="text-end">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="documentRegistry">
+                                                        <!--<tr>-->
+<!--                                                            <td><span class="fw-bold">ERD_Final.png</span></td>
+                                                            <td><span class="badge bg-secondary-subtle text-secondary border">PNG</span>
+                                                            </td>
+                                                            <td class="text-center pe-4">
+                                                                <button class="btn btn-sm btn-light border p-1 px-2"><i class="fas fa-eye text-muted"></i></button>
+                                                                <button class="btn btn-sm btn-light border p-1 px-2">
+                                                                    <i class="fas fa-download text-muted"></i>
+                                                                </button>
+                                                                <c:if test="${user.user_role == 'Project Manager'}">
+                                                                    <button id="docDeleteBtn" class="btn btn-sm btn-light border p-1 px-2 ms-1">
+                                                                        <i class="fas fa-trash-alt text-danger"></i>
+                                                                    </button>
+                                                                </c:if>
+                                                            </td>
+                                                        </tr>-->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade p-4" id="uploadModal">
+                                            <div class="mb-3">
+                                                <input type="hidden" id="document_id">
+                                                <label class="label-style mb-2">Document Name</label>
+                                                <input type="text" id="docLabel" class="form-control"
+                                                       placeholder="e.g. Project Charter">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="label-style mb-2">Document Category</label>
+                                                <select id="docType" class="form-select">
+                                                    <option value="" selected disabled>Select Category...</option>
+                                                    <option value="Project Charter">Project Charter</option>
+                                                    <option value="Project Plan">Project Plan</option>
+                                                    <option value="Requirement Specification">Requirement Specification</option>
+                                                    <option value="System Architecture Document">System Architecture Document</option>
+                                                    <option value="Risk Register">Risk Register</option>
+                                                    <option value="Stakeholder Register">Stakeholder Register</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <label class="label-style mb-2">Attachment</label>
+                                                <div id="dropZone" class="dropzone-container">
+                                                    <input type="file" id="actualFile" class="d-none">
+                                                    <img src="https://img.icons8.com/fluency/96/cloud-lighting.png" width="60"
+                                                         class="mb-2">
+                                                    <h6 class="fw-bold mb-1">Drag and drop file here</h6>
+                                                    <p class="text-muted small mb-0">or click to browse from computer</p>
+                                                   
+                                                    <div id="fileInfo" class="mt-3 d-none">
+                                                        <span class="badge bg-primary rounded-pill py-2 px-3">
+                                                            <i class="fas fa-file-alt me-2"></i>
+                                                            <span id="selectedFileName" class="fw-semibold"></span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer bg-light border-top">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary fw-bold px-3"
+                                            data-bs-dismiss="modal">Close</button>
+                                    <button type="button" id="confirmDocBtn" class="btn btn-sm btn-primary fw-bold px-4 d-none">Confirm
+                                        Upload</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <script>
-                        const projectId = "${project.projectId}";
-                    </script>
-                    <script src="js/common.js"></script>
-                    <script src="js/projectPage.js"></script>
-                    </body>
+                    
+                    <div class="modal fade" id="deleteDocModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow">
 
-                    </html>
+                                <div id="initialBody">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title fw-bold" style="font-size: 1rem;">
+                                            <i class="fas fa-exclamation-triangle me-2"></i> Permanent Document Deletion
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-center">
+                                        <div class="mb-3">
+                                            <i class="fas fa-folder-open text-danger fa-4x opacity-25"></i>
+                                        </div>
+                                        <h5 class="fw-bold">Destroy Document?</h5>
+                                        <p class="text-muted">You are about to delete the document <strong id="documentNameDel"></strong>. This will <strong>permanently remove</strong> the uploaded files.</p>
+                                        <div class="alert alert-danger p-2 mb-0">
+                                            <small class="fw-bold text-uppercase"><i class="fas fa-info-circle me-1"></i> This action is irreversible.</small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer bg-light">
+                                        <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Folder</button>
+                                        <button type="button" id="deletedocBtnCfm" class="btn btn-sm btn-danger fw-bold px-3" ">
+                                            Yes, Delete Directory
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="successBody" class="d-none">
+                                    <div class="modal-body p-5 text-center">
+                                        <div class="mb-3">
+                                            <i class="fas fa-check-circle text-success fa-5x animate__animated animate__bounceIn"></i>
+                                        </div>
+                                        <h5 class="fw-bold">Project Deleted</h5>
+                                        <p class="text-muted mb-0">The directory and all data have been successfully removed.</p>
+                                        <p class="small text-muted mt-2">Redirecting to Dashboard...</p>
+                                    </div>
+                                </div                                                            >
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <script>
+            const projectId = "${project.projectId}";
+        </script>
+        <script src="js/common.js"></script>
+        <script src="js/projectPage.js"></script>
+    </body>
+
+</html>

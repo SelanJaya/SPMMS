@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import DAO.UserDAO;
-import DAO.projectTeamDAO;
+import DAO.ProjectTeamDAO;
 import beans.Project;
 import beans.User;
 import beans.ProjectTeamAssignment;
@@ -75,7 +75,7 @@ public class teamAssignmentServlet extends HttpServlet {
             
             int projectId = Integer.parseInt(request.getParameter("project_id"));
                         
-            projectTeamDAO projectTeamDao = new projectTeamDAO();
+            ProjectTeamDAO projectTeamDao = new ProjectTeamDAO();
             
             projectTeamAssignmentArr = projectTeamDao.getAssignedMembers(projectId);
             for (User member : projectTeamAssignmentArr) {
@@ -202,7 +202,7 @@ public class teamAssignmentServlet extends HttpServlet {
 
         processType = request.getParameter("processType");
 
-        projectTeamDAO projectTeamDao = new projectTeamDAO();
+        ProjectTeamDAO projectTeamDao = new ProjectTeamDAO();
 
         assignedBy = (int) session.getAttribute("userId");
 

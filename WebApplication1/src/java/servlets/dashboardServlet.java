@@ -6,7 +6,7 @@ package servlets;
  */
 import DAO.UserDAO;
 import DAO.ProjectDAO;
-import DAO.projectTeamDAO;
+import DAO.ProjectTeamDAO;
 import beans.User;
 import beans.Project;
 import beans.ProjectTeamAssignment;
@@ -147,7 +147,7 @@ public class dashboardServlet extends HttpServlet {
 
             //Craete obj and INSERT assignment project Manager role (auto)
             ProjectTeamAssignment projectTeamAssignmentObj = new ProjectTeamAssignment(created_key, user_id, user_id);
-            projectTeamDAO projectTeamDao = new projectTeamDAO();
+            ProjectTeamDAO projectTeamDao = new ProjectTeamDAO();
 
             assigned = projectTeamDao.assignTeamMember(projectTeamAssignmentObj);
 
