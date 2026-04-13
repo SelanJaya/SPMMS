@@ -7,81 +7,184 @@
 let fileNameDisplay;
 let fileInfo;
 let isEditTask = false;
+document.addEventListener("DOMContentLoaded", async function () {
+    console.log("DOM LOADED");
+    const response = await fetch(`ProjectPageServlet?action=fetchProjectinfo&project_id=${projectId}`);
+    const result = await response.json();
+    console.log("Project Data", result);
+    document.getElementById("id-badge").innerText = result.projectData.projectId;
+    document.getElementById("status-badge").innerText = result.projectData.projectStatus;
+    document.getElementById("projectName-badge").innerText = result.projectData.projectName;
+    document.getElementById("projName").value = result.projectData.projectName;
+    document.getElementById("projectType").value = result.projectData.projectType;
+    document.getElementById("projClient").value = result.projectData.projectClient;
+    document.getElementById("projDesc").value = result.projectData.projectDesc;
+    document.getElementById("projStatus").value = result.projectData.projectStatus;
+    document.getElementById("ProjStart").value = result.projectData.projStartDate;
+    document.getElementById("ProjEnd").value = result.projectData.projEndDate;
+    document.getElementById("projDate").value = result.projectData.projCreatedAt;
+    console.log("project Date", result.projectData.projEndDate);
+});
+document.getElementById("formSubbtn").addEventListener("click", async function (e) {
+
+    e.preventDefault();
+    console.log("UpdateInstantiated");
+    const data = {
+        action: "projectInfoUpdate",
+        projectId: projectId,
+        projectName: document.getElementById("projName").value,
+        projectDesc: document.getElementById("projDesc").value,
+        projectType: document.getElementById("projectType").value,
+        projectClient: document.getElementById("projClient").value,
+        projStartDate: document.getElementById("ProjStart").value,
+        projEndDate: document.getElementById("ProjEnd").value
+    };
+    const result = await sendData_project(data);
+    if (result.status === "Success") {
+        populateProjectDetails(data);
+        toggleEdit(false);
+        displayMessage(result.message, result.status);
+    }
+
+    console.log(result);
+});
+function populateProjectDetails(data) {
+
+    document.getElementById("projName").value = data.projectName;
+    document.getElementById("projectType").value = data.projectType;
+    document.getElementById("projClient").value = data.projectClient;
+    document.getElementById("projDesc").value = data.projectDesc;
+    document.getElementById("ProjStart").value = data.projStartDate;
+    document.getElementById("ProjEnd").value = data.projEndDate;
+}
+
+async function sendData_project(data) {
+    console.log("Send Data Project ");
+    const response = await fetch("ProjectPageServlet", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result;
+}
+
+if (user_role === "Project Manager") {
+    let uploadModel;
+    document.getElementById("editBtn").addEventListener("click", function () {
+        toggleEdit(true);
+    });
+}
+
+function toggleEdit(enable) {
+    console.log("VAnilla togle edit");
+    const editableFields = document.querySelectorAll('.editable-field');
+    const projNameInput = document.getElementById('projName');
+    const editActions = document.getElementById('editActions');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtnHeader = document.getElementById('deleteBtnHeader');
+    const manageDocBtn = document.getElementById('manageDocBtn');
+    if (enable) {
+// Handle all editable fields except statusSelect
+        editableFields.forEach(field => {
+            if (field.id !== 'projStatus' && field.id !== 'projDate') {
+                field.readOnly = false;
+                field.classList.add('active-edit');
+                field.style.pointerEvents = 'auto';
+                console.log("Reached");
+            }
+        });
+        // UI Adjustments for "Edit Mode"
+        projNameInput.style.border = '';
+        projNameInput.style.paddingLeft = '0.75rem';
+        console.log("Reached2");
+        editActions.classList.remove('d-none');
+        // Hide primary buttons
+        editBtn.classList.add('d-none');
+        deleteBtnHeader.classList.add('d-none');
+        manageDocBtn.classList.add('d-none');
+    } else {
+// Handle all editable fields (resetting)
+        editableFields.forEach(field => {
+            field.readOnly = true;
+            field.classList.remove('active-edit');
+            field.style.pointerEvents = 'none';
+        });
+        // UI Adjustments for "View Mode"
+        projNameInput.style.border = '1px solid transparent';
+        projNameInput.style.paddingLeft = '0';
+        editActions.classList.add('d-none');
+        // Show primary buttons
+        editBtn.classList.remove('d-none');
+        deleteBtnHeader.classList.remove('d-none');
+        manageDocBtn.classList.remove('d-none');
+    }
+}
+;
+//Project folder delet
+document.getElementById("deleteBtn").addEventListener("click", async function () {
+
+    const data = {
+        action: "delete",
+        projectId: projectId
+    };
+    const result = await sendData_project(data);
+    console.log(result);
+    if (result.status === "Success") {
+// 3. SUCCESS UI SWAP
+// Hide the header and footer area
+        document.getElementById('initialBody').classList.add('d-none');
+        // Show the success checkmark body
+        document.getElementById('successBody').classList.remove('d-none');
+        // 4. Final Redirect after 2 seconds
+        setTimeout(() => {
+            window.location.href = "dashboardServlet?processType=projectInfo";
+        }, 2000);
+    } else if (result.status === "failed") {
+        displayFile(result.message, result.status);
+    }
+});
+function displayMessage(msg, status) {
+
+    let alertClass = "alert-success";
+    let icon = "fa-check-circle";
+    if (status === "failed") {
+        alertClass = "alert-danger";
+        icon = "fa-circle-xmark";
+    }
+    const messageDiv = document.getElementById("statusTab");
+    messageDiv.innerHTML = `<div id="successProcessTab" class="alert ${alertClass} alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                        <div class="icon-container me-3">
+                            <i class="fas ${icon} fa-lg"></i>
+                        </div>
+                        <div class="message-content">
+                            <h6 class="alert-heading mb-0 fw-bold" style="font-size: 0.9rem;">${msg}</h6>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>`;
+    setTimeout(() => {
+        messageDiv.innerHTML = "";
+    }, 5000);
+    return;
+}
 
 $(document).ready(function () {
     /**
      * Toggles the interface between View Mode and Edit Mode
      */
 
-//    window.toggleEdit = function (enable) {
-//        if (enable) {
-//            $('.editable-field').not('#statusSelect').prop('readonly', false)
-//                    .addClass('active-edit')
-//                    .css('pointer-events', 'auto');
-//            
-//            $('#projNameInput').css({'border': '', 'padding-left': '0.75rem'});
-//            $('#statusView').addClass('d-none');
-//            $('#statusSelect').removeClass('d-none').addClass('active-edit');
-//            $('#editActions').removeClass('d-none');
-//            $('#editBtn, #deleteBtnHeader').addClass('d-none'); // Hide Delete button while editing
-//        } else {
-//            $('.editable-field').prop('readonly', true)
-//                    .removeClass('active-edit')
-//                    .css('pointer-events', 'none');
-//            $('#projNameInput').css({'border': '1px solid transparent', 'padding-left': '0'});
-//            $('#statusView').removeClass('d-none');
-//            $('#statusSelect').addClass('d-none').removeClass('active-edit');
-//            $('#editActions').addClass('d-none');
-//            $('#editBtn, #deleteBtnHeader').removeClass('d-none');
-//        }
-//    };
-    $('#editBtn').click(() => toggleEdit(true));
     $('#uploadModal').on('shown.bs.modal', function () {
         $(this).find('.modal-content').draggable({
             handle: ".modal-header",
             containment: "window"
         });
     });
-    window.toggleEdit = function (enable) {
-        const editableFields = document.querySelectorAll('.editable-field');
-        const projNameInput = document.getElementById('projName');
-        const editActions = document.getElementById('editActions');
-        const editBtn = document.getElementById('editBtn');
-        const deleteBtnHeader = document.getElementById('deleteBtnHeader');
-        if (enable) {
-            // Handle all editable fields except statusSelect
-            editableFields.forEach(field => {
-                if (field.id !== 'projStatus' && field.id !== 'projDate') {
-                    field.readOnly = false;
-                    field.classList.add('active-edit');
-                    field.style.pointerEvents = 'auto';
-                    console.log("Reached");
-                }
-            });
-            // UI Adjustments for "Edit Mode"
-            projNameInput.style.border = '';
-            projNameInput.style.paddingLeft = '0.75rem';
-            console.log("Reached2");
-            editActions.classList.remove('d-none');
-            // Hide primary buttons
-            editBtn.classList.add('d-none');
-            deleteBtnHeader.classList.add('d-none');
-        } else {
-            // Handle all editable fields (resetting)
-            editableFields.forEach(field => {
-                field.readOnly = true;
-                field.classList.remove('active-edit');
-                field.style.pointerEvents = 'none';
-            });
-            // UI Adjustments for "View Mode"
-            projNameInput.style.border = '1px solid transparent';
-            projNameInput.style.paddingLeft = '0';
-            editActions.classList.add('d-none');
-            // Show primary buttons
-            editBtn.classList.remove('d-none');
-            deleteBtnHeader.classList.remove('d-none');
-        }
-    };
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('actualFile');
     fileInfo = document.getElementById('fileInfo');
@@ -110,25 +213,6 @@ $(document).ready(function () {
             displayFile(files[0]);
         }
     });
-
-//    function displayFile(file) {
-//        if (file) {
-//            fileInfo.classList.remove('d-none');
-//            fileNameDisplay.innerText = file.name;
-//            const docLabel = document.getElementById("docLabel");
-//            // Optionally auto-fill Label if empty
-//            if ($('#docLabel').val() === "") {
-//
-//                let cleanName = file.name
-//                        .replace(/\.[^/.]+$/, "")   // remove extension
-//                        .replace(/[_-]/g, " ")      // replace _ and -
-//                        .trim();
-//                docLabel.value = cleanName;
-//                //$('#docLabel').val(file.name.split('.').slice(0, -1).join('.'));
-//            }
-//        }
-//    }
-
     window.executeFolderDeletion = function (btn) {
 // 1. Loading State on button
         const originalContent = btn.innerHTML;
@@ -136,7 +220,7 @@ $(document).ready(function () {
         btn.disabled = true;
         // 2. AJAX Request to your Servlet
         $.ajax({
-            url: 'projectPageServlet',
+            url: 'ProjectPageServlet',
             type: 'GET',
             data: {
                 processType: 'deleteFolder',
@@ -167,37 +251,6 @@ $(document).ready(function () {
             }
         });
     };
-//    window.handleModalUpload = function () {
-//        // 1. You can add validation here
-//        const label = $('#docLabel').val();
-//        const file = $('#actualFile').val();
-//
-//        // More robust check for the file object
-//        if (!label || fileInput.files.length === 0) {
-//            alert("Please provide both a label and a file.");
-//            return;
-//        }
-//
-//        // 2. Call your existing upload function
-//        addFile();
-//
-//        // 3. Close the modal after triggering upload
-//        bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
-//
-//        // 4. Clear the form for next time
-//        document.getElementById('uploadForm').reset();
-//    };
-
-    window.toggleArchiveWarning = function (val) {
-        const notice = document.getElementById('archiveNotice');
-        // We change this to 'Archive' to match your <option value="Archive">
-        if (val === 'Archive') {
-            notice.classList.remove('d-none');
-        } else {
-            notice.classList.add('d-none');
-        }
-    };
-
     const tx = document.getElementsByTagName("textarea");
     for (let i = 0; i < tx.length; i++) {
         tx[i].setAttribute("style", "height:" + (tx[i].scrollHeight) + "px;overflow-y:hidden;");
@@ -209,8 +262,6 @@ $(document).ready(function () {
         this.style.height = (this.scrollHeight) + "px";
     }
 });
-
-
 function displayFile(file) {
     if (file) {
         fileInfo.classList.remove('d-none');
@@ -229,24 +280,20 @@ function displayFile(file) {
     }
 }
 
+
 // Load the document when the document model opens
-document.addEventListener("DOMContentLoaded", async function () {
+document.getElementById("manageDocBtn").addEventListener("DOMContentLoaded", async function () {
     console.log("doc panedd opened");
     populateViewTableDocument();
 });
-let counter = 0;
 async function populateViewTableDocument() {
 
-    const response = await fetch(`DocumentServlet?action=fetchdocuments&project_id=${projectId}`);
+    const response = await fetch(`ProjectDocumentServlet?action=fetchdocuments&project_id=${projectId}`);
     const result = await response.json();
-
-
     console.log("Result Document : ", result.documentData);
     console.log(result.documentData);
-
     // ✅ 1. Clear old data
     document.getElementById("documentRegistry").innerHTML = "";
-    console.log("cleaned", counter);
     result.documentData.forEach((item) => {
         try {
             appendFileRow(item);
@@ -254,10 +301,11 @@ async function populateViewTableDocument() {
             console.error("Error at index", e);
         }
     });
+    return;
 }
 
 // intialise taskModel
-const taskModel = document.getElementById("uploadModal");
+//const taskModel = document.getElementById("uploadModal");
 //Insert the document name based on the doc type selescted
 //const doctype = taskModel.querySelector("#docType");
 //doctype.addEventListener("change", () => {
@@ -269,11 +317,10 @@ const taskModel = document.getElementById("uploadModal");
 //  send document data to doPost of the DocumentServlet.java
 async function sendData(formData) {
 
-    const response = await fetch("DocumentServlet", {
+    const response = await fetch("ProjectDocumentServlet", {
         method: "POST",
         body: formData
     });
-
     if (!response.ok) {
         throw new Error("Server error" + response.status);
     }
@@ -282,14 +329,13 @@ async function sendData(formData) {
     return result;
 }
 ;
-
 // get the data from the docUpload form 
+// intialise taskModel
+const taskModel = document.getElementById("uploadModal");
 async function handleModalUpload() {
     let action = "insert";
-
     const docType = taskModel.querySelector("#docType").value;
     const formData = new FormData();
-
     if (isEditTask) {
         action = "edit";
         formData.append("document_id", taskModel.querySelector("#document_id").value);
@@ -299,16 +345,12 @@ async function handleModalUpload() {
     }
 
     formData.append("action", action);
-
     formData.append("document_name", taskModel.querySelector("#docLabel").value);
     formData.append("document_type", docType);
-
     const document_pdf = taskModel.querySelector("#actualFile").files[0] || null;
     formData.append("document_nameSys", docType + "_" + projectId);
     formData.append("document_pdf", document_pdf);
-
     const result = await sendData(formData);
-
     if (action === "insert" && result.status === "Success") {
         formData.append("document_id", result.document_id);
         formData.append("document_path", result.document_path);
@@ -316,38 +358,29 @@ async function handleModalUpload() {
     }
 
     taskModel.querySelector("#docLabel").value = "";
-
-    taskModel.querySelector("#confirmDocBtn").innerText = "Confirm Upload";
+    //taskModel.querySelector("#confirmDocBtn").innerText = "Confirm Upload";
     console.log("doc inserted successfully");
-
     //refresh or repopulate the view table
     populateViewTableDocument();
-
     // show view pane
     const triggerEl = projectDocModel.querySelector('#viewNavBtn');
-    const tab = new bootstrap.Tab(triggerEl);
+    const tab = bootstrap.Tab.getOrCreateInstance(triggerEl);
     tab.show();
 }
 ;
-
-
 // To populate the doc table when the doc model opens
 let bsTaskModal = null;
 document.getElementById("manageDocBtn").addEventListener("click", async function () {
 
-    // ✅ 1. Clear old data
+// ✅ 1. Clear old data
     document.getElementById("documentRegistry").innerHTML = "";
     populateViewTableDocument();
-
     bsTaskModal = new bootstrap.Modal(document.getElementById('projectDocModal'));
     bsTaskModal.show();
-
     const triggerEl = projectDocModel.querySelector('#viewNavBtn');
     const tab = new bootstrap.Tab(triggerEl);
     tab.show();
 });
-
-
 // add a single lister to entire pane covers(navigation bar, edit, delete and view)
 let deletionModal;
 const projectDocModel = document.getElementById("projectDocModal");
@@ -357,15 +390,19 @@ projectDocModel.addEventListener("click", function (e) {
     const uploadNavBtn = e.target.closest("#uploadNavBtn");
     const confirmDocBtn = e.target.closest("#confirmDocBtn");
     const confirmDocDeletion = e.target.closest(".docDeleteBtn");
+    const documentViewbtn = e.target.closest(".docViewBtn");
+    const documentDownloadbtn = e.target.closest(".docDownloadBtn");
     const link = e.target.closest(".doc-edit-link");
-
     // VIEW button clicked
     if (viewNavBtn) {
         projectDocModel.querySelector("#confirmDocBtn")
                 .classList.add("d-none");
         console.log("viewNavBtn clicked");
+    } else if (documentViewbtn) {
+        console.log("View Btn Clicked");
+        const row = e.target.closest("tr");
+        window.open(`ProjectDocumentServlet?action=fetchdocument_view&document_id=${row.id}`);
     }
-
     // UPLOAD button clicked
     else if (uploadNavBtn) {
         projectDocModel.querySelector("#confirmDocBtn").innerText = "Confirm Upload";
@@ -380,46 +417,42 @@ projectDocModel.addEventListener("click", function (e) {
 
         const row = e.target.closest("tr");
         console.log("Deletion btn clicked");
-
         deletionModal = document.getElementById("deleteDocModal");
-
         const docName = row.name;
         const docId = row.id;
-
+        console.log(docId);
         deletionModal.querySelector("#documentNameDel").innerText = docName;
         deletionModal.dataset.id = docId;
         const modal = new bootstrap.Modal(deletionModal);
         modal.show();
-
-    } else if (e.target.closest(".docDownloadBtn")) {
-
+        
+    } else if (documentDownloadbtn) {
+        console.log("document Download initialized ");
+        const row = e.target.closest("tr");
+        window.open(`ProjectDocumentServlet?action=downloadDocument&document_id=${row.id}`);
     } else if (link) {
         e.preventDefault();
-        const docId = link.dataset.id;
+        const row = e.target.closest("tr");
+        const docId = row.id;
         const docName = link.dataset.name;
 //        const docType = link.dataset.type;
         console.log("Link Edit Initiated  for id: ", docName, docId);
         editForm(docId);
-
     }
 
 });
 document.getElementById("deletedocBtnCfm").addEventListener("click", async function () {
 
     const formData = new FormData();
-
     formData.append("action", "delete");
     formData.append("document_id", deletionModal.dataset.id);
-
     console.log(formData);
     const result = await sendData(formData);
-    
     if (result.status === "Success") {
-        
-       const modal = bootstrap.Modal.getInstance(deletionModal);
+
+        const modal = bootstrap.Modal.getInstance(deletionModal);
         console.log(modal);
         modal.hide();
-
         //refresh or repopulate the view table
         populateViewTableDocument();
         const triggerEl = projectDocModel.querySelector('#viewNavBtn');
@@ -427,34 +460,23 @@ document.getElementById("deletedocBtnCfm").addEventListener("click", async funct
         tab.show();
     }
 });
-
 async function editForm(document_id) {
-
+    console.log("Edit form");
     isEditTask = true;
-
-    const responseMeta = await fetch(`DocumentServlet?action=fetchdocument_meta&document_id=${document_id}`);
+    const responseMeta = await fetch(`ProjectDocumentServlet?action=fetchdocument_meta&document_id=${document_id}`);
     const result = await responseMeta.json();
     console.log(result.document_name);
     console.log(result.document_name);
-
-//    const responseContent = await fetch(`DocumentServlet?action=fetchdocument_content`);
-
-
     taskModel.querySelector("#docLabel").value = result.documentData.document_name;
     taskModel.querySelector("#docType").value = result.documentData.document_type;
-
     const file = {};
     file.name = result.documentData.document_name;
-
     taskModel.querySelector("#document_id").value = document_id;
     displayFile(file);
-
     projectDocModel.querySelector("#confirmDocBtn").innerText = "Confirm Edit";
     projectDocModel.querySelector("#confirmDocBtn")
             .classList.remove("d-none");
-
-    const triggerEl = document.getElementById("deleteDocModal");
-    console.log(triggerEl);
+    const triggerEl = projectDocModel.querySelector('#uploadNavBtn');
     const tab = new bootstrap.Tab(triggerEl);
     tab.show();
 }
@@ -475,27 +497,30 @@ function appendFileRow(data) {
     const newRow = document.createElement("tr");
     newRow.id = data.document_id;
     newRow.name = data.document_name;
+//    const deletebtn = (userRole === "Project Manager") ? ` <button class="btn btn-sm btn-light border p-1 px-2 ms-1 docDeleteBtn">
+//                                <i class="fas fa-trash-alt text-danger"></i>
+//                            </button>` : ``;
+
     newRow.innerHTML = `
                          <td>
                             <a href="#" 
-                               class="fw-bold text-decoration-none doc-edit-link"
-                               data-id="${data.document_id}"
-                               data-name="${document_name}">
+                               class="fw-bold text-decoration-none doc-edit-link">
                                 ${document_name}
-                                
                             </a>
                         </td>
                          <td><span class="badge bg-secondary-subtle text-secondary border">PNG</span></td>
                          <td class="text-center pe-4">
-                            <button class="btn btn-sm btn-light border p-1 px-2"><i class="fas fa-eye text-muted"></i></button>
-                            <button class="btn btn-sm btn-light border p-1 px-2">
-                                <i class="fas fa-download text-muted"></i>
+                            <button class="btn btn-sm btn-light border p-1 px-2 docViewBtn">
+                                <i class="fas fa-eye text-muted"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light border p-1 px-2 docDownloadBtn">
+                                <i class="fas fa-download text-muted "></i>
                             </button>
                             <button class="btn btn-sm btn-light border p-1 px-2 ms-1 docDeleteBtn">
                                 <i class="fas fa-trash-alt text-danger"></i>
                             </button>
-                        </td>
-                       `;
+            </td>
+            `;
     // ✅ append to table
     docDiv.appendChild(newRow);
 //    // ✅ correct way to close modal
@@ -503,4 +528,6 @@ function appendFileRow(data) {
 //    if (!modal) {
 //        modal = new bootstrap.Modal(taskModel);
 //    }
+
+
 }

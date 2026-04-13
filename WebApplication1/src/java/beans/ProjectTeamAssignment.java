@@ -12,15 +12,15 @@ import java.time.LocalDateTime;
  */
 public class ProjectTeamAssignment {
 
-    private int projectTeam_id;  
-    private int project_id;      
-    private int assign_to;         
-    private int assign_by;       
-    private LocalDateTime assigned_at; 
+    private int projectTeam_id;
+    private int project_id;
+    private int assign_to;
+    private int assign_by;
+    private String assigned_at;
 
     public ProjectTeamAssignment() {
     }
-    
+
     public ProjectTeamAssignment(int project_id, int assign_to, int assign_by) {
         this.project_id = project_id;
         this.assign_to = assign_to;
@@ -43,7 +43,7 @@ public class ProjectTeamAssignment {
         this.assign_by = assign_by;
     }
 
-    public void setAssigned_at(LocalDateTime assigned_at) {
+    public void setAssigned_at(String assigned_at) {
         this.assigned_at = assigned_at;
     }
 
@@ -64,9 +64,7 @@ public class ProjectTeamAssignment {
     }
 
     public LocalDateTime getAssigned_at() {
-        return assigned_at;
+        return LocalDateTime.parse(assigned_at);
     }
-    
-    
 
 }

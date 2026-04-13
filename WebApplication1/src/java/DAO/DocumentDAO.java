@@ -22,6 +22,7 @@ import beans.Document;
 public class DocumentDAO {
 
     public int insertDocumentData(Connection con, Document document) throws Exception {
+        System.out.println("InsertDocument");
         String sql = """
                      INSERT INTO documents( document_name, document_path, document_type)
                      VALUES (?,?,?);
@@ -106,7 +107,7 @@ public class DocumentDAO {
         }
     }
 
-    public Document getDocumentsDataEdit(int document_id) throws Exception {
+    public Document getDocumentDataEdit(int document_id) throws Exception {
         System.out.println("Documents Lite Executes ");
 
         Document document = null;
@@ -156,6 +157,25 @@ public class DocumentDAO {
 
             return document_path;
         } catch (Exception e) {
+            throw e;
+        }
+    }
+    
+    public void setDocumentPath(Connection con, int document_id, String document_path) throws  Exception{
+        
+        String sql = """
+                     UPDATE documents SET document_path = ?  WHERE document_id = ?
+                     """;
+        
+        try(PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, document_path);
+            ps.setInt(2, document_id);
+            
+            ps.executeUpdate();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Exception Ocuurs : " + e );
             throw e;
         }
     }

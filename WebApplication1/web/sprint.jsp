@@ -33,12 +33,14 @@
                 <a href="dashboard.jsp" class="nav-link"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
 
                 <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
-                <a href="projectPage.jsp" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
-                <a href="sprint.jsp" class="nav-link active"><i class="fas fa-briefcase me-3"></i> Sprint</a>
-                <a href="backlog.jsp" class="nav-link">
+                <a href="ProjectPageServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
+
+                <a href="SprintServlet?action=redirect&project_id=${project_id}" class="nav-link active text-white"><i class="fas fa-briefcase me-3"></i> Sprint</a>
+
+                <a href="BacklogServlet?action=redirect&project_id=${project_id}" class="nav-link ">
                     <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                 </a>
-                <a href="teamMembersPage.jsp" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
+                <a href="teamAssignmentServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
                 <a href="projectAnalytics.jsp" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                 <div class="mt-auto">
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
@@ -51,7 +53,7 @@
         </nav>
 
         <div id="content-wrapper">
-            
+
             <div id="statusTab"></div>
             <nav class="top-nav px-4 d-flex justify-content-between align-items-center">
                 <div class="small text-muted">Management / <span class="fw-semibold text-dark">Project Console</span></div>
@@ -87,90 +89,90 @@
                 </div>
 
                 <div class="scrum-container" id="scrum-container">
-<!--                    <div class="scrum-board-card" id="board-101">
-                        <div class="board-header">
-                            <div class="board-info">
-                                <h2 class="val-name h4 fw-bold text-primary">Sprint 1: Authentication</h2>
-                                <span class="info-label">Description / Goal</span>
-                                <p class="val-goal">Setup secure login and registration flows with database integration.</p>
-                                <span class="info-label">Timeline</span>
-                                <div class="date-row"><i class="far fa-calendar-alt text-primary"></i> <span
-                                        class="val-start">2025-12-01</span> to <span class="val-end">2025-12-14</span></div>
-                            </div>
-                            <div class="text-end">
-                                <span class="info-label">Status</span>
-                                <div class="badge bg-primary-subtle text-primary val-status rounded-pill px-3 py-2 mb-2">
-                                    Active</div><br>
-                                    <c:if test="${user.user_role == 'Scrum Master'}">
-                                    <button class="btn btn-outline-secondary btn-sm" onclick="editBoard('board-101')"><i
-                                            class="fas fa-edit me-1"></i> Edit Details</button>
+                    <!--                    <div class="scrum-board-card" id="board-101">
+                                            <div class="board-header">
+                                                <div class="board-info">
+                                                    <h2 class="val-name h4 fw-bold text-primary">Sprint 1: Authentication</h2>
+                                                    <span class="info-label">Description / Goal</span>
+                                                    <p class="val-goal">Setup secure login and registration flows with database integration.</p>
+                                                    <span class="info-label">Timeline</span>
+                                                    <div class="date-row"><i class="far fa-calendar-alt text-primary"></i> <span
+                                                            class="val-start">2025-12-01</span> to <span class="val-end">2025-12-14</span></div>
+                                                </div>
+                                                <div class="text-end">
+                                                    <span class="info-label">Status</span>
+                                                    <div class="badge bg-primary-subtle text-primary val-status rounded-pill px-3 py-2 mb-2">
+                                                        Active</div><br>
+                    <c:if test="${user.user_role == 'Scrum Master'}">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="editBoard('board-101')"><i
+                            class="fas fa-edit me-1"></i> Edit Details</button>
 
-                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteBoard('board-101')">
-                                        <i class="fas fa-trash-alt me-1"></i> Delete
-                                    </button>
-                                </c:if>
-                            </div>
-                        </div>
+                    <button class="btn btn-outline-danger btn-sm" onclick="deleteBoard('board-101')">
+                        <i class="fas fa-trash-alt me-1"></i> Delete
+                    </button>
+                    </c:if>
+                </div>
+            </div>
 
-                        <div class="notes-grid">
-                            <div class="note-box"><span class="info-label">Review Notes</span>
-                                <div class="note-content val-review">Client approved UI. Ready for testing.</div>
-                            </div>
-                            <div class="note-box"><span class="info-label">Retrospective</span>
-                                <div class="note-content val-retro">Excellent communication. Documentation needed earlier.
-                                </div>
-                            </div>
-                        </div>
-                         ================= SPRINT BACKLOG ================= 
-                        <div class="note-box sprint-backlog-box">
+            <div class="notes-grid">
+                <div class="note-box"><span class="info-label">Review Notes</span>
+                    <div class="note-content val-review">Client approved UI. Ready for testing.</div>
+                </div>
+                <div class="note-box"><span class="info-label">Retrospective</span>
+                    <div class="note-content val-retro">Excellent communication. Documentation needed earlier.
+                    </div>
+                </div>
+            </div>
+             ================= SPRINT BACKLOG ================= 
+            <div class="note-box sprint-backlog-box">
 
-                            <span class="info-label">Sprint Backlog</span>
+                <span class="info-label">Sprint Backlog</span>
 
-                            <div class="backlog-list mt-2">
+                <div class="backlog-list mt-2">
 
-                                <span class="backlog-chip">
-                                    User Login Feature
-                                    <span class="badge bg-secondary ms-2">5 SP</span>
-                                </span>
+                    <span class="backlog-chip">
+                        User Login Feature
+                        <span class="badge bg-secondary ms-2">5 SP</span>
+                    </span>
 
-                                <span class="backlog-chip">
-                                    Registration Module
-                                    <span class="badge bg-secondary ms-2">8 SP</span>
-                                </span>
+                    <span class="backlog-chip">
+                        Registration Module
+                        <span class="badge bg-secondary ms-2">8 SP</span>
+                    </span>
 
-                                <span class="backlog-chip">
-                                    Role Management
-                                    <span class="badge bg-secondary ms-2">3 SP</span>
-                                </span>
+                    <span class="backlog-chip">
+                        Role Management
+                        <span class="badge bg-secondary ms-2">3 SP</span>
+                    </span>
 
-                            </div>
+                </div>
 
-                        </div>
+            </div>
 
-                        <div class="board-layout mt-4">
-                            <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
-                                <h3>To Do</h3>
-                                <c:if test="${user.user_role == 'Scrum Master'}">
-                                    <div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start"
-                                                                         onclick="addTask(this)">+ Add Task</button>
-                                    </c:if>
-                            </div>
-                            <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
-                                <h3>In Progress</h3>
-                                <c:if test="${user.user_role == 'Scrum Master'}">
-                                    <div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start"
-                                                                         onclick="addTask(this)">+ Add Task</button>
-                                    </c:if>
-                            </div>
-                            <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
-                                <h3>Done</h3>
-                                <c:if test="${user.user_role == 'Scrum Master'}">
-                                    <div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start"
-                                                                         onclick="addTask(this)">+ Add Task</button>
-                                    </c:if>
-                            </div>
-                        </div>
-                    </div>-->
+            <div class="board-layout mt-4">
+                <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <h3>To Do</h3>
+                    <c:if test="${user.user_role == 'Scrum Master'}">
+                        <div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start"
+                                                             onclick="addTask(this)">+ Add Task</button>
+                    </c:if>
+            </div>
+            <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+                <h3>In Progress</h3>
+                    <c:if test="${user.user_role == 'Scrum Master'}">
+                        <div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start"
+                                                             onclick="addTask(this)">+ Add Task</button>
+                    </c:if>
+            </div>
+            <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
+                <h3>Done</h3>
+                    <c:if test="${user.user_role == 'Scrum Master'}">
+                        <div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start"
+                                                             onclick="addTask(this)">+ Add Task</button>
+                    </c:if>
+            </div>
+        </div>
+    </div>-->
                 </div>
             </div>
         </div>
@@ -260,7 +262,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="modal fade" id="taskModal" tabindex="-1">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4">
@@ -454,9 +456,11 @@
             </div>
         </div>
         <script>
-        var project_id = ${projectId != null ? projectId : "null"};
-        var user_id = ${userInfo.user_id}
-        console.log("User id", user_id);
+            var project_id = ${project_id != null ? project_id : "null"};
+            var user_id = ${userInfo.user_id}
+            console.log("User id", user_id);
+            const user_role = "${user.user_role}";
+            console.log(user_role);
 
         </script>
 

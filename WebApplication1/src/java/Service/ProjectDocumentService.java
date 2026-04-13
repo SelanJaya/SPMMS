@@ -7,6 +7,7 @@ package Service;
 import DAO.DBConnection;
 import DAO.DocumentDAO;
 import DAO.ProjectDocumentDAO;
+import DAO.ProjectDAO;
 import beans.Document;
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
  *
  * @author HP
  */
-public class DocumentService {
+public class ProjectDocumentService {
 
     public Document insertDocument_localServer(Part filePart, Document document) throws Exception {
 
@@ -107,7 +108,16 @@ public class DocumentService {
 
             DocumentDAO documentDAO = new DocumentDAO();
             int document_id = documentDAO.insertDocumentData(con, document);
-
+            
+            // Update the project Status
+            if ("Project Charter".equalsIgnoreCase(document.getDocument_type())) {
+                ProjectDAO projectDAO = new ProjectDAO();
+                projectDAO.updateProjectStatus("Active", document.getProject_id());
+            } else if("Project Sign Off".equalsIgnoreCase(document.getDocument_type())){
+                ProjectDAO projectDAO = new ProjectDAO();
+                projectDAO.updateProjectStatus("Archive", document.getProject_id());
+            }
+            
             System.out.println("Document id : " + document_id);
             ProjectDocumentDAO pDocumentDAO = new ProjectDocumentDAO();
 
@@ -183,6 +193,26 @@ public class DocumentService {
 //            throw e;
 //        }
 //    }
+    
+    public File documentRetrivalService_view(int document_id) throws Exception {
+
+        try {
+            DocumentDAO documentDAO = new DocumentDAO();
+            String documentPath = documentDAO.getDocumentPath(document_id);
+
+            File file = new File(documentPath);
+
+            if (!file.exists()) {
+                throw new Error("Filr not exist");
+            }
+
+            return file;
+        } catch (Exception e) {
+            System.out.println("New Error Ocurs : " + e);
+            throw e;
+
+        }
+    }
 
     public void documentDeletionService(int document_id) throws Exception {
 
@@ -216,7 +246,7 @@ public class DocumentService {
         } catch (Exception e) {
             con.rollback();
             System.out.println("Exception occurs :" + e);
-            throw e; 
+            throw e;
 
         } finally {
             con.close();

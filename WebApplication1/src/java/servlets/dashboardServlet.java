@@ -118,12 +118,11 @@ public class dashboardServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String ProjName, ProjDesc, ProjType, ProjClient;
+        String ProjName, ProjDesc, ProjType, ProjClient , ProjStart, ProjEnd;
         int user_id;
         List<Project> profileInfo;
         int created_key;
         boolean assigned = false;
-        LocalDate ProjStart, ProjEnd;
 
         //RETRIEVE PROJECT INFO
         HttpSession session = request.getSession();
@@ -135,21 +134,21 @@ public class dashboardServlet extends HttpServlet {
         ProjDesc = request.getParameter("ProjDesc");
         ProjType = request.getParameter("ProjType");
         ProjClient = request.getParameter("ProjClient");
-        ProjStart = LocalDate.parse(request.getParameter("ProjStart"));
-        ProjEnd = LocalDate.parse(request.getParameter("ProjEnd"));
+        ProjStart = request.getParameter("ProjStart");
+        ProjEnd = request.getParameter("ProjEnd");
 
         ProjectDAO projectDao = new ProjectDAO();
 
         try {
             // Create Obj and INSERT proj data
-            Project project = new Project(ProjName, ProjDesc, "Active", ProjType, ProjClient, ProjStart, ProjEnd, user_id);
+            Project project = new Project(ProjName, ProjDesc, "Planned", ProjType, ProjClient, ProjStart, ProjEnd, user_id);
             created_key = projectDao.createProject(project);
 
             //Craete obj and INSERT assignment project Manager role (auto)
             ProjectTeamAssignment projectTeamAssignmentObj = new ProjectTeamAssignment(created_key, user_id, user_id);
             ProjectTeamDAO projectTeamDao = new ProjectTeamDAO();
 
-            assigned = projectTeamDao.assignTeamMember(projectTeamAssignmentObj);
+            projectTeamDao.assignTeamMember(projectTeamAssignmentObj);
 
         } catch (Exception e) {
             System.out.println(e);

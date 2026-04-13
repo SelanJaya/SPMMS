@@ -83,7 +83,7 @@ public class SprintServlet extends HttpServlet {
                     : null;
 
 
-            request.setAttribute("projectId", project_id);
+            request.setAttribute("project_id", project_id);
             request.getRequestDispatcher("sprint.jsp").forward(request, response);
         } catch (Exception e) {
             System.out.println("Exception Occurs" + e);

@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class ProjectDAO {
 
+    // Get projects info to desply in the dashboard
     public List<Project> projectInfo(int user_id) {
         // FIX 1: Corrected SQL syntax (added missing comma after project_id)
         // FIX 2: Filter by 'proj_created_by' instead of 'project_id' to get ALL user projects
@@ -47,8 +48,8 @@ public class ProjectDAO {
                 project.setProjectStatus(rs.getString("project_status"));
 
                 // FIX 5: Use distinct setters for Start and End dates
-                project.setProjStartDate(rs.getObject("proj_start_date", java.time.LocalDate.class));
-                project.setProjEndDate(rs.getObject("proj_end_date", java.time.LocalDate.class));
+                project.setProjStartDate(rs.getDate("proj_start_date").toString());
+                project.setProjEndDate(rs.getDate("proj_end_date").toString());
 
                 projectArr.add(project);
             }
@@ -93,31 +94,6 @@ public class ProjectDAO {
         return projects;
     }
 
-//    public boolean createProject(Project project) {
-//        String sql = "INSERT INTO projects (project_name, project_desc, project_status, "
-//                + "proj_start_date, proj_end_date, proj_created_by) "
-//                + "VALUES (?, ?, ?, ?, ?, ?)";
-//
-//        try (Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
-//
-//            ps.setString(1, project.getProjectName());
-//            ps.setString(2, project.getProjectDesc());
-//            // Default new projects to 'Active' or 'Pending'
-//            ps.setString(3, project.getProjectStatus());
-//
-//            // Convert LocalDate to SQL Date
-//            ps.setObject(4, project.getProjStartDate());
-//            ps.setObject(5, project.getProjEndDate());
-//            ps.setInt(6, project.getProjCreatedBy());
-//
-//            int rowsAffected = ps.executeUpdate();
-//            return rowsAffected > 0;
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//    }
     public int createProject(Project project) {
         // Correct table name from your schema is 'project' (singular)
         String sql = "INSERT INTO projects (project_name, project_desc, project_status, proj_type, proj_client"
@@ -156,6 +132,7 @@ public class ProjectDAO {
         return generatedId;
     }
 
+    // get  project info tp display in the projectPage
     public Project ProjectInfoById(int projectId) {
         String sql = "SELECT * FROM projects WHERE project_id = ?";
         Project project = null;
@@ -175,9 +152,9 @@ public class ProjectDAO {
                 project.setProjectClient(rs.getString("proj_client"));
 
                 // Modern Date Mapping
-                project.setProjStartDate(rs.getObject("proj_start_date", java.time.LocalDate.class));
-                project.setProjEndDate(rs.getObject("proj_end_date", java.time.LocalDate.class));
-                project.setProjCreatedAt(rs.getObject("proj_created_at", java.time.LocalDateTime.class));
+                project.setProjStartDate(rs.getDate("proj_start_date").toString());
+                project.setProjEndDate(rs.getDate("proj_end_date").toString());
+                project.setProjCreatedAt(rs.getTimestamp("proj_created_at").toLocalDateTime());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -185,7 +162,7 @@ public class ProjectDAO {
         return project;
     }
 
-    public boolean updateProject(Project project) {
+    public void updateProject(Project project) throws Exception {
         String sql = "UPDATE projects SET project_name = ?, project_desc = ?, "
                 + "proj_type = ?, proj_client =?, proj_start_date = ?, proj_end_date = ? "
                 + "WHERE project_id = ?";
@@ -204,31 +181,36 @@ public class ProjectDAO {
             ps.setInt(7, project.getProjectId());
 
             int rowsUpdated = ps.executeUpdate();
-            return rowsUpdated > 0;
+
+            if (!(rowsUpdated > 0)) {
+                throw new Exception("Project Update Failed");
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            throw e;
         }
     }
 
-    public boolean deleteProject(int projectId) {
+    public void deleteProject(int projectId) throws Exception{
+        System.out.println("Delet Project DAO EXECUTED");
+        
         String sql = "DELETE FROM projects WHERE project_id = ?";
-        boolean isDeleted = false;
 
         try (Connection conn = DBConnection.getConnection(); // Your DB connection method
                  PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+            System.out.println("project id " + projectId);
             pstmt.setInt(1, projectId);
             int rowsAffected = pstmt.executeUpdate();
-
-            if (rowsAffected > 0) {
-                isDeleted = true;
+            System.out.println("Row Affexted");
+            if (!(rowsAffected > 0)) {
+                throw new Error();
             }
+            System.out.println("Done");
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new Error("Project Deletion Failed");
         }
-        return isDeleted;
     }
 
     public List<Project> getArchivedProjectsByUserId(int userId) {
@@ -246,7 +228,7 @@ public class ProjectDAO {
                 p.setProjectId(rs.getInt("project_id"));
                 p.setProjectName(rs.getString("project_name"));
                 p.setProjectDesc(rs.getString("project_desc"));
-                p.setProjCreatedAt(rs.getObject("proj_created_at", java.time.LocalDateTime.class));
+                p.setProjCreatedAt(rs.getTimestamp("proj_created_at").toLocalDateTime());
                 archivedList.add(p);
 
                 System.out.println("----------------------------------------");
@@ -262,29 +244,28 @@ public class ProjectDAO {
         return archivedList;
     }
 
-    public boolean updateProjectStatus(int projectId) {
+    public void updateProjectStatus(String projectStatus, int project_id) throws  Exception{
         // Standard SQL for updating a specific column
-        String sql = "UPDATE projects SET project_status = 'Active' WHERE project_id = ?";
-        boolean isUpdated = false;
+        String sql = "UPDATE projects SET project_status = '?' WHERE project_id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             // Set the ID to target the specific row
-            ps.setInt(1, projectId);
+            ps.setString(1, projectStatus);
+            ps.setInt(2, project_id);
 
             // executeUpdate returns the number of rows affected
             int rowsAffected = ps.executeUpdate();
 
-            if (rowsAffected > 0) {
-                isUpdated = true;
-                System.out.println("Status updated successfully for Project ID: " + projectId);
+            if (!(rowsAffected > 0)) {
+               throw new Error();
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.err.println("Error updating project status: " + e.getMessage());
             e.printStackTrace();
+            throw new Error("Project Update Failed");
         }
 
-        return isUpdated;
     }
 }

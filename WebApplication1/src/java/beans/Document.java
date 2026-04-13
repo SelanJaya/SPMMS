@@ -12,7 +12,7 @@ import java.io.InputStream;
  */
 public class Document {
 
-    private int document_id, project_id;
+    private int document_id, project_id, backlog_item_id;
     private String document_name, document_nameSys, document_path, document_type, uploaded_at;
     private InputStream documentContent; // or InputStream if large
 
@@ -25,6 +25,10 @@ public class Document {
 
     public void setProject_id(int project_id) {
         this.project_id = project_id;
+    }
+
+    public void setBacklog_item_id(int backlog_item_id) {
+        this.backlog_item_id = backlog_item_id;
     }
 
     public void setDocument_name(String document_name) {
@@ -58,6 +62,12 @@ public class Document {
     public int getProject_id() {
         return project_id;
     }
+
+    public int getBacklog_item_id() {
+        return backlog_item_id;
+    }
+    
+    
 
     public String getDocument_name() {
         return document_name;

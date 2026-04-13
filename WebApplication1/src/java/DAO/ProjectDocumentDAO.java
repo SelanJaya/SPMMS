@@ -23,7 +23,7 @@ import beans.Document;
 public class ProjectDocumentDAO {
     
     public void insertProjectDocument(Connection con , int document_id, int project_id) throws Exception{
-        
+        System.out.println("insertProjectDocument");
         String sql = """
                      INSERT INTO project_documents(document_id, project_id)
                      VALUES (?,?)
@@ -41,6 +41,5 @@ public class ProjectDocumentDAO {
         }
     }
         
-    
     
 }

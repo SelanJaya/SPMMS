@@ -69,6 +69,7 @@ public class BacklogServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        System.out.println("Backlog Servlet Reporting");
 
         String action = request.getParameter("action");
 
@@ -95,7 +96,9 @@ public class BacklogServlet extends HttpServlet {
 
                 response.getWriter().write(gson.toJson(backlogData));
             } else if ("redirect".equalsIgnoreCase(action)) {
-
+                int project_id = Integer.parseInt(request.getParameter("project_id"));
+                System.out.println("Project id  : " + project_id );
+                request.setAttribute("project_id", project_id);
                 request.getRequestDispatcher("backlog.jsp").forward(request, response);
             } else if ("Delete".equalsIgnoreCase(action)) {
 

@@ -130,7 +130,7 @@
 
                                     <h6 class="project-title">${project.projectName}</h6>
 
-                                    <a href="projectPageServlet?projectId=${project.projectId}"
+                                    <a href="ProjectPageServlet?action=redirect&project_id=${project.projectId}"
                                        class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-bold mt-3">
                                         Open Project
                                     </a>

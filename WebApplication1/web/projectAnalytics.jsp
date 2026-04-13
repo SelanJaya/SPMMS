@@ -34,24 +34,23 @@
 
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
 
-                    <a href="projectPageServlet?projectId=${project.projectId}" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
+                    <a href="ProjectPageServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
 
-                    <a href="SprintServlet?action=redirect&project_id=${project.projectId}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
+                    <a href="SprintServlet?action=redirect&project_id=${project_id}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
 
 
-                    <a href="BacklogServlet?action=redirect&project_id=${project.projectId}" class="nav-link">
+                    <a href="BacklogServlet?action=redirect&project_id=${project_id}" class="nav-link">
                         <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                     </a>
 
-                    <a href="teamAssignmentServlet?action=fetchTeamAssignment&project_id=${project.projectId}" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
-                    <a href="projectAnalytics.jsp" class="nav-link active"><i class="fas fa-chart-line me-3"></i> Reports</a>
+                    <a href="teamAssignmentServlet?action=redirect&project_id=${project_id}" class="nav-link "><i class="fas fa-users-gear me-3"></i> Team</a>
+                    <a href="projectAnalytics.jsp" .html" class="nav-link"><i class="active fas fa-chart-line me-3"></i> Reports</a>
                     <div class="mt-auto">
                         <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
                         <a href="login_signUpServlet?processType=logOut" class="nav-link text-danger">
                             <i class="fas fa-sign-out-alt me-3"></i><span>Logout</span>
                         </a>
                     </div>
-
                 </div>
             </nav>
 

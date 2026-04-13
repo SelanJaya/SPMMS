@@ -15,16 +15,14 @@ import java.time.format.DateTimeFormatter;
 public class Project {
 
     private int projectId, projCreatedBy;
-    private String projectName, projectDesc, projectStatus, projectType, projectClient;
-    private LocalDate projStartDate;
-    private LocalDate projEndDate;
+    private String projectName, projectDesc, projectStatus, projectType, projectClient, projStartDate,  projEndDate;
     private LocalDateTime projCreatedAt;
 
     public Project() {
     }
     
     //Contructor for update project
-    public Project(String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, LocalDate projStartDate, LocalDate projEndDate, int createdBy) {
+    public Project(String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, String projStartDate, String projEndDate, int createdBy) {
         this.projectName = projectName;
         this.projectDesc = projectDesc;
         this.projectStatus = projectStatus;
@@ -36,7 +34,7 @@ public class Project {
     }
     
     //Contructor for update project
-    public Project(int projectId, String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, LocalDate projStartDate, LocalDate projEndDate, LocalDateTime projCreatedAt) {
+    public Project(int projectId, String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, String projStartDate, String projEndDate) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDesc = projectDesc;
@@ -45,11 +43,10 @@ public class Project {
         this.projectClient = projectClient;
         this.projStartDate = projStartDate;
         this.projEndDate = projEndDate;
-        this.projCreatedAt = this.projCreatedAt;
     }
     
      //Contructor for update project
-    public Project(int projectId, String projectName, String projectDesc,String projectType, String projectClient, LocalDate projStartDate, LocalDate projEndDate) {
+    public Project(int projectId, String projectName, String projectDesc,String projectType, String projectClient, String projStartDate, String projEndDate) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDesc = projectDesc;
@@ -87,11 +84,11 @@ public class Project {
         this.projectClient = projectClient;
     }
 
-    public void setProjStartDate(LocalDate projStartDate) {
+    public void setProjStartDate(String projStartDate) {
         this.projStartDate = projStartDate;
     }
 
-    public void setProjEndDate(LocalDate projEndDate) {
+    public void setProjEndDate(String projEndDate) {
         this.projEndDate = projEndDate;
     }
 
@@ -129,11 +126,11 @@ public class Project {
 
     
     public LocalDate getProjStartDate() {
-        return projStartDate;
+        return LocalDate.parse(projStartDate);
     }
 
     public LocalDate getProjEndDate() {
-        return projEndDate;
+        return LocalDate.parse(projEndDate);
     }
 
     public String getProjCreatedAt() {

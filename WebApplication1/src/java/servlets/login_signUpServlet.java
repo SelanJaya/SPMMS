@@ -101,12 +101,12 @@ public class login_signUpServlet extends HttpServlet {
 
             if (statusUserID > 0) {
                 
-//                session.setAttribute("userId", statusUserID);
+             session.setAttribute("userId", statusUserID);
                 
                 System.out.println("statusUserID :" + statusUserID);
                 
-                 User userObj = userDao.getUserSessionDataRoleById(statusUserID);
-                 userObj.setUser_id(statusUserID);
+                User userObj = userDao.getUserSessionDataRoleById(statusUserID);
+                userObj.setUser_id(statusUserID);
                 
                 session.setAttribute("userInfo", userObj);
                 

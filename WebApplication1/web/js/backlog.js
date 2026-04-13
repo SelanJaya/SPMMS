@@ -9,6 +9,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
  */
 
+let backlogDocModal = null;
+let viewDocPane = null;
+let uploadDocPane = null;
+let isEdit;
+
 // fetch the backlog data from the db after the backlog page is displayed
 document.addEventListener("DOMContentLoaded", async function () {
 
@@ -68,6 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const cells = row.querySelectorAll(".editable-cell");
 
         const rowData = {backlogI_id: backlogId};
+        console.log(rowData);
 
         cells.forEach(cell => {
             const field = cell.dataset.field;
@@ -274,19 +280,53 @@ $(document).ready(function () {
 //    });
 
     let backlogid = null;
-    document.getElementById("backlogTable").addEventListener("click", function (e) {
+
+    document.getElementById("backlogTable").addEventListener("click", async function (e) {
+
+        const deletebtn = e.target.closest(".btn-delete");
+        const manageDocbtn = e.target.closest(".btn-manageDoc");
+
+        if (manageDocbtn) {
+            const row = e.target.closest("tr");
+            console.log(row);
+            console.log("managebtn clicked");
+
+            backlogid = row.getAttribute("data-id");
+            console.log(backlogid);
 
 
-        const button = e.target.closest(".btn-delete");
-        console.log("Button ", button);
-        if (!button)
-            return;
+            //get the managedocumentPane
+            backlogDocModal = document.getElementById("backlogDocModal");
+            backlogDocModal.querySelector("#backlog_id").value = backlogid;
+            console.log(backlogDocModal);
 
-        backlogid = button.getAttribute("data-bs-id");
-        const title = button.getAttribute("data-bs-title");
+//            //request to get the document to display
+//            const response = await fetch(`BacklogDocumentServlet?action=fetchDocument&backlogItem_id=${backlogid}`);
+//            const result = await response.json();
+//            console.log(result);
+//
+//            if (!response.ok) {
+//                throw  new Error("Server error" + response.status);
+//            }
+//
+//            result.documentData.forEach((item, index) => {
+//                console.log(item),
+//                        console.log(index),
+//                        appendDocument(item);
+//            });
 
-        document.getElementById("backlogTitle").textContent = title;
-        deleteModal.show();
+            populateViewDocTable();
+            backlogDocModalBoot = new bootstrap.Modal(backlogDocModal);
+            backlogDocModal.querySelector("#backlog_id").value = backlogid;
+            backlogDocModalBoot.show();
+        }
+        if (deletebtn) {
+            backlogid = deletebtn.getAttribute("data-bs-id");
+            const title = deletebtn.getAttribute("data-bs-title");
+
+            document.getElementById("backlogTitle").textContent = title;
+            deleteModal.show();
+        }
         //new bootstrap.Modal(document.getElementById("deleteBacklogModal")).show();
     });
 
@@ -350,6 +390,31 @@ $(document).ready(function () {
 
 
 });
+
+
+async function populateViewDocTable() {
+
+    document.getElementById("backlogFileRegistry").innerHTML = "";
+    console.log(backlogDocModal);
+    const backlogid = backlogDocModal.querySelector("#backlog_id").value;
+    console.log(backlogid);
+    //request to get the document to display
+    const response = await fetch(`BacklogDocumentServlet?action=fetchDocument&backlogItem_id=${backlogid}`);
+    const result = await response.json();
+    console.log(result);
+
+    if (!response.ok) {
+        throw  new Error("Server error" + response.status);
+    }
+
+    result.documentData.forEach((item, index) => {
+        console.log(item),
+                console.log(index),
+                appendDocument(item);
+    });
+
+}
+;
 
 let deleteModal;  // global variable
 
@@ -439,26 +504,24 @@ async function sendBacklog(data) {
 
 function addbacklogToTable(data) {
 
-    console.log("Data", data);
-    console.log("ROLE", userRole);
+//    console.log("Data", data);
+//    console.log("ROLE", userRole);
 
     const actionHtml = (userRole === "Product Owner") ? `
-<div class="d-flex justify-content-center align-items-center gap-2">
-    <button type="button"
-        class="btn btn-sm btn-outline-primary shadow-sm"
-        data-bs-toggle="modal"
-        data-bs-target="#backlogDocModal">
-        <i class="fas fa-file-alt"></i>
-    </button>
+    <div class="d-flex justify-content-center align-items-center gap-2">
+        <button type="button"  
+            class="btn btn-sm btn-outline-primary shadow-sm btn-manageDoc">
+            <i class="fas fa-file-alt"></i>
+        </button>
 
-    <button type="button"
-        class="btn btn-sm btn-outline-danger shadow-sm btn-delete"
-        data-bs-id="${data.backlogI_id}"
-        data-bs-title="${data.backlogI_title}">
-        <i class="fas fa-trash-alt"></i>
-    </button>
-</div>
-` : '';
+        <button type="button"
+            class="btn btn-sm btn-outline-danger shadow-sm btn-delete"
+            data-bs-id="${data.backlogI_id}"
+            data-bs-title="${data.backlogI_title}">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </div>
+    ` : '';
 
     const dragAndDropSymbol = (userRole === "Product Owner") ?
             '<i class="fas fa-grip-vertical"></i>' : '';
@@ -479,7 +542,6 @@ function addbacklogToTable(data) {
 
     if (userRole === "Product Owner") {
         // Setup drag + priority
-
         $(newRow).find('td').eq(0).addClass('drag-handle');
     }
 // Store Row id
@@ -586,4 +648,304 @@ $('#backlog_priority').on('input', function () {
 
 });
 
+////////////////////////////////////////////////////////////////////////// Document ///////////////////////////////////////////////////////////////////////////////
 
+
+
+let deleteDocModal;
+document.getElementById("backlogDocModal").addEventListener("click", async function (e) {
+    const viewNavBtn = e.target.closest("#viewNavBtn");
+    const uploadNavBtn = e.target.closest("#uploadNavBtn");
+    const confirmDocBtn = e.target.closest("#confirmDocBtn");
+    const link = e.target.closest(".doc-edit-link");
+    const viewDocBtn = e.target.closest(".docViewBtn");
+    const deleteDocBtn = e.target.closest(".docDeleteBtn");
+    const downloadDocBtn = e.target.closest(".docDownloadBtn");
+
+    if (uploadNavBtn) {
+
+        console.log("uploadPane clicl");
+        fileDropHandler();
+        backlogDocModal.querySelector("#confirmDocBtn").classList.remove("d-none");
+
+    } else if (viewNavBtn) {
+
+        console.log("viewPane clicl");
+        backlogDocModal.querySelector("#confirmDocBtn").classList.add("d-none");
+
+    } else if (confirmDocBtn) {
+        console.log("confirm btn is clciked");
+        handleModelUpload();
+    } else if (link) {
+        const row = e.target.closest("tr");
+        console.log(row);
+        prepareEditForm(row.id);
+
+    } else if (viewDocBtn) {
+        const row = e.target.closest("tr");
+        window.open(`BacklogDocumentServlet?action=fetchDocument_view&document_id=${row.id}`);
+    } else if (downloadDocBtn) {
+        const row = e.target.closest("tr");
+        window.open(`BacklogDocumentServlet?action=downloadDocument&document_id=${row.id}`);
+    } else if (deleteDocBtn) {
+        deleteDocModal = document.getElementById("deleteDocModal");
+        console.log(deleteDocModal);
+
+        const row = e.target.closest("tr");
+        const docId = row.id;
+        const docName = row.name;
+
+        deleteDocModal.querySelector("#documentNameDel").innerText = docName;
+        deleteDocModal.dataset.id = docId;
+
+        const deleteDocModelBoot = new bootstrap.Modal(deleteDocModal);
+        deleteDocModelBoot.show();
+
+    }
+
+});
+
+document.getElementById("deletedocBtnCfm").addEventListener("click", async function () {
+    console.log("delete confirm clicked");
+    const document_id = deleteDocModal.dataset.id;
+
+    const formData = new FormData();
+    formData.append("action", "delete");
+    formData.append("document_id", document_id);
+
+    const result = await sendData_Document(formData);
+
+    if (result.status === "Failed") {
+        console.log("Server response : ", result.status);
+    }
+
+    const deleteDocModelBoot = bootstrap.Modal.getInstance(deleteDocModal);
+    deleteDocModelBoot.hide();
+
+
+    populateViewDocTable();
+    viewDocPane = document.querySelector(`[data-bs-target="#viewPane"]`);
+    const viewDocTab = new bootstrap.Tab(viewDocPane);
+    console.log(viewDocPane);
+    viewDocTab.show();
+});
+
+document.getElementById("searchDoc").addEventListener("input", filterBacklogDocuments);
+document.getElementById("filterType").addEventListener("change", filterBacklogDocuments);
+
+function filterBacklogDocuments() {
+    const searchValue = document.getElementById("searchDoc").value.toLowerCase();
+    const selectedType = document.getElementById("filterType").value;
+
+    const rows = document.querySelectorAll("#backlogFileRegistry tr");
+
+    rows.forEach(row => {
+        const name = row.children[0].innerText.toLowerCase();
+        const type = row.children[1].innerText.trim();
+
+        const matchName = name.includes(searchValue);
+        const matchType = selectedType === "" || type.includes(selectedType);
+
+        if (matchName && matchType) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+
+
+async function prepareEditForm(document_id) {
+    isEdit = true;
+    const response = await fetch(`BacklogDocumentServlet?action=fetchDocumentData&document_id=${document_id}`);
+    const result = await response.json();
+
+    console.log(result);
+
+    document.getElementById("document_id").value = result.documentData.document_id;
+    document.getElementById("docLabel").value = result.documentData.document_name;
+    document.getElementById("docType").value = result.documentData.document_type;
+
+    const file = {
+        name: result.documentData.document_name
+    };
+
+    // initialise global variable for dispalyFile function
+    fileNameDisplay = document.getElementById('selectedFileName');
+    fileInfo = document.getElementById('fileInfo');
+    displayFile(file);
+
+    backlogDocModal.querySelector("#confirmDocBtn").classList.remove("d-none");
+
+    uploadDocPane = document.querySelector('[data-bs-target="#uploadPane"]');
+    uploadDocPanBoot = bootstrap.Tab.getOrCreateInstance(uploadDocPane);
+    uploadDocPanBoot.show();
+}
+let fileNameDisplay;
+let fileInfo;
+
+function fileDropHandler() {
+    console.log("file Drop Handler");
+    const dropZone = document.getElementById('dropZone');
+    console.log(dropZone);
+    const fileInput = document.getElementById('actualFile');
+    console.log(fileInput);
+    fileInfo = document.getElementById('fileInfo');
+    console.log(fileInfo);
+    console.log("File info : ", fileInfo);
+    fileNameDisplay = document.getElementById('selectedFileName');
+    // Click to select
+    dropZone.addEventListener('click', () => fileInput.click());
+    // Handle file selection via input
+    fileInput.addEventListener('change', function () {
+        displayFile(this.files[0]);
+    });
+    // Drag and drop events
+    ['dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+    dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+        dropZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files; // Assign dropped file to the hidden input
+            displayFile(files[0]);
+        }
+    });
+}
+
+//let backlogDocModel;
+//async function prepareUploadModel(backlog_Id){
+//    console.log("manage btn clicked");
+//    const row = e.target.closest("tr");
+//    console.log(row);
+//    const backlog_id = row.dataset.id;
+//    
+//    
+//    console.log(backlogDocModal);
+//});
+
+
+
+// display the pill of the document attached in the field
+function displayFile(file) {
+    if (file) {
+        fileInfo.classList.remove('d-none');
+        fileNameDisplay.innerText = file.name;
+        const docLabel = document.getElementById("docLabel");
+        // Optionally auto-fill Label if empty
+        if ($('#docLabel').val() === "") {
+
+            let cleanName = file.name
+                    .replace(/\.[^/.]+$/, "")   // remove extension
+                    .replace(/[_-]/g, " ")      // replace _ and -
+                    .trim();
+            docLabel.value = cleanName;
+            //$('#docLabel').val(file.name.split('.').slice(0, -1).join('.'));
+        }
+    }
+}
+
+async function handleModelUpload() {
+    console.log("handleModelUpload is reached");
+    let action = "insert";
+
+    const formData = new FormData();
+
+    const actualFile = document.getElementById("actualFile").files[0] || null;
+    console.log(backlogDocModal);
+
+    if (isEdit) {
+        action = "update";
+        console.log(uploadDocPane);
+        formData.append("document_id", document.getElementById("document_id").value);
+    } else {
+        const backlog_id = backlogDocModal.querySelector("#backlog_id").value;
+        formData.append("backlog_item_id", backlog_id);
+    }
+
+    formData.append("action", action);
+
+//    formData.append("project_id", projectId);
+    formData.append("document_name", document.getElementById("docLabel").value);
+    formData.append("document_type", document.getElementById("docType").value);
+    formData.append("documentContent", actualFile);
+
+    console.log(formData.get("action"));
+    const result = await sendData_Document(formData);
+    console.log(result.document_id);
+    if (result.status === "Failed") {
+        console.log("Failed");
+    }
+
+    if (isEdit) {
+        populateViewDocTable();
+    } else {
+        formData.append("document_id", result.document_id);
+        appendDocument(formData);
+    }
+
+    viewDocPane = document.querySelector(`[data-bs-target="#viewPane"]`);
+    const viewDocTab = new bootstrap.Tab(viewDocPane);
+    console.log(viewDocPane);
+    viewDocTab.show();
+}
+
+async function sendData_Document(formData) {
+
+    console.log("sendData_Document ", formData.get("action"));
+    const response = await fetch("BacklogDocumentServlet", {
+        method: "POST",
+        body: formData
+    });
+
+    if (!response.ok) {
+        throw  new Error("Server error" + response.status);
+    }
+
+    const result = await response.json();
+    return  result;
+}
+
+function appendDocument(data) {
+
+    document_name = data instanceof FormData ? data.get("document_name") : data.document_name;
+    console.log(document_name);
+
+    document_type = data instanceof FormData ? data.get("document_type") : data.document_type;
+    console.log(document_type);
+
+    const docDiv = document.getElementById("backlogFileRegistry");
+    const row = document.createElement("tr");
+    row.id = data instanceof FormData ? data.get("document_id") : data.document_id;
+    row.name = document_name;
+    //console.log(data.document_id);
+    row.innerHTML = `
+                        
+                            <td>
+                                <a href="#" class="fw-bold text-decoration-none doc-edit-link">
+                                    ${document_name}
+                                </a>
+                            </td>
+                            <td><span class="badge bg-secondary-subtle text-secondary border">${document_type}</span></td>
+
+                            <td class="text-center pe-4">
+                                                    <button class="btn btn-sm btn-light border p-1 px-2 docViewBtn">
+                                                        <i class="fas fa-eye text-muted"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-light border p-1 px-2 docDownloadBtn">
+                                                        <i class="fas fa-download text-muted "></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-light border p-1 px-2 ms-1 docDeleteBtn">
+                                                        <i class="fas fa-trash-alt text-danger"></i>
+                                                    </button>
+                            </td>
+                        `;
+    docDiv.append(row);
+    return;
+}

@@ -95,7 +95,7 @@ public class BacklogDAO {
 
     public void updateBacklogItem(Backlog backlog) {
         String sql = "UPDATE backlog_items SET backlog_item_title = ?, backlog_item_desc = ?, "
-                + "acceptance_criteria = ?, story_points = ?, mandays = ?, backlog_item_priority = ? "
+                + "acceptance_criteria = ?, story_points = ?, mandays = ?,  "
                 + "where backlog_item_id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -105,8 +105,8 @@ public class BacklogDAO {
             ps.setString(3, backlog.getAcceptance_cri());
             ps.setInt(4, backlog.getStory_point());
             ps.setInt(5, backlog.getMandays());
-            ps.setInt(6, backlog.getBacklogI_priority());
-            ps.setInt(7, backlog.getBacklogI_id());
+            //ps.setInt(6, backlog.getBacklogI_priority());
+            ps.setInt(6, backlog.getBacklogI_id());
 
             ps.executeUpdate();
         } catch (SQLException e) {

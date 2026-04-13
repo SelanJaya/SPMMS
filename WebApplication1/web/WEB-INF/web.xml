@@ -13,8 +13,8 @@
         <servlet-class>servlets.dashboardServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>projectPageServlet</servlet-name>
-        <servlet-class>servlets.projectPageServlet</servlet-class>
+        <servlet-name>ProjectPageServlet</servlet-name>
+        <servlet-class>servlets.ProjectPageServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>teamAssignmentServlet</servlet-name>
@@ -41,8 +41,12 @@
         <servlet-class>servlets.TaskAssignmentServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>DocumentServlet</servlet-name>
-        <servlet-class>servlets.DocumentServlet</servlet-class>
+        <servlet-name>ProjectDocumentServlet</servlet-name>
+        <servlet-class>servlets.ProjectDocumentServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>BacklogDocumentServlet</servlet-name>
+        <servlet-class>servlets.BacklogDocumentServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>login_signUpServlet</servlet-name>
@@ -57,8 +61,8 @@
         <url-pattern>/dashboardServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>projectPageServlet</servlet-name>
-        <url-pattern>/projectPageServlet</url-pattern>
+        <servlet-name>ProjectPageServlet</servlet-name>
+        <url-pattern>/ProjectPageServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>teamAssignmentServlet</servlet-name>
@@ -85,8 +89,12 @@
         <url-pattern>/TaskAssignmentServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>DocumentServlet</servlet-name>
-        <url-pattern>/DocumentServlet</url-pattern>
+        <servlet-name>ProjectDocumentServlet</servlet-name>
+        <url-pattern>/ProjectDocumentServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BacklogDocumentServlet</servlet-name>
+        <url-pattern>/BacklogDocumentServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

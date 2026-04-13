@@ -18,7 +18,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import Service.DocumentService;
+import Service.ProjectDocumentService;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ import javax.servlet.annotation.MultipartConfig;
  * @author HP
  */
 @MultipartConfig
-public class DocumentServlet extends HttpServlet {
+public class ProjectDocumentServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -79,52 +81,85 @@ public class DocumentServlet extends HttpServlet {
         Map<String, Object> result = new HashMap<>();
         String path = null;
         try {
-            
+
             String action = request.getParameter("action");
+            System.out.println("Action : " + action);
 
             if ("fetchdocuments".equalsIgnoreCase(action)) {
-
                 List<Document> documentList = new ArrayList<>();
 
                 int project_id = Integer.parseInt(request.getParameter("project_id"));
-                System.out.println("project_id" + project_id);
+                System.out.println("project_id " + project_id);
 
                 DocumentDAO documentDAO = new DocumentDAO();
                 documentList = documentDAO.getDocumentsData(project_id);
-
+                System.out.println("Document data : " + documentList.getFirst().getDocument_name() );
 //                for(Document doc: documentList){
 //                    System.out.println("Doc data :" + doc.getDocument_name());
 //                }
-
                 result.put("documentData", documentList);
                 result.put("status", "Success");
-                
+
             } else if ("fetchdocument_meta".equalsIgnoreCase(action)) {
 
                 System.out.println("Servlet Report for edit data retrival");
-
                 int document_id = Integer.parseInt(request.getParameter("document_id"));
 
                 // retrive the document meta data (path to retrieve from the file system)            
                 DocumentDAO documentDAO = new DocumentDAO();
-                Document document = documentDAO.getDocumentsDataEdit(document_id);
-                
+                Document document = documentDAO.getDocumentDataEdit(document_id);
+
                 // set path to retrive the document 
                 path = document.getDocument_path();
-                
+
                 result.put("documentData", document);
-            } else if ("fetchdocument_content".equalsIgnoreCase(action)) { 
+            } else if ("fetchdocument_content".equalsIgnoreCase(action)) {
                 response.setContentType("application/pdf");
-                
-                DocumentService documentService = new DocumentService();
-                
-                InputStream is =  documentService.getDocumentStream(path);
+
+                ProjectDocumentService documentService = new ProjectDocumentService();
+
+                InputStream is = documentService.getDocumentStream(path);
                 OutputStream os = response.getOutputStream();
 
                 is.transferTo(os);
+            } else if ("fetchdocument_view".equalsIgnoreCase(action) || "downloadDocument".equalsIgnoreCase(action) ) {
+                System.out.println("Fetch Document for view executed");
+                try {
+                    String docIdParam = request.getParameter("document_id");
+                    System.out.println("Document_id Str : " + docIdParam);
+                    int document_id = Integer.parseInt(request.getParameter("document_id"));
+                    System.out.println("Document id = " + document_id);
+
+                    ProjectDocumentService documentService = new ProjectDocumentService();
+                    File file = documentService.documentRetrivalService_view(document_id);
+
+                    String mimeType = getServletContext().getMimeType(file.getName());
+                    if (mimeType == null) {
+                        mimeType = "application/octet_stream";
+                    }
+                    response.setContentType(mimeType);
+                    if("fetchdocument_view".equalsIgnoreCase(action)){
+                        response.setHeader("Content-Disposition", "inline; filrname=\"" + file.getName() + "\"");
+                    }else if("downloadDocument".equalsIgnoreCase(action)){
+                        response.setHeader("Content-Disposition", "attachment; filrname=\"" + file.getName() + "\"");
+                    }
+                    
+
+                    try (FileInputStream fis = new FileInputStream(file); OutputStream os = response.getOutputStream()) {
+                        byte[] buffer = new byte[4996];
+                        int byteRead;
+
+                        while ((byteRead = fis.read(buffer)) != -1) {
+                            os.write(buffer, 0, byteRead);
+                        }
+                    }
+                } catch (Exception e) {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());   
+                }
             }
             response.getWriter().write(gson.toJson(result));
         } catch (Exception e) {
+           
             System.out.println("Exception occur :" + e);
         }
     }
@@ -156,38 +191,38 @@ public class DocumentServlet extends HttpServlet {
                 document.setDocument_name(request.getParameter("document_name"));
                 document.setDocument_nameSys(request.getParameter("document_nameSys"));
                 document.setDocument_type(request.getParameter("document_type"));
-                
+
                 Part filePart = request.getPart("document_pdf");
-                DocumentService documentService = new DocumentService();
+                ProjectDocumentService documentService = new ProjectDocumentService();
                 Document documentReturn = documentService.insertDocument_localServer(filePart, document);
 
                 result.put("document_id", documentReturn.getDocument_id());
                 result.put("document_path", documentReturn.getDocument_path());
                 result.put("status", "Success");
-            } else if ("edit".equalsIgnoreCase(action)){
-                
+            } else if ("edit".equalsIgnoreCase(action)) {
+
                 System.out.println("Servler reporting edit executed");
                 Document document = new Document();
                 document.setDocument_id(Integer.parseInt(request.getParameter("document_id")));
                 document.setDocument_name(request.getParameter("document_name"));
                 document.setDocument_type(request.getParameter("document_type"));
-                
-                Part filePart = request.getPart("document_pdf") ;
 
-                DocumentService documentService = new DocumentService();
+                Part filePart = request.getPart("document_pdf");
+
+                ProjectDocumentService documentService = new ProjectDocumentService();
                 documentService.updateDocument_db(filePart, document);
-                
+
                 result.put("status", "Success");
-            } else if("delete".equalsIgnoreCase(action)){
-                
+            } else if ("delete".equalsIgnoreCase(action)) {
+
                 System.out.println("Server reporting deletion occurs");
                 Part filePart = request.getPart("document_pdf");
-                
+
                 int document_id = Integer.parseInt(request.getParameter("document_id"));
-                
-                DocumentService documentService = new DocumentService();
+
+                ProjectDocumentService documentService = new ProjectDocumentService();
                 documentService.documentDeletionService(document_id);
-                
+
                 result.put("status", "Success");
             }
 

@@ -310,9 +310,17 @@ function renderBoard(data) {
     `).join('')
             : `<span class="text-muted small">No backlog assigned</span>`;
 
-    const backlogIds = (data.backlog && data.backlog.length > 0)
+    const action = user_role === "Scrum Master" ? `<button class="btn btn-outline-secondary btn-sm" onclick="editBoard('${data.sprint_id}')"><i class="fas fa-edit me-1"></i> Edit Details</button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteBoard('${data.sprint_id}')">
+                                        <i class="fas fa-trash-alt me-1"></i> Delete
+                            </button>` : ``;
+
+            const backlogIds = (data.backlog && data.backlog.length > 0)
             ? data.backlog.map(b => b.backlogI_id).join(',')
             : '';
+            
+    const taskDragAndDrop = user_role === "Scrum Master" ? `ondragover="allowDrop(event)" ondrop="drop(event)"` : ``;
+    const addtaskBtn = user_role === "Scrum Master" ? `<button class="btn text-muted btn-sm fw-bold w-100 text-start" onclick="addTask(this)">+ Add Task</button>` : ``;
 
     board.innerHTML = `
                     <div class="board-header">
@@ -323,10 +331,7 @@ function renderBoard(data) {
                         </div>
                         <div class="text-end">
                             <span class="info-label">Status</span><div class="badge bg-primary-subtle text-primary val-status rounded-pill px-3 py-2 mb-2">${data.sprint_status}</div><br>
-                            <button class="btn btn-outline-secondary btn-sm" onclick="editBoard('${data.sprint_id}')"><i class="fas fa-edit me-1"></i> Edit Details</button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="deleteBoard('${data.sprint_id}')">
-                                        <i class="fas fa-trash-alt me-1"></i> Delete
-                                    </button>
+                            ${action}
                         </div>
                     </div>
                     <div class="notes-grid">
@@ -342,8 +347,8 @@ function renderBoard(data) {
                         </div>
                     </div>
                     <div class="board-layout mt-4">
-            ${['TO DO', 'IN PROGRESS', 'DONE'].map(c => `<div class="column" data-status="${c}" ondragover="allowDrop(event)" ondrop="drop(event)">
-            <h3>${c}</h3><div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start" onclick="addTask(this)">+ Add Task</button></div>`).join('')}
+            ${['TO DO', 'IN PROGRESS', 'DONE'].map(c => `<div class="column" data-status="${c}" ${taskDragAndDrop}>
+            <h3>${c}</h3><div class="task-list"></div>  ${addtaskBtn} </div>`).join('')}
                     </div>`;
     document.getElementById('scrum-container').appendChild(board);
 
@@ -355,11 +360,6 @@ function renderBoard(data) {
 let isTaskEdit = false;
 
 async function insertTask_Board(sprint_id) {
-    const data = {
-        action: "fetchTasks",
-        sprint_id: sprint_id
-    };
-    console.log(data);
 
     const response = await fetch(`TaskServlet?action=fetchTasks_Sprint&sprint_id=${sprint_id}`);
 
@@ -677,7 +677,7 @@ async function drop(ev) {
         const deps = task.dataset.dependency
                 ? task.dataset.dependency.split(",").map(Number).filter(n => n > 0)
                 : [];
-                
+
         console.log("Dependency : ", deps);
 
         if (deps.length > 0) {

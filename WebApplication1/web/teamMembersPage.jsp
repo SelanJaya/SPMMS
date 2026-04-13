@@ -36,16 +36,16 @@
 
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
 
-                    <a href="projectPageServlet?projectId=${project.projectId}" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
+                    <a href="ProjectPageServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
 
-                    <a href="SprintServlet?action=redirect&project_id=${project.projectId}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
+                    <a href="SprintServlet?action=redirect&project_id=${project_id}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
 
 
-                    <a href="BacklogServlet?action=redirect&project_id=${project.projectId}" class="nav-link">
+                    <a href="BacklogServlet?action=redirect&project_id=${project_id}" class="nav-link">
                         <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                     </a>
 
-                    <a href="teamAssignmentServlet?action=fetchTeamAssignment&project_id=${project.projectId}" class="nav-link active"><i class="fas fa-users-gear me-3"></i> Team</a>
+                    <a href="teamAssignmentServlet?action=redirect&project_id=${project_id}" class="nav-link active"><i class="fas fa-users-gear me-3"></i> Team</a>
                     <a href="projectAnalytics.jsp" .html" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                     <div class="mt-auto">
                         <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
@@ -90,133 +90,28 @@
                     <div class="role-header">Project Managers
                         <hr>
                     </div>
-                    <div class="row g-3 mb-4">
-                        <c:forEach var="user" items="${projectTeamAssignmentData}">
-                            <c:if test="${user.user_role == 'Project Manager'}">
+                    <div class="row g-3 mb-4" id="projectManager_div">
 
-                                <div class="col-xl-3 col-md-6">
-                                    <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user.username}&background=eff6ff&color=2563eb"
-                                             class="avatar-md me-3" />
-
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user.username}</div>
-                                            <div class="text-muted" style="font-size: 11px;">${user.email}</div>
-                                        </div>
-
-                                        <c:if test="${user.user_role == 'Project Manager'}">
-                                            <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                    data-bs-target="#deleteMemberModal" 
-                                                    data-project-id="${project.projectId}"
-                                                    data-user-id="${user.user_id}"
-                                                    name="Delete" value="Delete"
-                                                    > Delete
-                                            </button>
-                                        </c:if>
-
-                                    </div>
-                                </div>
-
-                            </c:if>
-                        </c:forEach>
                     </div>
                     <div class="role-header">Product Owners
                         <hr>
                     </div>
-                    <div class="row g-3 mb-4">
-                        <c:forEach var="user1" items="${projectTeamAssignmentData}">
-                            <c:if test="${user1.user_role == 'Product Owner'}">
+                    <div class="row g-3 mb-4" id="productOwner_div">
 
-                                <div class="col-xl-3 col-md-6">
-                                    <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user1.username}&background=eff6ff&color=2563eb"
-                                             class="avatar-md me-3" />
-
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user1.username} </div>
-                                            <div class="text-muted" style="font-size: 11px;">${user1.email}</div>
-                                        </div>
-
-                                        <c:if test="${user.user_role == 'Project Manager'}">
-                                            <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                    data-bs-target="#deleteMemberModal" 
-                                                    data-project-id="${project.projectId}"
-                                                    data-user-id="${user1.user_id}"
-                                                    name="Delete" value="Delete"
-                                                    > Delete
-                                            </button>
-                                        </c:if>
-                                    </div>
-                                </div>
-
-                            </c:if>
-                        </c:forEach>
                     </div> 
 
                     <div class="role-header">Scrum Master
                         <hr>
                     </div>
-                    <div class="row g-3 mb-4">
-                        <c:forEach var="user1" items="${projectTeamAssignmentData}">
-                            <c:if test="${user1.user_role == 'Scrum Master'}">
+                    <div class="row g-3 mb-4" id="scumMaster_div">
 
-                                <div class="col-xl-3 col-md-6">
-                                    <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user1.username}&background=eff6ff&color=2563eb"
-                                             class="avatar-md me-3" />
-
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user1.username}</div>
-                                            <div class="text-muted" style="font-size: 11px;">${user1.email}</div>
-                                        </div>
-
-                                        <c:if test="${user.user_role == 'Project Manager'}">
-                                            <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                    data-bs-target="#deleteMemberModal" 
-                                                    data-project-id="${project.projectId}"
-                                                    data-user-id="${user1.user_id}"
-                                                    name="Delete" value="Delete"
-                                                    > Delete
-                                            </button>
-                                        </c:if>
-                                    </div>
-                                </div>
-
-                            </c:if>
-                        </c:forEach>
                     </div> 
 
                     <div class="role-header">Developers
                         <hr>
                     </div>
-                    <div class="row g-3 mb-4">
-                        <c:forEach var="user1" items="${projectTeamAssignmentData}">
-                            <c:if test="${user1.user_role == 'Developer'}">
+                    <div class="row g-3 mb-4" id="developer_div">
 
-                                <div class="col-xl-3 col-md-6">
-                                    <div class="team-card p-3 d-flex align-items-center position-relative">
-                                        <img src="https://ui-avatars.com/api/?name=${user1.username}&background=eff6ff&color=2563eb"
-                                             class="avatar-md me-3" />
-
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark small">${user1.username}</div>
-                                            <div class="text-muted" style="font-size: 11px;">${user.email}</div>
-                                        </div>
-
-                                        <c:if test="${user.user_role == 'Project Manager'}">
-                                            <button type="button" class="btn-delete-member" data-bs-toggle="modal" 
-                                                    data-bs-target="#deleteMemberModal" 
-                                                    data-project-id="${project.projectId}"
-                                                    data-user-id="${user1.user_id}"
-                                                    name="Delete" value="Delete"
-                                                    > Delete
-                                            </button>
-                                        </c:if>
-                                    </div>
-                                </div>
-
-                            </c:if>
-                        </c:forEach>
                     </div> 
                 </div>
 
@@ -244,81 +139,84 @@
                                         <span class="pill-text-danger">Action will unasign member</span>
                                     </div>
 
-                                    <div class="d-grid gap-2">
-                                        <form action="teamAssignmentServlet" method="POST" id="removeMemberForm">
-                                            <input type="hidden" name="processType" value="deleteProcess">
-                                            <input type="hidden" name="userId" id="modalUserId">
-                                            <input type="hidden" name="projectId" id="modalProjectId">
-                                            <button type="submit" class="btn btn-confirm-destruction shadow-sm w-100">
-                                                Confirm Removal
-                                            </button>
-                                        </form>
-                                        <button class="btn btn-link btn-cancel-link" data-bs-dismiss="modal">
-                                            Keep Member
-                                        </button>
-                                    </div>
+
+                                    <button type="submit" id="deleteCfmBtn" class="btn btn-confirm-destruction shadow-sm w-100" data-bs-dismiss="modal">
+                                        Confirm Removal
+                                    </button>
+
+                                    <button class="btn btn-link btn-cancel-link"  data-bs-dismiss="modal">
+                                        Keep Member
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="successBody" class="modal-body p-5 d-none">
+                            <div class="text-center">
+                                <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                                <h4>Member Removed</h4>
+                                <p>Updating project team...</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="inviteModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content shadow">
+                        <div class="modal-body p-4">
+                            <div class="text-center mb-4">
+                                <div class="mb-2"><i class="fas fa-paper-plane text-primary fa-2x"></i></div>
+                                <h6 class="fw-bold text-dark">Invite Team Member</h6>
+                                <p class="text-muted small">Collaborate with your team by sending an invite.</p>
+                            </div>
+
+                            <input type="hidden" id="finalUserInput" name="userId">
+
+                            <label>1. Select Role to Filter Employees</label>
+                            <select id="roleSelector" class="form-select">
+                                <option value="" selected disabled>Choose a role...</option>
+                                <option value="Product Owner">Product Owner</option>
+                                <option value="Scrum Master">Scrum Master</option>
+                                <option value="Developer">Developer</option>
+                            </select>
+
+                            <div class="mb-3 mt-3 position-relative">
+                                <label for="employeeSearch" class="form-label fw-bold">2. Search Available Employees</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control border-start-0" id="employeeSearch" 
+                                           placeholder="Type initials, name or email..." autocomplete="off">
+                                </div>
+
+                                <div id="searchSuggestions" class="list-group shadow-sm position-absolute w-100 mt-1 d-none" 
+                                     style="z-index: 1050; max-height: 200px; overflow-y: auto;">
                                 </div>
                             </div>
 
-                            <div id="successBody" class="modal-body p-5 d-none">
-                                <div class="text-center">
-                                    <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
-                                    <h4>Member Removed</h4>
-                                    <p>Updating project team...</p>
-                                </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" id="inviteMemberSubmit_btn" class="btn btn-primary fw-bold py-2 rounded-pill" data-bs-dismiss="modal">Send
+                                    Invitation</button>
+                                <button type="button" class="btn btn-link text-muted small text-decoration-none"
+                                        data-bs-dismiss="modal">Cancel</button>
                             </div>
 
                         </div>
                     </div>
                 </div>
+            </div>
+            <script>
+                const project_id = ${project_id};
+                console.log(project_id);
+                const user_id = "${userId}";
+                console.log(user_id);
+                const user_role = "${user.user_role}";
+                console.log(user_role);
+            </script>
+            <script src="js/teamAssignment.js"></script>
 
-                <div class="modal fade" id="inviteModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content shadow">
-                            <div class="modal-body p-4">
-                                <div class="text-center mb-4">
-                                    <div class="mb-2"><i class="fas fa-paper-plane text-primary fa-2x"></i></div>
-                                    <h6 class="fw-bold text-dark">Invite Team Member</h6>
-                                    <p class="text-muted small">Collaborate with your team by sending an invite.</p>
-                                </div>
-                                <form id="inviteForm" action="teamAssignmentServlet" method="POST">
-                                    <input type="hidden" id="finalUserInput" name="userId">
-                                    <input type="hidden" name="processType" value="teamAssignment">
-                                    <label>1. Select Role to Filter Employees</label>
-                                    <select id="roleSelector" class="form-select">
-                                        <option value="" selected disabled>Choose a role...</option>
-                                        <option value="Product Owner">Product Owner</option>
-                                        <option value="Scrum Master">Scrum Master</option>
-                                        <option value="Developer">Developer</option>
-                                    </select>
+    </body>
 
-                                    <div class="mb-3 mt-3 position-relative">
-                                        <label for="employeeSearch" class="form-label fw-bold">2. Search Available Employees</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                                            <input type="text" class="form-control border-start-0" id="employeeSearch" 
-                                                   placeholder="Type initials, name or email..." autocomplete="off">
-                                        </div>
-
-                                        <div id="searchSuggestions" class="list-group shadow-sm position-absolute w-100 mt-1 d-none" 
-                                             style="z-index: 1050; max-height: 200px; overflow-y: auto;">
-                                        </div>
-                                    </div>
-
-                                    <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-primary fw-bold py-2 rounded-pill">Send
-                                            Invitation</button>
-                                        <button type="button" class="btn btn-link text-muted small text-decoration-none"
-                                                data-bs-dismiss="modal">Cancel</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <script src="js/teamAssignment.js"></script>
-
-                </body>
-
-                </html>
+</html>

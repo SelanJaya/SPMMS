@@ -39,14 +39,14 @@
 
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
 
-                    <a href="projectPageServlet?projectId=${project.projectId}" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
+                    <a href="ProjectPageServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-briefcase me-3"></i> Projects</a>
 
-                    <a href="SprintServlet?action=redirect&project_id=${project.projectId}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
+                    <a href="SprintServlet?action=redirect&project_id=${project_id}" class="nav-link "><i class="fas fa-briefcase me-3"></i> Sprint</a>
 
-                    <a href="BacklogServlet?action=redirect&project_id=${project.projectId}" class="nav-link active text-white">
+                    <a href="BacklogServlet?action=redirect&project_id=${project_id}" class="nav-link active text-white">
                         <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                     </a>
-                    <a href="teamAssignmentServlet?action=fetchTeamAssignment&project_id=${project.projectId}" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
+                    <a href="teamAssignmentServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
                     <a href="projectAnalytics.jsp" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                     <div class="mt-auto">
                         <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
@@ -111,6 +111,7 @@
             </div>
         </div>
 
+        <!-- Backlog Creation form -->
         <div class="modal fade" id="addItemModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
@@ -152,14 +153,7 @@
                                     <label class="label-style d-block mb-2">Mandays</label>
                                     <input type="number" id="backlog_Mdys" class="form-control" value="0" min="0" max="10"
                                            style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
-                                </div>
-
-<!--                                <div class="col-md-4">
-                                    <label class="label-style d-block mb-2">Priority Rank</label>
-                                    <input type="number" id="backlog_priority" class="form-control" placeholder="e.g. 1"
-                                           style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
-                                    <div id="alertPriority" class="invalid-feedback"></div>
-                                </div>-->
+                                </div>>
                             </div>
 
                             <div class="d-grid gap-2">
@@ -177,9 +171,10 @@
                 </div>
             </div>
         </div>
-        
+
         <!--Backlog level document pop up tab -->
         <div class="modal fade" id="backlogDocModal" tabindex="-1" data-bs-backdrop="false">
+            <input type="hidden" id="backlog_id">
             <div class="modal-dialog">
                 <div class="modal-content shadow-lg">
 
@@ -194,17 +189,30 @@
                     <div class="modal-body p-0">
                         <ul class="nav nav-tabs nav-fill bg-white border-bottom" id="docTabs" role="tablist">
                             <li class="nav-item">
-                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#viewPane">
+                                <button class="nav-link active" id="viewNavBtn" data-bs-toggle="tab" data-bs-target="#viewPane">
                                     <i class="fas fa-th-list me-2"></i>View Files
                                 </button>
                             </li>
                             <li class="nav-item">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#uploadPane">
+                                <button class="nav-link" id="uploadNavBtn" data-bs-toggle="tab" data-bs-target="#uploadPane">
                                     <i class="fas fa-plus-circle me-2"></i>Upload New
                                 </button>
                             </li>
                         </ul>
+                        <div class="d-flex justify-content-between mx-3 mt-2">
+                            <input type="text" id="searchDoc" class="form-control w-50"
+                                   placeholder="Search document name...">
 
+                            <select id="filterType" class="form-select w-25 ms-2">
+                                <option value="">All Types</option>
+                                <option value="Requirement">Requirement</option>
+                                <option value="Design">Design</option>
+                                <option value="Acceptance">Acceptance</option>
+                                <option value="Technical">Technical</option>
+                                <option value="Reference">Reference</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
 
                         <div class="tab-content">
                             <div class="tab-pane fade show active p-4" id="viewPane">
@@ -214,7 +222,7 @@
                                             <tr>
                                                 <th style="width: 30%;">Document Name</th>
                                                 <th style="width: 15%;">Type</th>
-                                                <th style="width: 35%;">Path</th>
+
                                                 <th class="action-col no-sort" style="width: 20%;" class="text-end">Actions</th>
                                             </tr>
                                         </thead>
@@ -223,38 +231,17 @@
                                                 <td><span class="fw-bold">ERD_Final.png</span></td>
                                                 <td><span class="badge bg-secondary-subtle text-secondary border">PNG</span>
                                                 </td>
-                                                <td><code>/uploads/p01/arch.png</code></td>
-                                                <td class="text-end">
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-boundary="viewport">
-                                                            <i class="fas fa-ellipsis-v text-secondary"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                                            <li>
-                                                                <a class="dropdown-item" href="#">
-                                                                    <i class="fas fa-eye me-2 text-purple-brand"></i> View Details
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item" href="#">
-                                                                    <i class="fas fa-download me-2 text-purple-brand"></i> Download
-                                                                </a>
-                                                            </li>
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            <li>
-                                                                <a class="dropdown-item text-danger" href="#">
-                                                                    <i class="fas fa-trash-alt me-2"></i> Delete
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                <td class="text-center pe-4">
+                                                    <button class="btn btn-sm btn-light border p-1 px-2 docViewBtn">
+                                                        <i class="fas fa-eye text-muted"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-light border p-1 px-2 docDownloadBtn">
+                                                        <i class="fas fa-download text-muted "></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-light border p-1 px-2 ms-1 docDeleteBtn">
+                                                        <i class="fas fa-trash-alt text-danger"></i>
+                                                    </button>
                                                 </td>
-                                                <!--                                                <td class="text-end">
-                                                                                                    <button class="btn btn-sm btn-light border"><i
-                                                                                                            class="fas fa-download text-primary"></i></button>
-                                                                                                    <button class="btn btn-sm btn-light border ms-1"><i
-                                                                                                            class="fas fa-trash-alt text-danger"></i></button>
-                                                                                                </td>-->
                                             </tr>
                                         </tbody>
                                     </table>
@@ -262,34 +249,40 @@
                             </div>
 
                             <div class="tab-pane fade p-4" id="uploadPane">
+
+                                <input type="hidden" id="document_id">
                                 <div class="mb-3">
                                     <label class="label-style mb-2">Document Name</label>
-                                    <input type="text" id="docNameInput" class="form-control"
-                                           placeholder="e.g. Project Charter">
+                                    <input type="text" id="docLabel" class="form-control"
+                                           placeholder="e.g. Login Validation Rules, API Auth Spec">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="label-style mb-2">Document Category</label>
-                                    <select id="docCategory" class="form-select">
+                                    <select id="docType" class="form-select">
                                         <option value="" selected disabled>Select Category...</option>
-                                        <option value="Charter">Project Charter</option>
-                                        <option value="SRS">Requirements (SRS)</option>
-                                        <option value="Design">Design Document</option>
+                                        <option value="Requirement">Requirement Document</option>
+                                        <option value="Design">Design Requirement</option>
+                                        <option value="Acceptance">Acceptance Document</option>
+                                        <option value="Technical">Technical Document</option>
+                                        <option value="Reference">Reference Document</option>
+                                        <option value="Other">Other Document</option>
+
                                     </select>
                                 </div>
 
                                 <div class="mb-2">
                                     <label class="label-style mb-2">Attachment</label>
-                                    <div id="modalDropZone" class="dropzone-container">
-                                        <input type="file" id="modalFileField" class="d-none">
+                                    <div id="dropZone" class="dropzone-container">
+                                        <input type="file" id="actualFile" class="d-none">
                                         <img src="https://img.icons8.com/fluency/96/cloud-lighting.png" width="60"
                                              class="mb-2">
                                         <h6 class="fw-bold mb-1">Drag and drop file here</h6>
                                         <p class="text-muted small mb-0">or click to browse from computer</p>
 
-                                        <div id="filePreview" class="mt-3 d-none">
+                                        <div id="fileInfo" class="mt-3 d-none">
                                             <span class="badge bg-primary rounded-pill py-2 px-3">
-                                                <i class="fas fa-file-alt me-2"></i><span id="fileNameText"></span>
+                                                <i class="fas fa-file-alt me-2"></i><span id="selectedFileName"></span>
                                             </span>
                                         </div>
                                     </div>
@@ -301,7 +294,7 @@
                     <div class="modal-footer bg-light border-top">
                         <button type="button" class="btn btn-sm btn-outline-secondary fw-bold px-3"
                                 data-bs-dismiss="modal">Close</button>
-                        <button type="button" id="confirmBtn" class="btn btn-sm btn-primary fw-bold px-4 d-none">Confirm
+                        <button type="button" id="confirmDocBtn" class="btn btn-sm btn-primary fw-bold px-4 d-none">Confirm
                             Upload</button>
                     </div>
                 </div>
@@ -351,12 +344,56 @@
             </div>
         </div>
 
+        <div class="modal fade" id="deleteDocModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+
+                    <div id="initialBody">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title fw-bold" style="font-size: 1rem;">
+                                <i class="fas fa-exclamation-triangle me-2"></i> Permanent Document Deletion
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-folder-open text-danger fa-4x opacity-25"></i>
+                            </div>
+                            <h5 class="fw-bold">Destroy Document?</h5>
+                            <p class="text-muted">You are about to delete the document <strong id="documentNameDel"></strong>. This will <strong>permanently remove</strong> the uploaded files.</p>
+                            <div class="alert alert-danger p-2 mb-0">
+                                <small class="fw-bold text-uppercase"><i class="fas fa-info-circle me-1"></i> This action is irreversible.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Folder</button>
+                            <button type="button" id="deletedocBtnCfm" class="btn btn-sm btn-danger fw-bold px-3" ">
+                                Yes, Delete Directory
+                            </button>
+                        </div>
+                    </div>
+                    <div id="successBody" class="d-none">
+                        <div class="modal-body p-5 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle text-success fa-5x animate__animated animate__bounceIn"></i>
+                            </div>
+                            <h5 class="fw-bold">Project Deleted</h5>
+                            <p class="text-muted mb-0">The directory and all data have been successfully removed.</p>
+                            <p class="small text-muted mt-2">Redirecting to Dashboard...</p>
+                        </div>
+                    </div                                                            >
+                </div>
+            </div>
+        </div>
+
         <script>
-            var projectId = ${project.projectId};
+            var projectId = ${project_id};
+            console.log(projectId);
             var userRole = "${user.user_role}";
             let table;
             let lowestPriority;
         </script>
+
         <script src="js/backlog.js"></script>
     </body>
 

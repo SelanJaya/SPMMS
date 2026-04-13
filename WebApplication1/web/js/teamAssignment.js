@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
  */
 
-
+let selectedUser;
 $(document).ready(function () {
     let employeeData = []; // global Cache for Live Search
 
@@ -26,12 +26,14 @@ $(document).ready(function () {
                 throw new Error("Network response was not ok");
 
             const result = await response.json();
+            console.log(result);
 
-            if (result.success) {
+            if (result.status === "Success") {
                 console.log("Cargo Arrived:", result.count, "users.");
 
-                // 1. Store the data globally so the 'input' event can search it later
-                employeeData = result.data;
+//                // 1. Store the data globally so the 'input' event can search it later
+                employeeData = result.userData;
+                console.log(employeeData);
 
                 // 2. Clear the search input and results list for the new role
                 document.getElementById('employeeSearch').value = "";
@@ -85,7 +87,13 @@ $(document).ready(function () {
             `;
 
                 item.onclick = () => {
+                    selectedUser = {
+                        username: user.username,
+                        email: user.email,
+                        user_role: document.getElementById('roleSelector').value
+                    };
                     document.getElementById('employeeSearch').value = user.username;
+
                     document.getElementById('finalUserInput').value = user.user_id; // <-- inject here
                     container.classList.add('d-none'); // Hide after selection
                     window.selectedUserId = user.user_id; // Store for the Invite button
@@ -147,27 +155,157 @@ $(document).ready(function () {
     });
 });
 
-// DELETE MEMBER LOGIC
-// Use delegation $(document).on('click', 'selector') to ensure it works with JSTL loops
-$(document).on('click', '.btn-delete-member', function () {
-    console.log("Delete Button Clicked");
+document.addEventListener("DOMContentLoaded", populateAssignedUser());
 
-    // 1. Extract data from the clicked button using jQuery .data()
-    // Note: jQuery handles 'data-user-id' as 'user-id'
-    const userId = $(this).attr('data-user-id');
-    const projectId = $(this).attr('data-project-id');
+async function populateAssignedUser() {
 
-    console.log("Target User ID:", userId);
-    console.log("Target Project ID:", projectId);
+    const response = await fetch(`teamAssignmentServlet?action=fetchTeamAssignment&project_id=${project_id}`);
+    const result = await response.json();
 
-    // 2. Find the username in the parent card to show in the modal
-    const userName = $(this).closest('.team-card').find('.fw-bold').first().text();
+    console.log(result);
 
-    // 3. Inject data into the Modal's hidden inputs
-    $('#modalUserId').val(userId);
-    $('#modalProjectId').val(projectId);
+    result.userAssignedData.forEach((item) => {
+        console.log(item);
+        appendUser_Role(item);
+    });
 
-    // 4. Update the text in the modal to show the name
-    $('#displayUserName').text(userName);
+}
+
+const roleDiveMap = {
+    "Project Manager": document.getElementById("projectManager_div"),
+    "Scrum Master": document.getElementById("scumMaster_div"),
+    "Product Owner": document.getElementById("productOwner_div"),
+    "Developer": document.getElementById("developer_div")
+};
+
+function cleanseAssignedData() {
+    //to convert object to array
+    Object.values(roleDiveMap).forEach((item) => {
+        if (item) {
+            item.innerHTML = "";
+        }
+    });
+}
+
+function appendUser_Role(data) {
+
+    const selected_div = roleDiveMap[data.user_role];
+    console.log(selected_div);
+    const action = (user_role === "Project Manager" && data.user_role !== "Project Manager" )? `<button type="button" class="btn-delete-member" data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteMemberModal" 
+                                                    name="Delete" value="Delete"
+                                                    > Delete
+                                            </button>` : ``;
+
+    if (selected_div) {
+        createdDiv = document.createElement("div");
+        createdDiv.className = "col-xl-3 col-md-6";
+        createdDiv.id = data.user_id;
+        createdDiv.innerHTML = `
+                                
+                                    <div class="team-card p-3 d-flex align-items-center position-relative">
+                                        <img src="https://ui-avatars.com/api/?name=${data.username}&background=eff6ff&color=2563eb"
+                                             class="avatar-md me-3" />
+
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold text-dark small">${data.username}</div>
+                                            <div class="text-muted" style="font-size: 11px;">${data.email}</div>
+                                        </div>
+                                        ${action}
+                                    </div>
+                                 `;
+
+        selected_div.appendChild(createdDiv);
+    } else {
+        console.log("unknown user Role");
+    }
+}
+
+let deleteDocModel;
+document.addEventListener("click", (e) => {
+    const deleteAssignmentbtn = e.target.closest(".btn-delete-member");
+
+    if (deleteAssignmentbtn) {
+        const capsule = e.target.closest(".col-xl-3");
+
+        console.log("delete is clicked");
+        deleteDocModel = document.getElementById("deleteMemberModal");
+        deleteDocModel.dataset.id = capsule.id;
+    }
 });
 
+
+// DELETE MEMBER LOGIC
+// Use delegation $(document).on('click', 'selector') to ensure it works with JSTL loops
+document.getElementById("deleteCfmBtn").addEventListener("click", async function deleteAssignment(e) {
+    console.log("Delete Button Clicked");
+    console.log(e);
+
+    const assign_to = deleteDocModel.dataset.id;
+
+    const data = {
+        action: "delete",
+        project_id: project_id,
+        assign_to: assign_to,
+        assign_by: user_id
+    };
+
+    const result = await sendData_Assigment(data);
+
+    cleanseAssignedData();
+    populateAssignedUser();
+
+    const deleteDocModelBoot = new bootstrap.Modal(deleteDocModel);
+    deleteDocModelBoot.hide();
+
+
+});
+
+async function sendData_Assigment(data) {
+
+    const response = await fetch("teamAssignmentServlet", {
+        method: "POST",
+        headers: {
+            "Content_Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+        throw new Error(response.status);
+    }
+    ;
+
+    const result = await response.json();
+
+    return result;
+}
+let inviteModal;
+document.getElementById("inviteMemberSubmit_btn").addEventListener("click", async function handleSubmitForm() {
+
+    console.log(document.getElementById("finalUserInput"));
+    const data = {
+        action: "teamAssignment",
+        project_id: project_id,
+        assign_to: document.getElementById("finalUserInput").value,
+        assign_by: user_id
+    };
+
+    const result = await sendData_Assigment(data);
+
+    data.user_role = document.getElementById("roleSelector").value;
+
+    if (result.status === "Failed") {
+        console.log("Insertion assigment failed");
+    } else if (result.status === "Success") {
+        appendUser_Role(selectedUser);
+        selectedUser = "";
+        console.log(selectedUser);
+    }
+
+    inviteModal = document.getElementById("inviteModal");
+    const inviteModalBoot = new bootstrap.ModalgetOrCreateInstance(inviteModal);
+    ;
+    inviteModalBoot.hide();
+
+});
