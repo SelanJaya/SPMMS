@@ -22,14 +22,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
     if (result.data.length > 0) {
-
         const lastItem = result.data[result.data.length - 1];
         lowestPriority = Number(lastItem.backlogI_priority);
-
     } else {
         lowestPriority = 0;
     }
-
     for (const item of result.data) {
         addbacklogToTable(item);
     }
@@ -40,8 +37,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 document.addEventListener("DOMContentLoaded", () => {
 
     table = document.getElementById("backlogTable");
-
-    let oldValue = "";
 
     //focusin work for contenteditable element
     table.addEventListener("focusin", (e) => {
@@ -55,51 +50,141 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     //detect when the user leave the cell editable(editing finished)
-    table.addEventListener("focusout", async (e) => {
+    table.addEventListener("focusout", (e) => {
 
-        //Ignore the element is not editable-cell
-        if (!e.target.classList.contains("editable-cell"))
-            return;
+        console.log("focues out");
+        getBacklogRowData(e);
 
-        //Get the new value after editing
-        const newValue = e.target.textContent.trim();
+    });
+});
 
-        if (newValue === oldValue)
-            return;
 
-        const row = e.target.closest("tr");
-        const backlogId = row.dataset.id;
+async function getBacklogRowData(e, option) {
+    console.log("getBacklogRowData execute");
+    let oldValue = "";
+
+    const cell = e.target.closest(".editable-cell");
+    console.log(cell);
+    if (!cell)
+        return;
+
+    //Get the new value after editing 
+    const newValue = e.target.textContent.trim();
+
+    if (newValue === oldValue)
+        return;
+
+    const row = cell.closest("tr");
+    console.log(row);
+    const backlogId = row.dataset.id;
+
+    const rowData = {backlogI_id: backlogId};
+    console.log(cell.id);
+    if (cell.id === "status") {
+        rowData.action = "Update_status";
+    } else {
+        rowData.action = "Update_PO";
+    }
+    console.log(rowData);
+    console.log(userRole);
+
+    let value;
+    let field;
+    if (userRole === "Product Owner") {
+        console.log("PO");
 
         const cells = row.querySelectorAll(".editable-cell");
+        cells.forEach(cell => {
 
-        const rowData = {backlogI_id: backlogId};
-        console.log(rowData);
+            field = cell.dataset.field;
+            console.log(field);
+
+            // ✅ handle by event type cleanly
+            if (e.type === "click" && field !== "status")
+                return;
+            if (e.type === "focusout" && field === "status")
+                return;
+
+            if (field === "status") {
+                value = cell.dataset.status;
+                console.log(value);
+                if (value === "Rejected") {
+                    if (value === "Rejected") {
+                        rowData["rejection_reason"] = cell.dataset.reason || "";
+                        rowData["last_updated_by"] = userId;
+                    }
+                }
+            } else {
+                value = cell.dataset.status;
+            }
+
+            console.log(value);
+
+            if (field === "priority" || field === "storyPoint") {
+                // filter out the ui ...
+                if (!value || value.trim() === "..." || isNaN(value)) {
+                    value = 0;
+                }
+            }
+
+            rowData[field] = value;
+        });
+    } else if (userRole === "Developer") {
+        const cells = row.querySelectorAll(".editable-cell.dev-editable");
 
         cells.forEach(cell => {
             const field = cell.dataset.field;
-            const value = cell.textContent.trim();
+
+            if (field === "backlogI_desc") {
+                rowData["status"] = "Refined";
+                rowData["last_updated_by"] = userId;
+
+            }
+
+            let value = cell.textContent.trim();
+            console.log(field, value);
+
+
+            // filter out the ui ...
+            if (field === "story_point" || field === "mandays") {
+                if (!value || value.trim() === "..." || isNaN(value)) {
+                    value = 0;
+                }
+            }
             rowData[field] = value;
+            option = row.querySelector(".status-dropdown");
+            console.log(option);
         });
-        rowData.action = "Update";
+        rowData.action = "Update_Dev";
+    }
 
-        //console.log(rowData);
+    console.log(rowData);
 
-        try {
+    try {
+        //call cervlet to update the field
+        const result = await updateBacklogRow(rowData);
 
-            //call cervlet to update the field
-            await updateBacklogRow(rowData);
+        if (result.status === "Success") {
+            console.log("Option : ", option);
+            if (option) {
+                //after user select option
+                const newStatus = option.dataset.value || rowData.status ;
+                console.log(newStatus);
 
-//            console.log("Row updated", rowData);
-
-//            setTimeout(() => {
-//                e.target.classList.remove("saved");
-//            }, 800);
-        } catch (err) {
-            console.error("Update Failed:", err);
-            alert("Failed to save change");
+                //insert in the ui to fetch later
+                const container = option.closest(".status-container");
+                console.log(container);
+                applyStatusUI(container, newStatus);
+            }
         }
-    });
-});
+    } catch (err) {
+        console.error("Update Failed:", err);
+        alert("Failed to save change");
+    }
+}
+;
+
+
 
 //call the servlet and send the updated data 
 async function updateBacklogRow(rowData) {
@@ -119,13 +204,14 @@ async function updateBacklogRow(rowData) {
 
     const result = await response.json();
 
-//    if(result.status !== "success"){
-//        throw new Error("Update failed");
-//    }
+    if (result.status !== "Success") {
+        throw new Error("Update failed");
+    }
 
     return result;
 }
 ;
+
 
 $(document).ready(function () {
 
@@ -136,9 +222,7 @@ $(document).ready(function () {
 
     });
 
-    if (userRole !== "Product Owner") {
-//        table.column(0).visible(false); // drag column
-//        table.column(7).visible(false); // action column
+    if (userRole !== "Product Owner" && userRole !== "Developer") {
         table.column('.action-col').visible(false);
     }
 
@@ -153,31 +237,6 @@ $(document).ready(function () {
 
     sidebar.addEventListener('dblclick', toggleSidebar);
     $('#sidebarToggle').on('click', toggleSidebar);
-
-//    Sortable.create(document.getElementById('sortableBody'), {
-//        handle: '.drag-handle',
-//        animation: 200,
-//
-//        onEnd: function (evt) {
-//
-//            const movedRow = $(evt.item);
-//
-//            // Priority of dragged row
-//            const movedPriority = Number(
-//                    movedRow.find('.priority-rank').text()
-//                    );
-//
-//            // Start from the row BELOW the dragged row
-//            let nextPriority = movedPriority + 1;
-//
-//            movedRow.nextAll('tr').each(function () {
-//                $(this).find('.priority-rank').text(nextPriority++);
-//            });
-//
-//            // Sync DataTables
-//            table.rows().invalidate().draw(false);
-//        }
-//    });
 
     if (userRole === "Product Owner") {
         // 2. Drag & Drop Reordering
@@ -256,140 +315,316 @@ $(document).ready(function () {
         }
     });
 
+});
+// START INSET ADD listener to the form submit button
+document.getElementById('confirmAddBtn').addEventListener('click', handleAddBacklog);
 
-    // START INSET ADD listener to the form submit button
-    document.getElementById('confirmAddBtn').addEventListener('click', handleAddBacklog);
+let backlogid = null;
+document.getElementById("backlogTable").addEventListener("click", async function (e) {
+    let dropDown;
+    const deletebtn = e.target.closest(".btn-delete");
+    const manageDocbtn = e.target.closest(".btn-manageDoc");
+    const option_div = e.target.closest(".status-dropdown");
+    option = e.target.closest(".dropdown-item");
+    const statusPill = e.target.closest(".status-container");
+
+    console.log(statusPill);
+    if (statusPill) {
+        handleDropDownUI(e);
+    }
+    if (manageDocbtn) {
+        const row = e.target.closest("tr");
+        console.log(row);
+        console.log("managebtn clicked");
+
+        backlogid = row.getAttribute("data-id");
+        console.log(backlogid);
+
+
+        //get the managedocumentPane
+        backlogDocModal = document.getElementById("backlogDocModal");
+        backlogDocModal.querySelector("#backlog_id").value = backlogid;
+        console.log(backlogDocModal);
+
+        populateViewDocTable();
+        backlogDocModalBoot = new bootstrap.Modal(backlogDocModal);
+        backlogDocModal.querySelector("#backlog_id").value = backlogid;
+        backlogDocModalBoot.show();
+    }
+    if (deletebtn) {
+        console.log("Delete btn click");
+        backlogid = deletebtn.getAttribute("data-bs-id");
+        const title = deletebtn.getAttribute("data-bs-title");
+
+        document.getElementById("backlogTitle").textContent = title;
+        deleteModal.show();
+    }
+    if (option) {
+//            //after user select option
+        const newStatus = option.dataset.value;
 //
-//                console.log("handleAddBacklog 1");
-//
-//                try {
-//                    // Call Server API
-//                    const result = await sendBacklog(getBacklogData());
-//                    console.log("Server response:", result);
-//                } catch (err) {
-//                    console.error("Save Failed", err);
-//                    alert("Failed to save backlog");
-//                }
-//            });
+//            //insert in the ui to fetch later
+        const container = option.closest(".status-container");
 
-//    // 5. Add New Row (Logic preserved and optimized)
-//    $('#confirmAddBtn').on('click', function () {
-//
-//
-////        const rank = $('#sortableBody tr').length + 1;
-//    });
 
-    let backlogid = null;
-
-    document.getElementById("backlogTable").addEventListener("click", async function (e) {
-
-        const deletebtn = e.target.closest(".btn-delete");
-        const manageDocbtn = e.target.closest(".btn-manageDoc");
-
-        if (manageDocbtn) {
+        //Open the rejectResoning model to get the reason
+        // 2. open the modal
+        if (newStatus === "View_EditReason") {
             const row = e.target.closest("tr");
-            console.log(row);
-            console.log("managebtn clicked");
-
             backlogid = row.getAttribute("data-id");
-            console.log(backlogid);
+
+            handleReasonModel(backlogid);
+        } else {
+            if (newStatus === "Rejected") {
+                const modalEl = document.getElementById('rejectBacklogModal');
+                const modal = new bootstrap.Modal(modalEl);
 
 
-            //get the managedocumentPane
-            backlogDocModal = document.getElementById("backlogDocModal");
-            backlogDocModal.querySelector("#backlog_id").value = backlogid;
-            console.log(backlogDocModal);
+                modalEl._context = {
+                    container: container,
+                    event: e,
+                    option: option
+                };
 
-//            //request to get the document to display
-//            const response = await fetch(`BacklogDocumentServlet?action=fetchDocument&backlogItem_id=${backlogid}`);
-//            const result = await response.json();
-//            console.log(result);
-//
-//            if (!response.ok) {
-//                throw  new Error("Server error" + response.status);
-//            }
-//
-//            result.documentData.forEach((item, index) => {
-//                console.log(item),
-//                        console.log(index),
-//                        appendDocument(item);
-//            });
+                modal.show();
+                return;
+            }
 
-            populateViewDocTable();
-            backlogDocModalBoot = new bootstrap.Modal(backlogDocModal);
-            backlogDocModal.querySelector("#backlog_id").value = backlogid;
-            backlogDocModalBoot.show();
+            // 3. Store value in dataset (THIS is your injected value)
+            container.dataset.status = newStatus;
+            console.log(container.dataset.status);
+
+            getBacklogRowData(e, option);
+            // 4. Hide dropdown
+            container.querySelector(".status-dropdown").classList.add("d-none");
         }
-        if (deletebtn) {
-            backlogid = deletebtn.getAttribute("data-bs-id");
-            const title = deletebtn.getAttribute("data-bs-title");
+    }
+    //new bootstrap.Modal(document.getElementById("deleteBacklogModal")).show();
+});
 
-            document.getElementById("backlogTitle").textContent = title;
-            deleteModal.show();
+async function handleReasonModel(backlogI_id) {
+    const modalEl = document.getElementById('rejectBacklogModal');
+    const modal = new bootstrap.Modal(modalEl);
+
+    const response = await fetch(`BacklogServlet?action=fetchReason&backlogId=${backlogI_id}`);
+    const result = await response.json();
+    console.log(result);
+
+    const reasonField = document.getElementById("rejectionReason");
+    reasonField.value = result.rejection_reason;
+
+    if (userRole === "Developer") {
+        reasonField.readOnly = true;
+        document.getElementById("rejectionPrompMessagae").innerText = "This Backlog Item is rejected by Product Owner due to the reason below";
+        document.getElementById("buttonDiv").classList.add("d-none");
+    } else {
+        const submitModelElBtn = modalEl.querySelector("#confirmRejectBtn");
+        submitModelElBtn.innerText = "Confirm Edit";
+        modalEl.dataset.action = "edit";
+        modalEl.dataset.backlogI_id = backlogI_id;
+    }
+    modal.show();
+    return;
+}
+
+
+document.getElementById("confirmRejectBtn").addEventListener("click", async function () {
+    const modalEl = document.getElementById('rejectBacklogModal');
+    console.log(modalEl);
+    const action = modalEl.dataset.action;
+
+    if (action === "insert") {
+        const context = modalEl._context;
+
+        const reasonInput = document.getElementById("rejectionReason");
+        const reason = reasonInput.value.trim();
+
+        if (!reason) {
+            console.log("Reason required");
+            return;
         }
-        //new bootstrap.Modal(document.getElementById("deleteBacklogModal")).show();
-    });
 
-    document.getElementById("deleteModelBtn").addEventListener("click", () => {
-        if (backlogid !== null) {
-            console.log("ID IS NULL");
-            executeBacklogDeletion(backlogid);
-        }
-    });
+        const {container, event, option} = context;
 
-    async function executeBacklogDeletion(backlogid) {
-        console.log("Backlog DELETION EXECUTED ");
-        console.log("ID ", backlogid);
-        const response = await fetch(`BacklogServlet?action=Delete&backlogId=${backlogid}`, {
-            method: "GET"
-        });
+        // update dataset
+        container.dataset.reason = reason;
+        container.dataset.status = "Rejected";
 
-        if (!response.ok) {
-            throw new Error("Server Return Error");
-        }
+        // update UI
+        container.querySelector(".status-text").innerText = "Rejected";
 
-        const result = await response.json();
+        // close modal
+        bootstrap.Modal.getInstance(modalEl).hide();
 
-        console.log("RESULT", result);
+        // call your existing function
+        getBacklogRowData(event, option);
+    } else if (action === "edit") {
+        const reasonInput = document.getElementById("rejectionReason");
+        const reason = reasonInput.value.trim();
+
+        const data = {
+            action: "updateRejectionReason",
+            backlogI_id: modalEl.dataset.backlogI_id,
+            rejection_reason: reason,
+            last_updated_by: userId
+        };
+
+        const result = await sendBacklog(data);
+
         if (result.status === "Success") {
-            console.log("STATUS SUCCESS");
+            console.log("reason Update Success");
+
+        }
+
+    }
+});
+
+//insert the option into the UI Variable to be fetch later
+function applyStatusUI(container, newStatus) {
+    console.log("applyStatusUI invoked");
+    const pill = container.querySelector(".status-pill");
+    const text = container.querySelector(".status-text");
+
+    // 1. Update visible text
+    text.textContent = newStatus;
+    
+    const noclick_refined = newStatus === "Refined" ? `no-click` : ``;
+    // 2. Update class (VERY IMPORTANT for color/style)
+    pill.classList.remove("status-pending", "status-approved", "status-rejected", "status-pending");
+    pill.className = `status-pill status-${newStatus.toLowerCase()} ${noclick_refined}`;
+
+    // 3. Store value in dataset (THIS is your injected value)
+    container.dataset.selectedStatus = newStatus;
+}
+
+// handled the UI drop doen for status Option 
+function handleDropDownUI(e) {
+
+    console.log(userRole);
+    if (userRole === "Developer") {
+
+        const row = e.target.closest("tr");
+        console.log(row);
+        backlogid = row.getAttribute("data-id");
+
+        handleReasonModel(backlogid);
+    } else if (userRole === "Product Owner") {
+        // 1. Check if the click was inside a status container
+        const isInsideContainer = e.target.closest('.status-container');
+
+        // 2. If the click was OUTSIDE any status container... (to close the dropdown)
+        if (!isInsideContainer) {
+            // ...find ALL dropdowns on the page and hide them
+            document.querySelectorAll('.status-dropdown').forEach(d => {
+                d.classList.add('d-none');
+            });
+            return; // Stop here
+        }
+
+        const pill = e.target.closest(".status-pill");
+        const statusOptions = e.target.closest(".statusOptions");
+        // 3. If the user clicked the PILL, toggle that specific dropdown (Drop the dropdown)
+        if (pill || statusOptions) {
+            console.log(pill);
+            const currentDropdown = isInsideContainer.querySelector('.status-dropdown');
+
+            // Optional: Close other dropdowns before opening this one
+            document.querySelectorAll('.status-dropdown').forEach(d => {
+                if (d !== currentDropdown)
+                    d.classList.add('d-none');
+            });
+
+            currentDropdown.classList.toggle('d-none');
+        }
+    }
+}
+
+document.getElementById("deleteModelBtn").addEventListener("click", () => {
+    if (backlogid !== null) {
+        console.log("ID IS NULL");
+        executeBacklogDeletion(backlogid);
+    }
+});
+
+async function executeBacklogDeletion(backlogid) {
+    console.log("Backlog DELETION EXECUTED ");
+    console.log("ID ", backlogid);
+    const response = await fetch(`BacklogServlet?action=Delete&backlogId=${backlogid}`, {
+        method: "GET"
+    });
+
+    if (!response.ok) {
+        throw new Error("Server Return Error");
+    }
+
+    const result = await response.json();
+
+    console.log("RESULT", result);
+    if (result.status === "Success") {
+        console.log("STATUS SUCCESS");
 
 //            document.getElementById("initialBody").classList.add("d-none");
-            removeTableRow(backlogid);
+        removeTableRow(backlogid);
 
+    }
+
+    console.log("executeBacklogDeletion Trigered");
+}
+;
+
+function removeTableRow(backlogid) {
+
+    const idNum = Number(backlogid); // convert once
+
+    // Iterate through DataTables rows properly
+    table.rows().every(function () {
+
+        const rowId = Number($(this.node()).attr('data-id'));
+        //const rowId = $(this.node()).data('id');
+
+        if (rowId === idNum) {
+            this.remove();   // remove correct row
         }
+    });
 
-        console.log("executeBacklogDeletion Trigered");
-    }
-    ;
+    table.draw(); // refresh table
 
-    function removeTableRow(backlogid) {
+    // update priority numbers
+    $('.priority-rank').each(function (i) {
+        $(this).text(i + 1);
+    });
 
-        const idNum = Number(backlogid); // convert once
-
-        // Iterate through DataTables rows properly
-        table.rows().every(function () {
-
-            const rowId = Number($(this.node()).attr('data-id'));
-            //const rowId = $(this.node()).data('id');
-
-            if (rowId === idNum) {
-                this.remove();   // remove correct row
-            }
-        });
-
-        table.draw(); // refresh table
-
-        // update priority numbers
-        $('.priority-rank').each(function (i) {
-            $(this).text(i + 1);
-        });
-
-        deleteModal.hide(); // close modal correctly
-    }
+    deleteModal.hide(); // close modal correctly
+}
 
 
-});
+
+
+function injectStatus(e) {
+
+    const option = e.target.closest(".dropdown-item");
+
+
+    const newStatus = option.dataset.value;
+    console.log(newStatus);
+
+    const container = option.closest(".status-container");
+    const pill = container.querySelector(".status-pill");
+    const text = container.querySelector(".status-text");
+
+    // 1. Update visible text
+    text.textContent = newStatus;
+
+    // 2. Update class (VERY IMPORTANT for color/style)
+    pill.className = `status-pill status-${newStatus.toLowerCase()}`;
+
+    // 3. Store value in dataset (THIS is your injected value)
+    container.dataset.selectedStatus = newStatus;
+
+    // 4. Hide dropdown
+    container.querySelector(".status-dropdown").classList.add("d-none");
+}
+;
 
 
 async function populateViewDocTable() {
@@ -417,7 +652,6 @@ async function populateViewDocTable() {
 ;
 
 let deleteModal;  // global variable
-
 document.addEventListener("DOMContentLoaded", () => {
     deleteModal = new bootstrap.Modal(
             document.getElementById("deleteBacklogModal")
@@ -425,6 +659,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function getBacklogData(key) {
+
     const data = {
         //get the vales form the backlog form
         action: "Create",
@@ -433,8 +668,15 @@ function getBacklogData(key) {
         backlogI_desc: $('#backlog_description').val(),
         acceptance_cri: $('#backlog_ACriteria').val(),
         mandays: $('#backlog_Mdys').val(),
-        story_point: $('#backlog_SPts').val()
+        story_point: $('#backlog_SPts').val(),
+        createdBy: `${userId}`
     };
+
+    if (userRole === "Product Owner") {
+        data.status = "Approved";
+    } else if (userRole === "Developer") {
+        data.status = "Pending";
+    }
 
     lowestPriority = lowestPriority + 1;
     data.backlogI_priority = lowestPriority;
@@ -504,39 +746,90 @@ async function sendBacklog(data) {
 
 function addbacklogToTable(data) {
 
-//    console.log("Data", data);
+    console.log("Data", data);
 //    console.log("ROLE", userRole);
 
-    const actionHtml = (userRole === "Product Owner") ? `
-    <div class="d-flex justify-content-center align-items-center gap-2">
-        <button type="button"  
-            class="btn btn-sm btn-outline-primary shadow-sm btn-manageDoc">
-            <i class="fas fa-file-alt"></i>
-        </button>
+    const actionPermitted = (userRole === "Developer" && data.created_by === userId);
 
-        <button type="button"
-            class="btn btn-sm btn-outline-danger shadow-sm btn-delete"
-            data-bs-id="${data.backlogI_id}"
-            data-bs-title="${data.backlogI_title}">
-            <i class="fas fa-trash-alt"></i>
-        </button>
-    </div>
-    ` : '';
+    const canDelete = userRole === "Product Owner";
+    const canManageDoc = (userRole === "Product Owner") || (userRole === "Developer" && data.created_by === userId);
+
+    const actionHtml = `<div class="d-flex justify-content-center align-items-center gap-2">
+                            ${canManageDoc ? `<button type="button"  
+                                        class="btn btn-sm btn-outline-primary shadow-sm btn-manageDoc">
+                                        <i class="fas fa-file-alt"></i>
+                                        </button>` : ``}
+                            ${canDelete ? `<button type="button"
+                                        class="btn btn-sm btn-outline-danger shadow-sm btn-delete"
+                                        data-bs-id="${data.backlogI_id}"
+                                        data-bs-title="${data.backlogI_title}">
+                                        <i class="fas fa-trash-alt"></i>
+                                   </button>` : ``}
+
+                            ${!canDelete && !canManageDoc ? `<span class="upload-restricted">Restricted</span>` : ``}
+                        </div>`;
+
 
     const dragAndDropSymbol = (userRole === "Product Owner") ?
             '<i class="fas fa-grip-vertical"></i>' : '';
 
-    const editableClass = (userRole === "Product Owner") ? "editable-cell" : "";
-    const editableAttr = (userRole === "Product Owner") ? 'contenteditable="true"' : "";
+    const statusValue = data.status || "Unknown";
+    console.log(statusValue);
+    const statusClass = statusValue.toLowerCase();
+
+    const isPO = userRole === "Product Owner";
+    const isDev = userRole === "Developer";
+
+    const roleClass = userRole === "Product Owner" || (userRole === "Developer" && data.status === "Rejected") ? "" : "no-click";
+
+// PO-only fields
+    const editableClass = (isPO) ? "editable-cell po-editable" : "";
+    const editableAttr = (isPO) ? 'contenteditable="true"' : "";
+    const editableDropDown = isPO ?
+            `<svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>` : ``;
+
+//Special permmision for developer to edit rejected row
+    const rejectedEditableClass = (isDev && data.status === "Rejected") ? "editable-cell dev-editable" : "";
+    const rejectedEditableAttr = (isDev && data.status === "Rejected") ? 'contenteditable="true"' : "";
+
+// PO + Dev fields
+    const editableClassSpe = (isPO || isDev) ? "editable-cell dev-editable" : "";
+    const editableAttrSpe = (isPO || isDev) ? 'contenteditable="true"' : "";
+
+    const mandays = (data.mandays === null || data.mandays === 0) ? "..." : data.mandays;
+    const story_point = (data.story_point === null || data.story_point === 0) ? "..." : data.story_point;
+
+    //To display the option to display and edit the reson for reject
+    const reasonOption = data.status === "Rejected" ? `<div class="dropdown-item view-reason-action border-top mt-1 pt-2 text-primary fw-semibold" data-value="View_EditReason">
+    ✏️ View / Edit Reason </div>` : ``;
 
     const newRow = table.row.add([
         dragAndDropSymbol,
         `<div  data-field="backlogI_priority">${data.backlogI_priority}</div>`,
-        `<div  class="${editableClass}" ${editableAttr} data-field="backlogI_title">${data.backlogI_title}</div>`,
-        `<div  class="${editableClass}" ${editableAttr} data-field="backlogI_desc">${data.backlogI_desc}</div>`,
-        `<div  class="${editableClass}" ${editableAttr} data-field="acceptance_cri">${data.acceptance_cri}</div>`,
-        `<div  class="${editableClass}" ${editableAttr} data-field="mandays">${data.mandays}</div>`,
-        `<div  class="${editableClass}" ${editableAttr}  data-field="story_point">${data.story_point}</div>`,
+        `<div  class=" editable-cell ${editableClass} ${rejectedEditableClass}" ${editableAttr} data-field="backlogI_title">${data.backlogI_title}</div>`,
+        `<div  class=" editable-cell ${editableClass} ${rejectedEditableClass}" ${rejectedEditableAttr} ${editableAttr} data-field="backlogI_desc">${data.backlogI_desc}</div>`,
+        `<div  class=" editable-cell ${editableClass} ${rejectedEditableClass}" ${rejectedEditableAttr} ${editableAttr} data-field="acceptance_cri">${data.acceptance_cri}</div>`,
+
+        ` <div class="editable-cell ${roleClass} status-container" id="status" data-field="status" data-status="${data.status}"
+                data-reason="${data.rejection_reason || ''}"">
+            <div class="status-pill status-${statusClass}" role="button" aria-haspopup="true">
+                <span class="status-dot"></span>
+                <span class="status-text">${data.status}</span>
+                ${editableDropDown}
+            </div>
+        
+            <div class="status-dropdown d-none statusOptions ">
+                <div class="dropdown-header">Change Status</div>
+                <div class="dropdown-item" data-value="Stakeholder">Stakeholder</div>
+                <div class="dropdown-item" data-value="Pending">Pending</div>
+                <div class="dropdown-item" data-value="Approved">Approved</div>
+                <div class="dropdown-item" data-value="Rejected">Rejected</div>
+                ${reasonOption}
+            </div>
+        </div> `,
+
+        `<div  class=" editable-cell ${editableClassSpe}" ${editableAttrSpe} data-field="mandays">${mandays}</div>`,
+        `<div  class="editable-cell ${editableClassSpe}" ${editableAttrSpe}  data-field="story_point">${story_point}</div>`,
         actionHtml
     ]).draw(false).node();
 
@@ -564,55 +857,6 @@ function getExistingPriorities() {
 
     return priorities;
 }
-
-
-//async function handleAddBacklog() {
-//
-//    const enteredPriority = Number($('#backlog_priority').val());
-//
-//    if (!enteredPriority) {
-//        alert("Priority is required");
-//        return;
-//    }
-//
-//    const existingPriorities = getExistingPriorities();
-//
-//    if (existingPriorities.includes(enteredPriority)) {
-//        document.getElementById("alertPriority").innerHTML("Priority already exists. Please choose another.");
-//        alert("Priority already exists. Please choose another.");
-//        return;
-//    }
-//
-//    try {
-//        const result = await sendBacklog(getBacklogData());
-//        console.log("Server response:", result);
-//    } catch (err) {
-//        console.error("Save Failed", err);
-//        alert("Failed to save backlog");
-//    }
-//}
-//
-//
-//$('#backlog_priority').on('input', function () {
-//
-//    const enteredPriority = parseInt($(this).val());
-//    const existingPriorities = getExistingPriorities();
-//    var formSubbtn = document.getElementById("formSubbtn");
-// 
-//    if (existingPriorities.includes(enteredPriority)) {
-//
-////        $('#alertPriority').text("Priority already exists. Please choose another.");
-//        $(this).addClass('is-invalid');
-//        $('#alertPriority').text("Priority already exists.");
-//        formSubbtn.disabled = true;
-////        alert("Priority already exists.");
-//
-//    } else {
-//        document.getElementById("alertPriority").innerHTML = "";
-//        formSubbtn.disabled = false;
-//    }
-//
-//});
 
 $('#backlog_priority').on('input', function () {
 
@@ -924,7 +1168,9 @@ function appendDocument(data) {
     const row = document.createElement("tr");
     row.id = data instanceof FormData ? data.get("document_id") : data.document_id;
     row.name = document_name;
-    //console.log(data.document_id);
+    const actionDelete = userRole === "Product Owner" ? `<button class="btn btn-sm btn-light border p-1 px-2 ms-1 docDeleteBtn">
+                                                        <i class="fas fa-trash-alt text-danger"></i>
+                                                    </button>` : ``;
     row.innerHTML = `
                         
                             <td>
@@ -941,9 +1187,7 @@ function appendDocument(data) {
                                                     <button class="btn btn-sm btn-light border p-1 px-2 docDownloadBtn">
                                                         <i class="fas fa-download text-muted "></i>
                                                     </button>
-                                                    <button class="btn btn-sm btn-light border p-1 px-2 ms-1 docDeleteBtn">
-                                                        <i class="fas fa-trash-alt text-danger"></i>
-                                                    </button>
+                                                    ${actionDelete}
                             </td>
                         `;
     docDiv.append(row);

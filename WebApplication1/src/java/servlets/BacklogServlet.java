@@ -74,7 +74,7 @@ public class BacklogServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         Gson gson = new Gson();
-
+        Map<String, Object> backlogData = new HashMap<>();
         try {
             BacklogDAO backlogDAO = new BacklogDAO();
 
@@ -87,17 +87,15 @@ public class BacklogServlet extends HttpServlet {
 
                 backlogArr = backlogDAO.getBacklogItem(project_id);
 
-                Map<String, Object> backlogData = new HashMap<>();
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
-                
+
                 backlogData.put("data", backlogArr);
                 backlogData.put("status", "Success");
 
-                response.getWriter().write(gson.toJson(backlogData));
             } else if ("redirect".equalsIgnoreCase(action)) {
                 int project_id = Integer.parseInt(request.getParameter("project_id"));
-                System.out.println("Project id  : " + project_id );
+                System.out.println("Project id  : " + project_id);
                 request.setAttribute("project_id", project_id);
                 request.getRequestDispatcher("backlog.jsp").forward(request, response);
             } else if ("Delete".equalsIgnoreCase(action)) {
@@ -106,21 +104,25 @@ public class BacklogServlet extends HttpServlet {
 
                 backlogDAO.deleteBacklogItem(backlog_id);
 
-                Map<String, Object> backlogData = new HashMap<>();
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 backlogData.put("status", "Success");
 
-                response.getWriter().write(gson.toJson(backlogData));
+            } else if ("fetchReason".equalsIgnoreCase(action)) {
+                int backlog_id = Integer.parseInt(request.getParameter("backlogId"));
+                System.out.println("B id : " + backlog_id);
+                String rejection_reason = backlogDAO.getBacklogReason(backlog_id);
+                backlogData.put("rejection_reason", rejection_reason);
+                backlogData.put("status", "Success");
             }
 
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-            Map<String, Object> backlogData = new HashMap<>();
+            System.out.println("Exception Ocuurs : " + e);
             backlogData.put("status", "Failed");
-            response.getWriter().write(gson.toJson(backlogData));
+
         }
+        response.getWriter().write(gson.toJson(backlogData));
 
     }
 
@@ -163,8 +165,7 @@ public class BacklogServlet extends HttpServlet {
             String action = jsonObject.get("action").getAsString();
 
             System.out.println("Action : " + action);
-            
-            
+
             if (!"Reorder".equalsIgnoreCase(action)) {
                 //Convert the Json strings to bean variable
                 backlog = gson.fromJson(json, Backlog.class);
@@ -180,7 +181,6 @@ public class BacklogServlet extends HttpServlet {
 //            if (backlog.getBacklogI_title() == null) {
 //                System.out.println("TITLE ID NULLL MYYGOOOODDDDDDDD");
 //            }
-
             // System.out.println("Backlog ID: " + backlog.getBacklogI_id() + "\n");
 //            System.out.println("Backlog Title: " + backlog.getBacklogI_title() + "\n");
             BacklogDAO backlogDAO = new BacklogDAO();
@@ -188,6 +188,9 @@ public class BacklogServlet extends HttpServlet {
             Map<String, Object> result = new HashMap<>();
 
             if ("Create".equalsIgnoreCase(action)) {
+
+//                //set the status to pending
+//                backlog.setStatus("Pending");
                 // insert the Backlog data
                 generatedKey = backlogDAO.insertBacklogItem(backlog);
 
@@ -196,16 +199,27 @@ public class BacklogServlet extends HttpServlet {
                 } else {
                     throw new Exception();
                 }
-            } else if ("Update".equalsIgnoreCase(action)) {
+
+            } else if ("Update_PO".equalsIgnoreCase(action)) {
                 //Update
                 backlogDAO.updateBacklogItem(backlog);
+            } else if ("Update_Dev".equalsIgnoreCase(action)) {
+                if ("Refined".equalsIgnoreCase(backlog.getStatus())) {
+                    backlogDAO.updateBacklogItem_Dev(backlog);
+                } else {
+                    backlogDAO.updateBacklogItem_Dev(backlog);
+                }
+            } else if ("Update_status".equalsIgnoreCase(action)) {
+
+                backlogDAO.updateBacklogItem_status(backlog);
             } else if ("Reorder".equalsIgnoreCase(action)) {
                 for (Backlog item : orderList) {
                     backlogDAO.reorderBacklogItem(
-                    item.getBacklogI_priority(),
-                    item.getBacklogI_id());
-
+                            item.getBacklogI_priority(),
+                            item.getBacklogI_id());
                 }
+            } else if ("updateRejectionReason".equalsIgnoreCase(action)) {
+                backlogDAO.updateBacklog_RejectionReason(backlog);
             } else {
                 System.out.println("WRONG CODE \n");
             }

@@ -11,6 +11,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     --sidebar-width: 250px;
     --sidebar-collapsed-width: 70px;
     --body-bg: #f8fafc;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -197,7 +200,7 @@ body {
     min-height: 34px;
 }
 
-.editable-cell:hover {
+.editable-cell[contenteditable="true"]:hover {
     background: #f1f5f9;
     border-color: #cbd5e1;
     cursor: text;
@@ -208,7 +211,6 @@ body {
 }
 
 /* Styling for modal form elements to match your theme */
-
 .modal-content input:focus,
 .modal-content textarea:focus {
     border-color: #2563eb !important;
@@ -278,7 +280,7 @@ body {
 }
 
 /* 2. Allow the tab containers to show overflowing content */
-.tab-content, 
+.tab-content,
 .tab-pane {
     overflow: visible !important;
 }
@@ -312,4 +314,210 @@ code {
     background: #fdf2f8;
     padding: 2px 4px;
     border-radius: 4px;
+}
+
+.status-container{
+    position: relative;
+    display: inline-block;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* --- The Pill --- */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+    user-select: none;
+}
+
+.no-click {
+    cursor: default;
+    pointer-events: none;   /* disables clicking completely */
+    opacity: 0.7;           /* optional: slightly faded */
+}
+
+.status-pill:hover {
+    filter: brightness(0.95);
+    box-shadow: var(--shadow-sm);
+}
+
+.status-pill .chevron {
+    opacity: 0.6;
+    transition: transform 0.2s;
+}
+
+/* --- The Dropdown Menu --- */
+.status-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 160px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+    padding: 6px;
+    overflow: hidden;
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    padding: 8px 12px;
+    font-weight: 700;
+}
+
+.dropdown-item {
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #334155;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dropdown-item:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+/* --- Status Themes --- */
+.status-approved {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+.status-refined,
+.status-pending  {
+    background: #fef9c3;
+    color: #854d0e;
+    border-color: #fef08a;
+}
+.status-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+.status-stakeholder {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
+}
+
+/* Status Dot (Optional) */
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+/* Modal container */
+.custom-modal {
+    border-radius: 24px;
+    /* Matches the high-rounding in your image */
+    border: none;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+}
+
+/* Title centering tweak */
+.custom-modal .modal-title {
+    font-size: 1.5rem;
+    color: #212529;
+    margin-top: 10px;
+}
+
+/* Textarea styling */
+.custom-modal textarea {
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    background: #fcfcfc;
+}
+
+/* Update these specific parts in your existing CSS */
+
+.modal-footer {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.modal-footer .btn {
+    border-radius: 50px;
+    /* Perfect pill shape */
+    padding: 12px 0;
+    /* Vertical padding only, width is handled by col-6 */
+    font-weight: 600;
+    font-size: 0.95rem;
+    /* Slightly smaller to ensure "Confirm Rejection" fits one line */
+    transition: all 0.2s ease;
+    width: 100%;
+    /* Takes full width of the col-6 */
+    display: block;
+}
+
+/* Specific button colors to match your image */
+.btn-cancel {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    color: #777;
+}
+
+.btn-cancel:hover {
+    background: #f8f9fa;
+    color: #333;
+}
+
+.btn-danger {
+    background-color: #e33446;
+    border: none;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #cc2d3d;
+    transform: translateY(-1px);
+}
+
+.status-restricted {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6c757d;
+    background-color: #f1f3f5;
+    border-radius: 20px;
+}
+
+/* small dot like your Approved status */
+.status-restricted::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: #6c757d;
+    border-radius: 50%;
 }

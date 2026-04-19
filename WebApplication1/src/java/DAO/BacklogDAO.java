@@ -21,10 +21,13 @@ import beans.Backlog;
  */
 public class BacklogDAO {
 
-    public int insertBacklogItem(Backlog backlog) {
-        String sql = "INSERT INTO backlog_items (project_id, backlog_item_title, backlog_item_desc, "
-                + "acceptance_criteria, story_points, mandays, backlog_item_priority, "
-                + "backlog_item_added_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    public int insertBacklogItem(Backlog backlog) throws Exception {
+
+        String sql = """
+                     INSERT INTO backlog_items (project_id, backlog_item_title, backlog_item_desc, 
+                     acceptance_criteria, story_points, mandays, backlog_item_priority, status, created_by,
+                     backlog_item_added_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     """;
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -35,8 +38,10 @@ public class BacklogDAO {
             ps.setInt(5, backlog.getStory_point());
             ps.setInt(6, backlog.getMandays());
             ps.setInt(7, backlog.getBacklogI_priority());
+            ps.setString(8, backlog.getStatus());
+            ps.setInt(9, backlog.getCreated_by());
             // Sets the current timestamp for the added_at field
-            ps.setTimestamp(8, new java.sql.Timestamp(System.currentTimeMillis()));
+            ps.setTimestamp(10, new java.sql.Timestamp(System.currentTimeMillis()));
 
             if (ps.executeUpdate() > 0) {
                 // 2. Retrieve the generated keys
@@ -51,6 +56,8 @@ public class BacklogDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("Exception in in insertion DOA : " + e);
+            throw e;
         }
         return -1;
     }
@@ -59,7 +66,7 @@ public class BacklogDAO {
 
         String sql = "SELECT backlog_item_id, backlog_item_title, backlog_item_desc, "
                 + "acceptance_criteria, story_points, mandays, backlog_item_priority, "
-                + "backlog_item_added_at FROM backlog_items WHERE project_id = ? ORDER BY backlog_item_priority ASC";
+                + "backlog_item_added_at, status, created_by FROM backlog_items WHERE project_id = ? ORDER BY backlog_item_priority ASC";
 
         List<Backlog> backlogItemArr = new ArrayList<>();
 
@@ -80,6 +87,8 @@ public class BacklogDAO {
                 backlog.setStory_point(rs.getInt("story_points"));
                 backlog.setMandays(rs.getInt("mandays"));
                 backlog.setBacklogI_priority(rs.getInt("backlog_item_priority"));
+                backlog.setStatus(rs.getString("status"));
+                backlog.setCreated_by(rs.getInt("created_by"));
 
                 backlogItemArr.add(backlog);
             }
@@ -94,9 +103,12 @@ public class BacklogDAO {
     }
 
     public void updateBacklogItem(Backlog backlog) {
-        String sql = "UPDATE backlog_items SET backlog_item_title = ?, backlog_item_desc = ?, "
-                + "acceptance_criteria = ?, story_points = ?, mandays = ?,  "
-                + "where backlog_item_id = ?";
+        System.out.println("Backlog update DAO reporting");
+        String sql = """
+                      UPDATE backlog_items SET backlog_item_title = ?, backlog_item_desc = ?, 
+                      acceptance_criteria = ?, story_points = ?, mandays = ?
+                      WHERE backlog_item_id = ?
+                      """;
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -104,13 +116,71 @@ public class BacklogDAO {
             ps.setString(2, backlog.getBacklogI_desc());
             ps.setString(3, backlog.getAcceptance_cri());
             ps.setInt(4, backlog.getStory_point());
+            System.out.println(" backlog.getStory_point() " + backlog.getStory_point());
             ps.setInt(5, backlog.getMandays());
+            System.out.println("backlog.getMandays() " + backlog.getMandays());
             //ps.setInt(6, backlog.getBacklogI_priority());
             ps.setInt(6, backlog.getBacklogI_id());
 
             ps.executeUpdate();
         } catch (SQLException e) {
+            System.out.println("Exception occurs : " + e);
             e.printStackTrace();
+        }
+
+    }
+
+    public void updateBacklogItem_Dev(Backlog backlog) {
+        System.out.println("Backlog update DAO reporting");
+        String sql = """
+                      UPDATE backlog_items SET backlog_item_title = ?, backlog_item_desc = ?, 
+                      acceptance_criteria = ?, story_points = ?, mandays = ?, status = ? , rejection_reason = ?, last_updated_by = ?
+                      WHERE backlog_item_id = ?
+                      """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, backlog.getBacklogI_title());
+            ps.setString(2, backlog.getBacklogI_desc());
+            ps.setString(3, backlog.getAcceptance_cri());
+            ps.setInt(4, backlog.getStory_point());
+            System.out.println(" backlog.getStory_point() " + backlog.getStory_point());
+            ps.setInt(5, backlog.getMandays());
+            System.out.println("backlog.getMandays() " + backlog.getMandays());
+            ps.setString(6, backlog.getStatus());
+            ps.setString(7, backlog.getRejection_reason());
+            ps.setInt(8, backlog.getLast_updated_by());
+
+            //ps.setInt(6, backlog.getBacklogI_priority());
+            ps.setInt(9, backlog.getBacklogI_id());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Exception occurs : " + e);
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateBacklogItem_status(Backlog backlog) throws Exception {
+        System.out.println("Backlog update status DAO reporting");
+        String sql = """
+                      UPDATE backlog_items SET status = ? , rejection_reason = ?, last_updated_by = ?
+                      WHERE backlog_item_id = ?
+                      """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, backlog.getStatus());
+
+            ps.setString(2, backlog.getRejection_reason());
+            ps.setInt(3, backlog.getLast_updated_by());
+            ps.setInt(4, backlog.getBacklogI_id());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Exception occurs : " + e);
+            e.printStackTrace();
+            throw e;
         }
 
     }
@@ -217,6 +287,51 @@ public class BacklogDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String getBacklogReason(int backlogI_id) throws Exception {
+        String reason = null;
+        String sql = """
+                     SELECT rejection_reason FROM backlog_items 
+                     WHERE backlog_item_id = ? AND status = 'Rejected'
+                     """;
+
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, backlogI_id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                reason = rs.getString("rejection_reason");
+            }
+            return reason;
+        } catch (Exception e) {
+            System.out.println("Exception Ocuured : " + e);
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public void updateBacklog_RejectionReason(Backlog backlog) throws Exception {
+        System.out.println("Backlog update rejection reason DAO reporting");
+        String sql = """
+                      UPDATE backlog_items SET rejection_reason =  ?, last_updated_by =  ?
+                      WHERE  backlog_item_id =  ? AND status = 'Rejected'
+                      """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, backlog.getRejection_reason());
+            ps.setInt(2, backlog.getLast_updated_by());
+            ps.setInt(3, backlog.getBacklogI_id());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Exception occurs : " + e);
+            e.printStackTrace();
+            throw e;
+        }
+
     }
 
 }

@@ -65,13 +65,13 @@
                                 style="font-size: 1.2rem;">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <div class="small text-muted">Management / <span class="fw-semibold text-dark">Product Backlog</span>
-                        </div>
+                        <div class="small text-muted">Management / <span class="fw-semibold text-dark">Product Backlog</span></div>
+
                     </div>
                     <div class="user-info d-flex align-items-center">
                         <div class="user-details me-3 text-end d-none d-sm-block">
-                            <div class="user-name">Douglas McGee</div>
-                            <div class="user-role">Administrator</div>
+                            <span class="user-name">${user.username}</span>
+                            <span class="user-role">${user.user_role}</span>
                         </div>
                         <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
                              class="rounded-circle border" width="34">
@@ -81,7 +81,7 @@
                 <div class="container-fluid p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h1 class="h3 fw-bold mb-0">Project Backlog</h1>
-                        <c:if test="${user.user_role == 'Product Owner'}">
+                        <c:if test="${user.user_role == 'Product Owner' || user.user_role == 'Developer'}">
                             <button class="btn btn-primary px-4 shadow-sm" data-bs-toggle="modal"
                                     data-bs-target="#addItemModal">
                                 <i class="fas fa-plus me-2"></i>New Backlog Item
@@ -98,6 +98,7 @@
                                     <th>TITLE</th>
                                     <th>DESCRIPTION</th>
                                     <th>ACCEPTANCE CRITERIA</th>
+                                    <th>Status</th>
                                     <th>Mandays</th>
                                     <th>POINTS</th>
                                     <th class="no-sort action-col">ACTION</th>
@@ -122,7 +123,7 @@
                     <div class="modal-body p-4">
                         <form id="addItemForm" action="backlogServlet" method="post">
                             <div class="mb-3">
-                                <label class="label-style d-block mb-2">Backlog Title</label>
+                                <label class="label-stylxae d-block mb-2">Backlog Title</label>
                                 <input type="text" id="backlog_title" class="form-control" placeholder="Enter title..."
                                        style="border-radius: 8px; padding: 10px; border: 1px solid #e2e8f0;" required>
                             </div>
@@ -142,19 +143,21 @@
                                           style="border-radius: 8px; border: 1px solid #e2e8f0;" required></textarea>
                             </div>
 
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <label class="label-style d-block mb-2">Story Points</label>
-                                    <input type="number" id="backlog_SPts" class="form-control" value="0" min="0" max="10"
-                                           style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
-                                </div>
+                            <c:if test="${user.user_role == 'Developer'}">
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="label-style d-block mb-2">Story Points</label>
+                                        <input type="number" id="backlog_SPts" class="form-control" value="0" min="0" max="10"
+                                               style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
+                                    </div>
 
-                                <div class="col-md-6">
-                                    <label class="label-style d-block mb-2">Mandays</label>
-                                    <input type="number" id="backlog_Mdys" class="form-control" value="0" min="0" max="10"
-                                           style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
-                                </div>>
-                            </div>
+                                    <div class="col-md-6">
+                                        <label class="label-style d-block mb-2">Mandays</label>
+                                        <input type="number" id="backlog_Mdys" class="form-control" value="0" min="0" max="10"
+                                               style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
+                                    </div>
+                                </div>
+                            </c:if>
 
                             <div class="d-grid gap-2">
                                 <button type="button" class="btn btn-primary fw-bold py-2 " id="confirmAddBtn"
@@ -167,6 +170,44 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="rejectBacklogModal" data-action="insert" data-backlogI_id ="" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-modal px-3 py-2">
+                    <div class="modal-header border-0 pb-0 position-relative">
+                        <h5 class="modal-title fw-bold w-100 text-center" id="rejectModalLabel">Reject Backlog Item</h5>
+                        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p id="rejectionPrompMessagae" class="text-muted">Please provide a reason for rejecting this item. This will be visible to
+                            the Scrum Master and Team.</p>
+                        <form id="rejectBacklogForm">
+                            <div class="">
+                                <label for="rejectionReason" class="form-label fw-bold">Rejection Reason</label>
+                                <textarea class="form-control" id="rejectionReason" rows="4"
+                                          placeholder="e.g., Missing acceptance criteria or out of scope for this sprint..."
+                                          required></textarea>
+                            </div>
+                            <input type="hidden" id="rejectBacklogId" value="">
+                        </form>
+                    </div>
+
+                    <div class="modal-footer border-0 pb-2">
+                        <div id="buttonDiv" class="row w-100 justify-content-center">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-cancel w-100" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" id="confirmRejectBtn" class="btn btn-danger w-100">Confirm
+                                    Rejection</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -389,6 +430,7 @@
         <script>
             var projectId = ${project_id};
             console.log(projectId);
+            var userId = ${userId}
             var userRole = "${user.user_role}";
             let table;
             let lowestPriority;

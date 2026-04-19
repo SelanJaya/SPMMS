@@ -59,8 +59,8 @@
                 <div class="small text-muted">Management / <span class="fw-semibold text-dark">Project Console</span></div>
                 <div class="d-flex align-items-center">
                     <div class="text-end me-3">
-                        <div class="small fw-bold lh-1">Douglas McGee</div>
-                        <small class="text-muted" style="font-size: 10px;">Administrator</small>
+                        <div class="small fw-bold lh-1">${user.username}</div>
+                        <small class="text-muted" style="font-size: 10px;">${user.user_role}</small>
                     </div>
                     <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff" class="rounded-circle border"
                          width="34">

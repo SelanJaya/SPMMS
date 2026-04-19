@@ -9,9 +9,9 @@ package beans;
  * @author HP
  */
 public class Backlog {
-   
-   private String backlogI_title, backlogI_desc, acceptance_cri;
-   private int project_id, backlogI_id, story_point, mandays, backlogI_priority;
+
+    private String backlogI_title, backlogI_desc, acceptance_cri, status, rejection_reason;
+    private int project_id, backlogI_id, story_point, mandays, backlogI_priority, created_by, last_updated_by;
 
     public Backlog() {
     }
@@ -26,8 +26,6 @@ public class Backlog {
         this.mandays = mandays;
         this.backlogI_priority = backlogI_priority;
     }
-    
-    
 
     public Backlog(int project_id, String backlogI_title, String backlogI_desc, String acceptance_cri, int story_point, int mandays, int backlogI_priority) {
         this.project_id = project_id;
@@ -39,8 +37,6 @@ public class Backlog {
         this.backlogI_priority = backlogI_priority;
     }
 
-   
-    
     public void setProject_id(int project_id) {
         this.project_id = project_id;
     }
@@ -48,7 +44,7 @@ public class Backlog {
     public void setBacklogI_id(int backlogI_id) {
         this.backlogI_id = backlogI_id;
     }
-    
+
     public void setBacklogI_title(String backlogI_title) {
         this.backlogI_title = backlogI_title;
     }
@@ -59,6 +55,22 @@ public class Backlog {
 
     public void setAcceptance_cri(String acceptance_cri) {
         this.acceptance_cri = acceptance_cri;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setRejection_reason(String rejection_reason) {
+        this.rejection_reason = rejection_reason;
+    }
+
+    public void setCreated_by(int created_by) {
+        this.created_by = created_by;
+    }
+
+    public void setLast_updated_by(int last_updated_by) {
+        this.last_updated_by = last_updated_by;
     }
 
     public void setStory_point(int story_point) {
@@ -72,15 +84,15 @@ public class Backlog {
     public void setBacklogI_priority(int backlogI_priority) {
         this.backlogI_priority = backlogI_priority;
     }
-    
+
     public int getProject_id() {
         return project_id;
     }
-    
+
     public int getBacklogI_id() {
         return backlogI_id;
     }
-    
+
     public String getBacklogI_title() {
         return backlogI_title;
     }
@@ -91,6 +103,10 @@ public class Backlog {
 
     public String getAcceptance_cri() {
         return acceptance_cri;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public int getStory_point() {
@@ -104,6 +120,17 @@ public class Backlog {
     public int getBacklogI_priority() {
         return backlogI_priority;
     }
-   
-   
+
+    public String getRejection_reason() {
+        return rejection_reason;
+    }
+
+    public int getCreated_by() {
+        return created_by;
+    }
+
+    public int getLast_updated_by() {
+        return last_updated_by;
+    }
+
 }
