@@ -41,7 +41,7 @@
                     <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                 </a>
                 <a href="teamAssignmentServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
-                <a href="projectAnalytics.jsp" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
+                <a href="projectAnalyticsServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                 <div class="mt-auto">
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
                     <a href="login_signUpServlet?processType=logOut" class="nav-link text-danger">
@@ -54,16 +54,47 @@
 
         <div id="content-wrapper">
 
+            <div id="successProcessTab" class="d-none alert alert-success alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                <div class="icon-container me-3">
+                    <i class="fas fa-check-circle fa-lg"></i>
+                </div>
+                <div class="message-content">
+                    <h6 class="alert-heading mb-0 fw-bold" style="font-size: 0.9rem;"></h6>
+                    <p id="successProcessmsg" class="mb-0 small"></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+
+            <div id="failedProcessTab" class="d-none alert alert-danger alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                <div class="icon-container me-3">
+                    <i class="fas fa-times-circle fa-lg"></i>
+                </div>
+                <div class="message-content">
+                    <h6 class="alert-danger mb-0 fw-bold" style="font-size: 0.9rem;"></h6>
+                    <p id="failedProcessmsg" class="mb-0 small"></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
             <div id="statusTab"></div>
             <nav class="top-nav px-4 d-flex justify-content-between align-items-center">
                 <div class="small text-muted">Management / <span class="fw-semibold text-dark">Project Console</span></div>
-                <div class="d-flex align-items-center">
-                    <div class="text-end me-3">
-                        <div class="small fw-bold lh-1">${user.username}</div>
-                        <small class="text-muted" style="font-size: 10px;">${user.user_role}</small>
+                <!--                <div class="d-flex align-items-center">
+                                    <div class="text-end me-3">
+                                        <div class="small fw-bold lh-1">${user.username}</div>
+                                        <small class="text-muted" style="font-size: 10px;">${user.user_role}</small>
+                                    </div>
+                                    <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff" class="rounded-circle border"
+                                         width="34">
+                                </div>-->
+                <div class="user-info">
+                    <div class="user-details d-none d-sm-block">
+                        <span class="user-name">${user.username}</span>
+                        <span class="user-role">${user.user_role}</span>
                     </div>
-                    <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff" class="rounded-circle border"
-                         width="34">
+                    <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
+                         class="rounded-circle border" width="34">
                 </div>
             </nav>
 
@@ -89,278 +120,493 @@
                 </div>
 
                 <div class="scrum-container" id="scrum-container">
-                    <!--                    <div class="scrum-board-card" id="board-101">
-                                            <div class="board-header">
-                                                <div class="board-info">
-                                                    <h2 class="val-name h4 fw-bold text-primary">Sprint 1: Authentication</h2>
-                                                    <span class="info-label">Description / Goal</span>
-                                                    <p class="val-goal">Setup secure login and registration flows with database integration.</p>
-                                                    <span class="info-label">Timeline</span>
-                                                    <div class="date-row"><i class="far fa-calendar-alt text-primary"></i> <span
-                                                            class="val-start">2025-12-01</span> to <span class="val-end">2025-12-14</span></div>
-                                                </div>
-                                                <div class="text-end">
-                                                    <span class="info-label">Status</span>
-                                                    <div class="badge bg-primary-subtle text-primary val-status rounded-pill px-3 py-2 mb-2">
-                                                        Active</div><br>
-                    <c:if test="${user.user_role == 'Scrum Master'}">
-                    <button class="btn btn-outline-secondary btn-sm" onclick="editBoard('board-101')"><i
-                            class="fas fa-edit me-1"></i> Edit Details</button>
-
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteBoard('board-101')">
-                        <i class="fas fa-trash-alt me-1"></i> Delete
-                    </button>
-                    </c:if>
-                </div>
-            </div>
-
-            <div class="notes-grid">
-                <div class="note-box"><span class="info-label">Review Notes</span>
-                    <div class="note-content val-review">Client approved UI. Ready for testing.</div>
-                </div>
-                <div class="note-box"><span class="info-label">Retrospective</span>
-                    <div class="note-content val-retro">Excellent communication. Documentation needed earlier.
-                    </div>
-                </div>
-            </div>
-             ================= SPRINT BACKLOG ================= 
-            <div class="note-box sprint-backlog-box">
-
-                <span class="info-label">Sprint Backlog</span>
-
-                <div class="backlog-list mt-2">
-
-                    <span class="backlog-chip">
-                        User Login Feature
-                        <span class="badge bg-secondary ms-2">5 SP</span>
-                    </span>
-
-                    <span class="backlog-chip">
-                        Registration Module
-                        <span class="badge bg-secondary ms-2">8 SP</span>
-                    </span>
-
-                    <span class="backlog-chip">
-                        Role Management
-                        <span class="badge bg-secondary ms-2">3 SP</span>
-                    </span>
-
-                </div>
-
-            </div>
-
-            <div class="board-layout mt-4">
-                <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
-                    <h3>To Do</h3>
-                    <c:if test="${user.user_role == 'Scrum Master'}">
-                        <div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start"
-                                                             onclick="addTask(this)">+ Add Task</button>
-                    </c:if>
-            </div>
-            <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
-                <h3>In Progress</h3>
-                    <c:if test="${user.user_role == 'Scrum Master'}">
-                        <div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start"
-                                                             onclick="addTask(this)">+ Add Task</button>
-                    </c:if>
-            </div>
-            <div class="column" ondragover="allowDrop(event)" ondrop="drop(event)">
-                <h3>Done</h3>
-                    <c:if test="${user.user_role == 'Scrum Master'}">
-                        <div class="task-list"></div><button class="btn text-muted btn-sm fw-bold w-100 text-start"
-                                                             onclick="addTask(this)">+ Add Task</button>
-                    </c:if>
-            </div>
-        </div>
-    </div>-->
                 </div>
             </div>
         </div>
 
-        <div class="modal" id="sprintModal" tabindex="-1">
+        <div class="modal fade" id="sprintModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
 
-                    <div class="modal-body p-5">
+                    <!-- Header -->
+                    <div class="modal-header bg-primary text-white py-3 border-0 position-relative">
+                        <h5 class="modal-title fw-bold w-50 text-center" id="modalTitle">
+                            Create Sprint
+                        </h5>
 
-                        <div class="text-center mb-4">
-                            <h3 class="fw-bold" id="modalTitle">Create Sprint</h3>
-                        </div>
+                        <button type="button"
+                                class="btn-close btn-close-white position-absolute end-0 me-3"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                        </button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="modal-body px-2 p-md-5">
 
                         <input type="hidden" id="editBoardId">
 
+                        <!-- Sprint Name & Goal -->
                         <div class="row g-3">
+
                             <div class="col-md-6">
-                                <label class="fw-bold small mb-2">SPRINT NAME</label>
-                                <input type="text" class="form-control rounded-3"
-                                       id="s_name" placeholder="Enter sprint name...">
+                                <label for="s_name" class="fw-bold small mb-2 text-uppercase">
+                                    Sprint Name
+                                </label>
+
+                                <input type="text"
+                                       class="form-control rounded-3"
+                                       id="s_name"
+                                       placeholder="Enter sprint name...">
+
+                                <p id="errorSprintName"
+                                   class="d-none validation-message text-danger small mb-0 mt-1"></p>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="fw-bold small mb-2">GOAL</label>
+                                <label for="s_goal" class="fw-bold small mb-2 text-uppercase">
+                                    Goal
+                                </label>
+
                                 <textarea class="form-control rounded-3"
-                                          id="s_goal" rows="1"
+                                          id="s_goal"
+                                          rows="1"
                                           placeholder="Sprint objective..."></textarea>
+
+                                <p id="errorSprintGoal"
+                                   class="d-none validation-message text-danger small mb-0 mt-1"></p>
                             </div>
+
                         </div>
 
-
+                        <!-- Dates -->
                         <div class="row g-3 mt-2">
+
                             <div class="col-md-6">
-                                <label class="fw-bold small mb-2">START DATE</label>
-                                <input type="date" class="form-control rounded-3" id="s_start">
+                                <label for="s_start" class="fw-bold small mb-2 text-uppercase">
+                                    Start Date
+                                </label>
+
+                                <input type="date"
+                                       class="form-control rounded-3"
+                                       id="s_start">
+
+                                <p id="errorSprintStart"
+                                   class="d-none validation-message text-danger small mb-0 mt-1"></p>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="fw-bold small mb-2">END DATE</label>
-                                <input type="date" class="form-control rounded-3" id="s_end">
+                                <label for="s_end" class="fw-bold small mb-2 text-uppercase">
+                                    End Date
+                                </label>
+
+                                <input type="date"
+                                       class="form-control rounded-3"
+                                       id="s_end">
+
+                                <p id="errorSprintEnd"
+                                   class="d-none validation-message text-danger small mb-0 mt-1"></p>
                             </div>
+
+                            <div class="col-12">
+                                <p id="errorSprintDateRange"
+                                   class="d-none validation-message text-danger small mb-0"></p>
+                            </div>
+
                         </div>
 
-
+                        <!-- Notes -->
                         <div class="row g-3 mt-2">
+
                             <div class="col-md-6">
-                                <label class="fw-bold small mb-2">REVIEW NOTES</label>
+                                <label for="s_review" class="fw-bold small mb-2 text-uppercase">
+                                    Review Notes
+                                </label>
+
                                 <textarea class="form-control rounded-3"
-                                          id="s_review" rows="2"
+                                          id="s_review"
+                                          rows="2"
                                           placeholder="Review summary..."></textarea>
+
+                                <p id="errorSprintReview"
+                                   class="d-none validation-message text-danger small mb-0 mt-1"></p>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="fw-bold small mb-2">RETROSPECTIVE NOTES</label>
+                                <label for="s_retro" class="fw-bold small mb-2 text-uppercase">
+                                    Retrospective Notes
+                                </label>
+
                                 <textarea class="form-control rounded-3"
-                                          id="s_retro" rows="2"
+                                          id="s_retro"
+                                          rows="2"
                                           placeholder="Retrospective notes..."></textarea>
+
+                                <p id="errorSprintRetro"
+                                   class="d-none validation-message text-danger small mb-0 mt-1"></p>
                             </div>
+
                         </div>
 
-
+                        <!-- Backlog -->
                         <div class="mt-3">
-                            <label class="fw-bold small mb-2">LINK BACKLOG ITEMS</label>
+
+                            <label for="s_backlog_links"
+                                   class="fw-bold small mb-2 text-uppercase">
+                                Link Backlog Items
+                            </label>
+
                             <select class="form-select rounded-3"
                                     id="s_backlog_links"
-                                    size="1"
-                                    multiple
-                                    >
-
+                                    multiple="multiple"
+                                    style="width:100%;">
                             </select>
+
+                            <p id="errorSprintBacklog"
+                               class="d-none validation-message text-danger small mb-0 mt-1"></p>
                         </div>
 
+                    </div>
 
-                        <div class="mt-4 d-grid">
-                            <button class="btn btn-primary rounded-pill py-2 fw-bold" id="SprintSubBtn"
-                                    onclick="saveBoard()">
-                                Create Sprint
-                            </button>
+                    <!-- Footer -->
+                    <div class="modal-footer border-0 justify-content-center pb-4 pt-0">
 
-                            <button class="btn btn-link text-secondary mt-2"
+                        <div class="d-flex gap-3" style="width:420px; max-width:100%;">
+
+                            <button id="sprintSubBtn" type="button"
+                                    class="btn btn-outline-secondary rounded-pill flex-fill"
                                     data-bs-dismiss="modal">
                                 Cancel
                             </button>
+
+                            <button type="button"
+                                    class="btn btn-primary rounded-pill fw-bold flex-fill"
+                                    id="SprintSubBtn">
+                                Create Sprint
+                            </button>
+
                         </div>
+
                     </div>
+
                 </div>
             </div>
         </div>
 
         <div class="modal fade" id="taskModal" tabindex="-1">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-content border-0 shadow-lg rounded-5">
 
-                    <div class="modal-body p-4">
+                    <!-- Header -->
+                    <div class="modal-header border-0 justify-content-center position-relative bg-primary bg-gradient rounded-top-5">
+                        <h5 id="taskModel_title" class="fw-bold text-white text-center p-0 m-0">Add Task</h5>
+                        <button id="deleteTaskBtn" class="btn btn-outline-light btn-sm position-absolute end-0 me-3" style="display:none;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <input type="hidden" id="t_board_id">
+                    <input type="hidden" id="t_column_id" >
+                    <hr class="m-0">
 
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4 id="taskModel_title"  class="fw-bold text-center flex-grow-1 m-0">Add Task</h4>
+                    <!-- Body -->
 
+                    <div class="modal-body px-4 py-3 bg-light">
 
-                            <button id="deleteTaskBtn"
-                                    class="btn btn-outline-danger btn-sm"
-                                    style="display:none;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                        <input type="hidden" id="t_board_id">
-                        <input type="hidden" id="t_column_id" >
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-secondary border-bottom pb-1">Task Details</h6>
 
-                        <!-- TASK NAME -->
-                        <div class="mb-3">
-                            <label class="fw-bold small mb-2">TASK NAME</label>
-                            <input type="text"
-                                   class="form-control rounded-3"
-                                   id="t_name">
-                        </div>
+                            <div class="mb-3">
+                                <label class="small fw-semibold text-secondary">Task Name</label>
+                                <input type="text" class="form-control rounded-4 shadow-sm" id="t_name">
 
-                        <!-- DESCRIPTION -->
-                        <div class="mb-3">
-                            <label class="fw-bold small mb-2">DESCRIPTION</label>
-                            <textarea class="form-control rounded-3"
-                                      id="t_desc"
-                                      rows="2"></textarea>
-                        </div>
-
-                        <!-- ROLE + USER -->
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="fw-bold small mb-2">ROLE</label>
-                                <select class="form-select rounded-3"
-                                        id="t_user_role">
-                                    <option id="Developer">Developer</option>
-                                    <option id="Designer">Designer</option>
-                                    <option id="QA Tester">QA Tester</option>
-                                </select>
+                                <p id="errorTaskName"
+                                   class="validation-message text-danger small mt-1 mb-0 d-none"></p>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="fw-bold small mb-2">ASSIGNEE</label>
-                                <select class="form-select rounded-3"
-                                        id="assignee">
-                                </select>
-                            </div>
-                        </div>
+                            <div class="mb-3">
+                                <label class="small fw-semibold text-secondary">Description</label>
+                                <textarea class="form-control rounded-4 shadow-sm"
+                                          id="t_desc"
+                                          rows="2"></textarea>
 
-                        <!-- DATES + DEPENDENCY -->
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-4">
-                                <label class="fw-bold small mb-2">START</label>
-                                <input type="date"
-                                       class="form-control rounded-3"
-                                       id="t_start">
+                                <p id="errorTaskDesc"
+                                   class="validation-message text-danger small mt-1 mb-0 d-none"></p>
                             </div>
 
-                            <div class="col-md-4">
-                                <label class="fw-bold small mb-2">END</label>
-                                <input type="date"
-                                       class="form-control rounded-3"
-                                       id="t_end">
-                            </div>
+                            <div class="row g-3">
 
-                            <div class="col-md-4">
-                                <label class="fw-bold small mb-2">
-                                    DEPENDENCY
-                                </label>
-                                <select class="form-select rounded-3"
-                                        id="t_dependency"
-                                        size="1"
-                                        multiple>
+                                <div class="col-md-6">
+                                    <label class="small fw-semibold text-secondary">
+                                        Associated Backlog
+                                    </label>
 
-                                </select>
+                                    <select class="form-select rounded-4 shadow-sm" id="t_backlog">
+                                    </select>
+
+                                    <p id="errorTaskBacklog"
+                                       class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="small fw-semibold text-secondary">
+                                        Dependency
+                                    </label>
+
+                                    <select class="form-select rounded-4 shadow-sm"
+                                            id="t_dependency"
+                                            multiple>
+                                    </select>
+                                </div>
+
                             </div>
                         </div>
 
-                        <!-- BUTTONS -->
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-primary rounded-pill py-2 fw-bold" id="taskModel_Sbt"
-                                    onclick="confirmAddTask()">
-                                Add Task
-                            </button>
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-secondary border-bottom pb-1">Assignment</h6>
 
-                            <button class="btn btn-link text-secondary"
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+                                    <label class="small fw-semibold text-secondary">Role</label>
+
+                                    <select class="form-select rounded-4 shadow-sm"
+                                            id="t_user_role">
+                                        <option>Developer</option>
+                                        <option>Designer</option>
+                                        <option>QA Tester</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="small fw-semibold text-secondary">Assignee</label>
+
+                                    <select class="form-select rounded-4 shadow-sm"
+                                            id="assignee">
+                                    </select>
+
+                                    <p id="errorTaskAssignee"
+                                       class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-secondary border-bottom pb-1">Timeline</h6>
+
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+                                    <label class="small fw-semibold text-secondary">Start</label>
+
+                                    <input type="date"
+                                           class="form-control rounded-4 shadow-sm"
+                                           id="t_start">
+
+                                    <p id="errorTaskStart"
+                                       class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="small fw-semibold text-secondary">End</label>
+
+                                    <input type="date"
+                                           class="form-control rounded-4 shadow-sm"
+                                           id="t_end">
+
+                                    <p id="errorTaskEnd"
+                                       class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+                                </div>
+
+                                <div class="col-12">
+                                    <p id="errorTaskDateRange"
+                                       class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-1">
+
+                            <button class="btn btn-secondary rounded-pill px-4 fw-semibold shadow-sm"
                                     data-bs-dismiss="modal">
                                 Cancel
                             </button>
+
+                            <button type="button"
+                                    class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm"
+                                    id="taskModel_Sbt">
+                                <i class="fas fa-plus-circle me-2"></i>
+                                Add Task
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Backlog level document pop up tab -->
+        <div class="modal fade" id="backlogDocModal" data-backlogId  tabindex="-1" data-bs-backdrop="false">
+            <input type="hidden" id="backlog_id">
+            <div class="modal-dialog">
+                <div class="modal-content shadow-lg">
+
+                    <div class="modal-header bg-primary text-white py-3 shadow-sm" style="cursor: move;">
+                        <h5 class="modal-title fw-bold">
+                            <i class="fas fa-folder-open me-2"></i>Documents: <span id="modalBacklogTitle">Selected Backlog Details</span>
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body p-0">
+                        <ul class="nav nav-tabs nav-fill bg-white border-bottom" id="docTabs" role="tablist">
+
+                            <li class="nav-item">
+                                <button class="nav-link" id="viewBacklogDetailsBtn" data-bs-toggle="tab" data-bs-target="#viewBacklogPane">
+                                    <i class="fas fa-plus-circle me-2"></i> Backlog Details
+                                </button>
+                            </li>
+
+                            <li class="nav-item">
+                                <button class="nav-link active" id="viewDocNavBtn" data-bs-toggle="tab" data-bs-target="#viewPane">
+                                    <i class="fas fa-th-list me-2"></i>View Files
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="d-flex justify-content-between mx-3 mt-2">
+                            <input type="text" id="searchDoc" class="form-control w-50"
+                                   placeholder="Search document name...">
+
+                            <select id="filterType" class="form-select w-25 ms-2">
+                                <option value="">All Types</option>
+                                <option value="Requirement">Requirement</option>
+                                <option value="Design">Design</option>
+                                <option value="Acceptance">Acceptance</option>
+                                <option value="Technical">Technical</option>
+                                <option value="Reference">Reference</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
 
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active p-4" id="viewPane">
+                                <div class="table-responsive">
+                                    <table class="table align-middle table-hover">
+                                        <thead class="text-muted">
+                                            <tr>
+                                                <th style="width: 30%;">Document Name</th>
+                                                <th style="width: 15%;">Type</th>
+
+                                                <th class="action-col no-sort" style="width: 20%;" class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="backlogFileRegistry">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade p-4" id="viewBacklogPane">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col">Title</th>
+                                                <th scope="col">Description</th>
+                                                <th scope="col">Acceptance Criteria</th>
+                                                <th scope="col" class="text-center">Mandays</th>
+                                                <th scope="col" class="text-center">Points</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="backlogDetails">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <div class="modal-footer bg-light border-top">
+                        <button type="button" class="btn btn-sm btn-outline-secondary fw-bold px-3"
+                                data-bs-dismiss="modal">Close</button>
+                        <button type="button" id="confirmDocBtn" class="btn btn-sm btn-primary fw-bold px-4 d-none">Confirm
+                            Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="sprintReviewModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-5">
+
+                    <!-- Header -->
+                    <div class="modal-header bg-gradient text-white rounded-top-5 py-3">
+                        <div>
+                            <h5 id="sprintReviewModalTitle" class="modal-title fw-bold mb-0">Sprint Review: Sprint 1</h5>
+                            <small id="sprintReviewModalDate" class="text-light"></small>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Body -->
+                    <div id="sprintReviewContainer" class="modal-body p-4 bg-light rounded-bottom-5">
+                        <h6 class="fw-bold mb-3">Backlogs</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle border rounded-3 shadow-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Task Title</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Design UI</td>
+                                        <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-danger me-1">
+                                                <i class="fas fa-times me-1"></i> Reject
+                                            </button>
+                                            <button class="btn btn-sm  btn-outline-success">
+                                                <i class="fas fa-check me-1"></i> Approve
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Implement API</td>
+                                        <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-danger me-1">
+                                                <i class="fas fa-times me-1"></i> Reject
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-check me-1"></i> Approve
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer justify-content-between bg-light rounded-bottom-5">
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-download me-1"></i> Download Report
+                        </button>
+                        <div>
+                            <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="button" class="btn btn-success rounded-pill px-4 fw-bold">
+                                <i class="fas fa-archive me-1"></i> Archive & Finalize Sprint
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -455,13 +701,57 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="taskRejectionModal" data-action="rejection" data-task_id="" tabindex="-1" aria-labelledby="rejectTaskModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-modal border-0 shadow-lg rounded-4 overflow-hidden">
+
+                    <div class="modal-header position-relative border-0 py-3" style="background-color: #5a5eb9; color: white;">
+                        <h5 class="modal-title fw-bold w-100 text-center" id="rejectTaskModalLabel">
+                            Reject Task
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body px-4 pt-4 pb-3">
+                        <p id="rejectionTaskPromptMessage" class="text-muted mb-4">
+                            This Task is being rejected. Please provide a reason below.
+                        </p>
+                        <form id="rejectTaskForm">
+                            <div>
+                                <label for="rejectionTaskReason" class="form-label fw-bold text-dark">Rejection Reason</label>
+                                <textarea class="form-control rounded-3" id="rejectionTaskReason" rows="4"
+                                          placeholder="e.g., Fails acceptance testing, incomplete implementation, or blocked by a bug..."
+                                          required>
+                                </textarea>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                        <div class="row w-100 mx-0 g-2">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-secondary w-100 fw-bold rounded-pill" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" id="confirmTaskRejectBtn" class="btn btn-danger w-100 fw-bold rounded-pill">
+                                    Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script>
             var project_id = ${project_id != null ? project_id : "null"};
             var user_id = ${userInfo.user_id}
             console.log("User id", user_id);
             const user_role = "${user.user_role}";
             console.log(user_role);
-
         </script>
 
         <script src="js/sprint.js"></script>

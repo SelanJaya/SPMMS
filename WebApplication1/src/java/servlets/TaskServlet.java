@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
@@ -12,11 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import DAO.UserDAO;
 import DAO.TaskDAO;
+import DAO.TaskApprovalDAO;
 import beans.User;
 import beans.Task;
+import beans.TaskApproval;
 import beans.TaskAssignment;
 import Service.TaskServices;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -92,7 +97,6 @@ public class TaskServlet extends HttpServlet {
                 int project_id = Integer.parseInt(request.getParameter("project_id"));
 
 //                System.out.println("Role : " + user_role);
-
                 UserDAO userDao = new UserDAO();
                 userList = userDao.getUsersByRole(user_role, project_id);
 
@@ -118,7 +122,7 @@ public class TaskServlet extends HttpServlet {
                 int task_id = Integer.parseInt(request.getParameter("task_id"));
                 TaskDAO taskDAO = new TaskDAO();
                 Task task = taskDAO.getTaskByTaskId(task_id);
-                
+
                 result.put("taskData", task);
             } else if ("fetchTask_dependency".equalsIgnoreCase(action)) {
                 int sprint_id = Integer.parseInt(request.getParameter("sprint_id"));
@@ -135,8 +139,27 @@ public class TaskServlet extends HttpServlet {
                 }
 
                 result.put("taskData", taskArr);
-            }
+            } else if ("fetchTask_Backlog".equalsIgnoreCase(action)) {
+                List<Task> taskArr = new ArrayList<>();
+                int sprint_id = Integer.parseInt(request.getParameter("sprint_id"));
 
+                TaskDAO taskDAO = new TaskDAO();
+                taskArr = taskDAO.getTask_Backlog(sprint_id);
+
+                result.put("tasksData", taskArr);
+                gson = new GsonBuilder()
+                        .serializeNulls()
+                        .create();
+            } else if ("fetchReason".equalsIgnoreCase(action)) {
+                int reason_id = Integer.parseInt(request.getParameter("reason_id"));
+
+                TaskApproval taskApproval = new TaskApproval();
+
+                TaskApprovalDAO taskApprovalDAO = new TaskApprovalDAO();
+
+                taskApproval = taskApprovalDAO.getTaskRejectionReason(reason_id);
+                result.put("rejectionReason", taskApproval);
+            }
             result.put("status", "Success");
         } catch (Exception e) {
             e.printStackTrace();
@@ -184,19 +207,19 @@ public class TaskServlet extends HttpServlet {
             response.setCharacterEncoding("UTF-8");
 
             if ("Insert".equalsIgnoreCase(action)) {
-                
+
                 System.out.println("Task Inserted");
                 Task task = gson.fromJson(json, Task.class);
 
                 // System.out.println("Dependency received: " + task.getTask_dependency());
-
 //                int task_id = taskDao.insertTask(task);
                 TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
                 task.setTaskAssignment(taskAssignment);
-                
-                Type type = new TypeToken<List<Integer>>(){}.getType();
-                List<Integer> dependencyArr = gson.fromJson(jsonObject.get("taskDepedencies"),type);
-                
+
+                Type type = new TypeToken<List<Integer>>() {
+                }.getType();
+                List<Integer> dependencyArr = gson.fromJson(jsonObject.get("taskDepedencies"), type);
+
                 TaskServices taskServices = new TaskServices();
                 int task_id = taskServices.insertTaskDetails_Assignment(task, dependencyArr);
 
@@ -204,46 +227,78 @@ public class TaskServlet extends HttpServlet {
 //                request.setAttribute("taskAssignment", taskAssignment);
 //                request.getRequestDispatcher("/TaskAssignmentServlet").include(request, response);
                 System.out.println("task Id return " + task_id);
-                
+
                 result.put("task_id", task_id);
                 result.put("message", "Task Saved");
                 result.put("status", "Success");
-                
-            } else if ("updateTaskStatus".equalsIgnoreCase(action)) {
 
+            } else if ("updateTaskStatus".equalsIgnoreCase(action)) {
                 int task_id = jsonObject.get("task_id").getAsInt();
                 String task_status = jsonObject.get("task_status").getAsString();
 
                 TaskDAO taskDao = new TaskDAO();
                 taskDao.updateTaskStatus(task_id, task_status);
-                
+
                 result.put("message", "Task Status Updated");
                 result.put("status", "Success");
-                
-            } else if ("UpdateTaskDetials".equalsIgnoreCase(action)) {
 
+            } else if ("UpdateTaskDetials".equalsIgnoreCase(action)) {
+                System.out.println("Updated executed");
                 Task task = gson.fromJson(json, Task.class);
 
                 TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
                 task.setTaskAssignment(taskAssignment);
-                
-                Type type = new TypeToken<List<Integer>>(){}.getType();
-                List<Integer> dependencyArr = gson.fromJson(jsonObject.get("taskDepedencies"),type);
+
+                Type type = new TypeToken<List<Integer>>() {
+                }.getType();
+//                List<Integer> dependencyArr = gson.fromJson(jsonObject.get("taskDepedencies"), type);
+
+                JsonElement depElement = jsonObject.get("taskDepedencies");
+
+                List<Integer> dependencyArr;
+
+                if (depElement != null && !depElement.isJsonNull()) {
+                    dependencyArr = gson.fromJson(depElement, type);
+                } else {
+                    dependencyArr = new ArrayList<>(); // safe default
+                }
 
                 TaskServices taskServices = new TaskServices();
                 taskServices.updateTaskDetails_Assignment(task, dependencyArr);
                 result.put("task_id", task.getTask_id());
                 result.put("message", "Task Details Updated");
                 result.put("status", "Success");
-                
+
             } else if ("deleteTask".equalsIgnoreCase(action)) {
-                
+
                 int task_id = jsonObject.get("task_id").getAsInt();
 
                 TaskServices taskServices = new TaskServices();
                 taskServices.deleteTaskDetails_Assignment(task_id);
-                
+
                 result.put("message", "Task Deleted");
+                result.put("status", "Success");
+            } else if ("insert_taskApproval".equalsIgnoreCase(action)) {
+                TaskApproval taskApproval = gson.fromJson(json, TaskApproval.class);
+
+                TaskApprovalDAO taskApprovalDAO = new TaskApprovalDAO();
+                int taskAproval_id = taskApprovalDAO.insertTaskApproval(taskApproval);
+                result.put("taskAproval_id", taskAproval_id);
+                result.put("status", "Success");
+            } else if ("update_taskApproval".equalsIgnoreCase(action)) {
+                String reason = null;
+
+                System.out.println("Task update_taskApproval");
+                TaskApproval taskApproval = gson.fromJson(json, TaskApproval.class);
+                System.out.println("Data : " + taskApproval.getApproval_id() + " " + taskApproval.getTaskApproval_status());
+                TaskApprovalDAO taskApprovalDAO = new TaskApprovalDAO();
+                taskApprovalDAO.updateTaskApproval(taskApproval);
+                result.put("status", "Success");
+            } else if ("updateTaskReason".equalsIgnoreCase(action)) {
+                TaskApproval taskApproval = gson.fromJson(json, TaskApproval.class);
+
+                TaskApprovalDAO taskApprovalDAO = new TaskApprovalDAO();
+                taskApprovalDAO.updateTaskApprovalRemark(taskApproval);
                 result.put("status", "Success");
             }
         } catch (Exception e) {

@@ -15,6 +15,7 @@ import DAO.ProjectTeamDAO;
 import beans.Project;
 import beans.User;
 import beans.ProjectTeamAssignment;
+import Service.TeamAssignmentService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -110,91 +111,7 @@ public class teamAssignmentServlet extends HttpServlet {
                 users = userDAO.getUsersByRole(roleType);
 
                 jsonResponse.put("userData", users);
-
-//                String URLRole, decodedRole, role;
-//
-//                List<User> users = new ArrayList<>();
-//
-//                UserDAO userDao = new UserDAO();
-//
-//                try {
-//                    
-//                    URLRole = request.getParameter("roleType");
-//
-//                    // URL decoding converts %20 back into a real space
-//                    decodedRole = java.net.URLDecoder.decode(URLRole, "UTF-8");
-//
-//                    System.out.println("Cleaned Role for DB: [" + decodedRole + "]");
-//
-//                    // Check if parameter is missing or empty
-//                    if (decodedRole == null || decodedRole.trim().isEmpty()) {
-//
-//                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // Error 400
-//
-//                        jsonResponse.put("success", false);
-//                        jsonResponse.put("message", "Role parameter is required.");
-//                    } else {
-//                        users = userDao.getUsersByRole(decodedRole);
-//
-//                        if (users == null) {
-//                            users = new ArrayList<>(); // Return empty list instead of null
-//                        }
-//
-//                        System.out.println("======= START DAO CONTENT LOG =======");
-//                        if (users != null && !users.isEmpty()) {
-//                            for (User u : users) {
-//                                // This prints the specific fields of each User object
-//                                System.out.println("ID: " + u.getUser_id()
-//                                        + " | Name: " + u.getUsername()
-//                                        + " | Email: " + u.getEmail());
-//                            }
-//                        } else {
-//                            System.out.println("No data inside the list.");
-//                        }
-//                        System.out.println("======== END DAO CONTENT LOG ========");
-//
-//                        jsonResponse.put("success", true);
-//                        jsonResponse.put("data", users);
-//                        jsonResponse.put("count", users.size());
-//
-//                    }
-//
-//                } catch (Throwable t) {
-//
-//                    System.err.println("!!! FATAL ERROR CAUGHT !!!");
-//                    t.printStackTrace(); // This WILL print even if a library is missing
-//
-//                    System.err.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//                    jsonResponse.put("success", false);
-            
-            ////            jsonResponse.put("message", "Internal Server Error: " + e.getMessage());
-//                } finally {
-//                    try {
-//                        response.setContentType("application/json");
-//                        response.setCharacterEncoding("UTF-8");
-//
-//                        // 1. Use GsonBuilder to exclude "problem" fields or complex internals
-//                        // This prevents the "Failed making field accessible" error
-//                        gson = new GsonBuilder()
-//                                .setPrettyPrinting()
-//                                .create();
-//
-//                        // 2. Generate the JSON
-//                        String jsonOutput = gson.toJson(jsonResponse);
-//
-//                        System.out.println("DEBUG - FINAL JSON CARGO: " + jsonOutput);
-//
-//                        out.print(jsonOutput);
-//                        out.flush();
-//                    } catch (Exception e) {
-//                        System.err.println("JSON Error: " + e.getMessage());
-//                        e.printStackTrace();
-//                    }
-//                }
-//                return;
-
             }
-
             jsonResponse.put("status", "Success");
         } catch (Exception e) {
             jsonResponse.put("status", "Failed");
@@ -219,12 +136,11 @@ public class teamAssignmentServlet extends HttpServlet {
 
         System.out.println("ENTERED SERVELEET YAAY");
 
-        int projectId, assignedTo, assignedBy;
-        String processType;
-        boolean status = false;
-        List<User> projectTeamAssignmentArr;
-        Project projectObj;
-
+//        int projectId, assignedTo, assignedBy;
+//        String processType;
+//        boolean status = false;
+//        List<User> projectTeamAssignmentArr;
+//        Project projectObj;
 //        assignedTo = Integer.parseInt(request.getParameter("userId"));
 //        HttpSession session = request.getSession();
 //
@@ -236,11 +152,11 @@ public class teamAssignmentServlet extends HttpServlet {
 //
 //        projectObj = (Project) session.getAttribute("project");
 //        projectId = projectObj.getProjectId();
-        Map<String, Object> result =  new HashMap<>();
+
+        Map<String, Object> result = new HashMap<>();
         Gson gson = new Gson();
         try {
-            
-            
+
             // create reader object 
             BufferedReader reader = request.getReader();
             StringBuilder jsonBuilder = new StringBuilder();
@@ -262,17 +178,16 @@ public class teamAssignmentServlet extends HttpServlet {
 
                 ProjectTeamAssignment projectTeamAssignment = gson.fromJson(json, ProjectTeamAssignment.class);
 
-                projectTeamDao.assignTeamMember(projectTeamAssignment);
-                
+                TeamAssignmentService teamAssignmentService = new TeamAssignmentService();
+                teamAssignmentService.recruitementService(projectTeamAssignment);
+
+//               projectTeamDao.assignTeamMember(projectTeamAssignment);
             } else if ("delete".equalsIgnoreCase(action)) {
 
                 ProjectTeamAssignment projectTeamAssignment = gson.fromJson(json, ProjectTeamAssignment.class);
 
-                System.out.println(" PROJECT ID :" + projectTeamAssignment.getProject_id());
-                System.out.println("ASSIGNED USER ID " + projectTeamAssignment.getAssign_to());
-                System.out.println("ASSIGNED USER ID " + projectTeamAssignment.getAssign_by());
-
-                projectTeamDao.removeTeamMember(projectTeamAssignment);
+                TeamAssignmentService teamAssignmentService = new TeamAssignmentService();
+                teamAssignmentService.removeMemberService(projectTeamAssignment);
             }
             result.put("status", "Success");
         } catch (Exception e) {
@@ -280,7 +195,7 @@ public class teamAssignmentServlet extends HttpServlet {
             e.printStackTrace();
             result.put("status", "Failed");
         }
-        
+
         response.getWriter().write(gson.toJson(result));
 
     }

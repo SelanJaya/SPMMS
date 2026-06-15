@@ -80,12 +80,12 @@ public class BacklogServlet extends HttpServlet {
 
             System.out.println("Action TYPE " + action + "\n");
 
-            if ("fetchData".equalsIgnoreCase(action)) {
+            if ("fetchBacklogs".equalsIgnoreCase(action)) {
                 int project_id = Integer.parseInt(request.getParameter("project_id"));
 
                 List<Backlog> backlogArr = new ArrayList<>();
 
-                backlogArr = backlogDAO.getBacklogItem(project_id);
+                backlogArr = backlogDAO.getBacklogItems(project_id);
 
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
@@ -113,6 +113,11 @@ public class BacklogServlet extends HttpServlet {
                 System.out.println("B id : " + backlog_id);
                 String rejection_reason = backlogDAO.getBacklogReason(backlog_id);
                 backlogData.put("rejection_reason", rejection_reason);
+                backlogData.put("status", "Success");
+            }else if("fetchBacklogSprint".equalsIgnoreCase(action)){
+                int backlog_id = Integer.parseInt(request.getParameter("backlog_id"));
+                Backlog backlog = backlogDAO.getBacklogItem(backlog_id);
+                backlogData.put("backlogData", backlog);
                 backlogData.put("status", "Success");
             }
 
@@ -189,15 +194,14 @@ public class BacklogServlet extends HttpServlet {
 
             if ("Create".equalsIgnoreCase(action)) {
 
-//                //set the status to pending
-//                backlog.setStatus("Pending");
-                // insert the Backlog data
+                System.out.println("Created By : " + backlog.getCreated_by());
                 generatedKey = backlogDAO.insertBacklogItem(backlog);
 
                 if (generatedKey > -1) {
                     result.put("key", generatedKey);
+                    result.put("message", "Backlog item saved");
                 } else {
-                    throw new Exception();
+                    throw new Exception("Backlog item creation failed ");
                 }
 
             } else if ("Update_PO".equalsIgnoreCase(action)) {
@@ -233,6 +237,7 @@ public class BacklogServlet extends HttpServlet {
             System.out.println(e);
             Map<String, Object> result = new HashMap<>();
             result.put("status", "Failed");
+            result.put("message", e.getMessage());
 
             response.getWriter().write(gson.toJson(result));
         }

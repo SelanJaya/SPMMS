@@ -104,7 +104,7 @@ public class SprintDAO {
                 + "sprint_end_date, sprint_goal, sprint_status, "
                 + "restrospective_notes, review_notes, sprint_created_at)"
                 + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, sprint.getProject_id());
@@ -185,4 +185,57 @@ public class SprintDAO {
         }
     }
 
+    public List getSprintName_Task(int project_int) throws Exception {
+
+        List<Sprint> sprintNameArr = new ArrayList<>();
+        String sql = """
+                     SELECT s.sprint_name, s.sprint_id
+                     FROM sprints s
+                     JOIN projects
+                     USING(project_id)
+                     RIGHT JOIN tasks
+                     USING (sprint_id)
+                     WHERE project_id = ?
+                     GROUP BY sprint_name
+                     """;
+
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, project_int);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Sprint sprint = new Sprint();
+                sprint.setSprint_id(rs.getInt("sprint_id"));
+                sprint.setSprint_name(rs.getString("sprint_name"));
+                sprintNameArr.add(sprint);
+            }
+
+            return sprintNameArr;
+        } catch (Exception e) {
+            System.out.println("Exception occurs in getSprintName : " + e);
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+    public void updateSprintStatus(Sprint sprint) throws Exception {
+
+        String sql = """
+                     UPDATE sprints
+                     SET sprint_status = ?
+                     WHERE sprint_id = ?
+                     """;
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            
+            ps.setString(1, sprint.getSprint_status());
+            ps.setInt(2, sprint.getSprint_id());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }

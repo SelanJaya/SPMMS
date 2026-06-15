@@ -32,7 +32,7 @@
                 <a href="profileServlet" class="nav-link">
                     <i class="fas fa-user-circle me-3"></i> Profile
                 </a>
-                <a href="dashboardServlet?userId=${user.user_id}&processType=projectInfo" class="nav-link"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
+                <a href="dashboard.jsp" class="nav-link"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
                 <a href="projectArchive.jsp" class="nav-link active"><i class="fas fa-box-archive me-3"></i> Archived Projects</a>
                 <div class="mt-auto">
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
@@ -47,12 +47,20 @@
             <nav class="top-nav">
                 <div class="small text-muted">Management / <span class="fw-semibold text-dark">Archive Vault</span></div>
                 <div class="user-info">
-                    <div class="user-details d-none d-sm-block">
-                        <span class="user-name">${user.username}</span>
-                        <span class="user-role">${user.user_role}</span>
+                    <!--                    <div class="user-details d-none d-sm-block">
+                                            <span class="user-name">${user.username}</span>
+                                            <span class="user-role">${user.user_role}</span>
+                                        </div>
+                                        <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
+                                             class="rounded-circle border" width="34">-->
+                    <div class="user-info">
+                        <div class="user-details d-none d-sm-block">
+                            <span class="user-name">${user.username}</span>
+                            <span class="user-role">${user.user_role}</span>
+                        </div>
+                        <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
+                             class="rounded-circle border" width="34">
                     </div>
-                    <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
-                         class="rounded-circle border" width="34">
                 </div>
             </nav>
 
@@ -74,16 +82,6 @@
                         </div>
                     </div>
                 </div>
-                <!--                <div class="d-flex justify-content-between align-items-end mb-4">
-                                    <div>
-                                        <h4 class="fw-bold mb-1">Archive Vault</h4>
-                                        <p class="text-muted small mb-0">Manage long-term project storage and history.</p>
-                                    </div>
-                                    <div class="input-group input-group-sm" style="width: 300px;">
-                                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                                        <input type="text" id="vaultSearch" class="form-control border-start-0" placeholder="Search by name or description...">
-                                    </div>
-                                </div>-->
 
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-0">
@@ -98,46 +96,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="vaultBody">
-                                    <c:forEach var="project" items="${profileInfo}">
-                                        <tr class="vault-row" data-search="${project.projectName.toLowerCase()} ${project.projectDesc.toLowerCase()}">
-                                            <td>
-                                                <a href="projectPageServlet?projectId=${project.projectId}" class="project-title-link">
-                                                    <i class="fas fa-file-invoice text-muted me-2"></i>${project.projectName}
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <div class="description-snippet" ondblclick="toggleDescription(this)" title="Double-click to expand">
-                                                    ${project.projectDesc}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <i class="far fa-calendar-alt text-muted me-2"></i> ${project.projCreatedAt}
-                                            </td>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-light border dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown">
-                                                        Manage
-                                                    </button>
-                                                    <ul class="dropdown-menu shadow-sm">
-                                                        <li><a class="dropdown-item" href="projectPageServlet?projectId=${project.projectId}"><i class="fas fa-folder-open text-primary me-2"></i> Open Vault</a></li>
-                                                        <li><button class="dropdown-item"  data-bs-toggle="modal" 
-                                                                    data-bs-target="#restoreFolderModal" 
-                                                                    data-project-id="${project.projectId}"
-                                                                    data-project-name="${project.projectName}" ><i class="fas fa-undo-alt text-success me-2"></i> Restore Project</button></li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li><button class="dropdown-item text-danger"  data-bs-toggle="modal" data-bs-target="#deleteFolderModal"
-                                                                    data-project-id="${project.projectId}"
-                                                                    data-project-name="${project.projectName}"><i class="fas fa-trash-alt me-2"></i> Delete Permanently</button></li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                    <c:if test="${empty profileInfo}">
-                                        <tr>
-                                            <td colspan="4" class="text-center py-5 text-muted">No archived projects found.</td>
-                                        </tr>
-                                    </c:if>
+
                                 </tbody>
                             </table>
                         </div>
@@ -145,49 +104,6 @@
                 </div>
             </div>
         </div>
-
-        <!--        <div class="modal fade" id="deleteFolderModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content border-0 shadow">
-        
-                            <div id="initialBody">
-                                <div class="modal-header bg-danger text-white">
-                                    <h5 class="modal-title fw-bold" style="font-size: 1rem;">
-                                        <i class="fas fa-exclamation-triangle me-2"></i> Permanent Directory Deletion
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body p-4 text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-folder-open text-danger fa-4x opacity-25"></i>
-                                    </div>
-                                    <h5 class="fw-bold">Destroy Project Folder?</h5>
-                                    <p class="text-muted">You are about to delete the entire project directory for <strong>${project.projectName}</strong>. This will <strong>permanently remove</strong> all uploaded files.</p>
-                                    <div class="alert alert-danger p-2 mb-0">
-                                        <small class="fw-bold text-uppercase"><i class="fas fa-info-circle me-1"></i> This action is irreversible.</small>
-                                    </div>
-                                </div>
-                                <div class="modal-footer bg-light">
-                                    <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Folder</button>
-                                    <button type="button" id="deleteBtn" class="btn btn-sm btn-danger fw-bold px-3" onclick="executeFolderDeletion(this)">
-                                        Yes, Delete Directory
-                                    </button>
-        
-                                </div>
-                            </div>
-                            <div id="successBody" class="d-none">
-                                <div class="modal-body p-5 text-center">
-                                    <div class="mb-3">
-                                        <i class="fas fa-check-circle text-success fa-5x animate__animated animate__bounceIn"></i>
-                                    </div>
-                                    <h5 class="fw-bold">Project Deleted</h5>
-                                    <p class="text-muted mb-0">The directory and all data have been successfully removed.</p>
-                                    <p class="small text-muted mt-2">Redirecting to Dashboard...</p>
-                                </div>
-                            </div                                                            >
-                        </div>
-                    </div>
-                </div>-->
 
         <div class="modal fade" id="deleteFolderModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -236,19 +152,63 @@
             </div>
         </div>
 
+        <!--        <div class="modal fade" id="restoreFolderModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content modal-premium">
+                            <div id="restoreInitialBody" class="modal-body p-5">
+                                <button type="button" class="btn-close btn-modal-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <div class="text-center">
+                                    <div class="icon-box-success" style="background: rgba(25, 135, 84, 0.1); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                                        <i class="fas fa-undo-alt text-success fa-2x"></i>
+                                    </div>
+                                    <h4 class="modal-title-bold mb-2">Restore Directory</h4>
+                                    <p class="modal-desc-text">
+                                        You are about to restore <span id="displayRestoreName" class="text-dark fw-bold">this project</span>.
+                                    </p>
+                                    <div class="d-grid gap-2">
+                                        <button type="button" id="confirmRestoreBtn" class="btn btn-success shadow-sm fw-bold py-2" style="border-radius: 12px;">
+                                            Confirm Restoration
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="restoreSuccessBody" class="modal-body p-5 d-none">
+                                <div class="text-center">
+                                    <i class="fas fa-check-circle text-success fa-5x mb-3"></i>
+                                    <h4 class="fw-bold">Project Restored</h4>
+                                    <p>Redirecting...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+
         <div class="modal fade" id="restoreFolderModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content modal-premium">
                     <div id="restoreInitialBody" class="modal-body p-5">
-                        <button type="button" class="btn-close btn-modal-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-modal-close shadow-none" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 20px; top: 20px;"></button>
                         <div class="text-center">
                             <div class="icon-box-success" style="background: rgba(25, 135, 84, 0.1); width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                                 <i class="fas fa-undo-alt text-success fa-2x"></i>
                             </div>
                             <h4 class="modal-title-bold mb-2">Restore Directory</h4>
-                            <p class="modal-desc-text">
+                            <p class="modal-desc-text mb-4">
                                 You are about to restore <span id="displayRestoreName" class="text-dark fw-bold">this project</span>.
                             </p>
+
+                            <div class="text-start bg-light p-3 rounded-3 mb-4 border">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold text-uppercase mb-1">Current End Date</label>
+                                    <p id="displayEndDate" class="text-dark fw-bold mb-0">--</p>
+                                </div>
+                                <div>
+                                    <label for="newDateInput" class="form-label text-muted small fw-bold text-uppercase mb-1">Update Data / New Date</label>
+                                    <input type="date" class="form-control shadow-sm" id="newDateInput">
+                                    <p id="errorRestoreDate"
+                                       class="validation-message text-danger small mb-0 mt-1 d-none" ></p>
+                                </div>
+                            </div>
                             <div class="d-grid gap-2">
                                 <button type="button" id="confirmRestoreBtn" class="btn btn-success shadow-sm fw-bold py-2" style="border-radius: 12px;">
                                     Confirm Restoration
@@ -301,179 +261,6 @@
             </div>
         </div>
 
-
-
-        <script>
-            let currentId = null;
-            let currentMode = '';
-            //const actionModal = new bootstrap.Modal('#actionModal');
-
-            // Search Filter
-            $('#vaultSearch').on('keyup', function () {
-                let val = $(this).val().toLowerCase();
-                $('.vault-row').each(function () {
-                    $(this).toggle($(this).attr('data-search').indexOf(val) > -1);
-                });
-            });
-
-
-            document.addEventListener('DOMContentLoaded', function () {
-
-                // Dedicated Execute Action for Delete project 
-                function executeFolderDeletion(btn, projectId, method, initialId, successId, redirect) {
-                    const originalContent = btn.innerHTML;
-
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-                    btn.disabled = true;
-
-                    $.ajax({
-                        url: 'projectPageServlet',
-                        type: 'GET',
-                        data: {
-                            processType: method,
-                            projectId: projectId
-                        },
-                        dataType: 'json',
-                        success: function (response) {
-                            if (response.success) {
-                                document.getElementById(initialId).classList.add('d-none');
-                                document.getElementById(successId).classList.remove('d-none');
-                                setTimeout(() => {
-                                    window.location.href = redirect;
-                                }, 2000);
-                            } else {
-                                alert("Error: " + response.message);
-                                btn.innerHTML = originalContent;
-                                btn.disabled = false;
-                            }
-                        },
-                        error: function () {
-                            alert("Network Error: Could not reach server.");
-                            alert(
-                                    "Network Error: Could not reach server.\n" +
-                                    "Status: " + status + "\n" +
-                                    "Error: " + error + "\n" +
-                                    "Request Data: " + JSON.stringify(requestData) + "\n" +
-                                    "Response Text: " + xhr.responseText
-                                    );
-                            btn.innerHTML = originalContent;
-                            btn.disabled = false;
-                        }
-                    });
-                }
-
-                // 2. THE HANDSHAKE (Listens for any modal to open)
-                document.addEventListener('show.bs.modal', function (event) {
-                    const triggerBtn = event.relatedTarget;
-                    if (!triggerBtn)
-                        return;
-
-                    const projectId = triggerBtn.getAttribute('data-project-id');
-                    const projectName = triggerBtn.getAttribute('data-project-name');
-                    const projectStatus = triggerBtn.getAttribute('data-project-status');
-
-                    const modalId = event.target.getAttribute('id');
-
-                    // Handle Delete Modal (GET)
-                    if (modalId === 'deleteFolderModal') {
-                        document.getElementById('displayProjectName').textContent = projectName;
-                        document.getElementById('initialBody').classList.remove('d-none');
-                        document.getElementById('successBody').classList.add('d-none');
-
-                        document.getElementById('deleteBtn').onclick = function () {
-                            executeFolderDeletion(this, projectId, 'deleteFolder', 'initialBody', 'successBody', 'dashboardServlet?processType=projectInfo');
-                        };
-                    }
-
-
-                    if (modalId === 'restoreFolderModal') {
-                        // 1. Extract multiple details from the button
-                        const projectId = triggerBtn.getAttribute('data-project-id');
-                        const projectName = triggerBtn.getAttribute('data-project-name');
-//                        const userId = triggerBtn.getAttribute('data-user-id'); // Assuming you added this to the button
-//                        const projectTag = triggerBtn.getAttribute('data-tag');     // Assuming you added this to the button
-
-                        document.getElementById('displayRestoreName').textContent = projectName;
-                        document.getElementById('restoreInitialBody').classList.remove('d-none');
-                        document.getElementById('restoreSuccessBody').classList.add('d-none');
-
-                        document.getElementById('confirmRestoreBtn').onclick = function () {
-
-                            // 3. Pass the object to the engine
-                            executeRestoreFolder(this, projectId, 'updateStatus', 'restoreInitialBody', 'restoreSuccessBody', 'projectPageServlet?processType=updateStatus');
-                        };
-                    }
-                });
-
-                // Funtion for restore project
-                function executeRestoreFolder(btn, projectId, method, initialId, successId, redirect) {
-                    const originalContent = btn.innerHTML;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-                    btn.disabled = true;
-
-                    $.ajax({
-                        url: 'projectPageServlet',
-                        type: 'POST',
-                        data: {
-                            processType: "updateStatus",
-                            projectId: projectId,
-                        },
-                        dataType: 'json',
-                        success: function (response) {
-                            // 1. JS reads the 'success' boolean from your Servlet's JSON
-                            if (response.success === true) {
-
-                                // 1. Find the current open modal
-                                const currentModalEl = document.querySelector('.modal.show');
-
-                                if (currentModalEl) {
-                                    // Attempt to get the existing instance
-                                    let currentModal = bootstrap.Modal.getInstance(currentModalEl);
-
-                                    // FIX: If instance is null, initialize it manually before hiding
-                                    if (!currentModal) {
-                                        currentModal = new bootstrap.Modal(currentModalEl);
-                                    }
-
-                                    currentModal.hide();
-                                }
-
-                                // 2. Short delay for smooth transition, then show Decision Modal
-                                setTimeout(() => {
-                                    const decisionModal = new bootstrap.Modal(document.getElementById('decisionModal'));
-                                    decisionModal.show();
-                                }, 500);
-
-                            } else {
-                                // Handle the 'false' reply from Servlet
-                                alert("Error: " + response.message);
-                                btn.disabled = false;
-                                btn.innerHTML = "Retry Action";
-
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            // This runs if the Servlet crashes (500 error) or URL is wrong (404)
-                            console.error("Technical Error:", error);
-                            alert("Connection Error: Could not reach the server.");
-                            btn.disabled = false;
-                        }
-                    });
-                }
-
-                document.querySelectorAll('.dropdown').forEach(dropdown => {
-                    dropdown.addEventListener('show.bs.dropdown', function () {
-                        const menu = this.querySelector('.dropdown-menu');
-                        menu.style.opacity = '1';
-                        menu.style.transform = 'translateY(0)';
-                    });
-                });
-            });
-
-            function toggleDescription(element) {
-                element.classList.toggle('expanded');
-            }
-
-        </script>
+        <script src="js/projectArchive.js"></script>
     </body>
 </html>

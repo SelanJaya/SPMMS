@@ -136,7 +136,6 @@ public class ProjectPageServlet extends HttpServlet {
             result.put("status", "failed");
             System.out.println("Excption ocurrs : " + e);
             e.printStackTrace();
-            throw e;
 
         }
 
@@ -225,6 +224,10 @@ public class ProjectPageServlet extends HttpServlet {
                 System.out.println("project ID " + projectId);
                 projectDao.deleteProject(projectId);
                 System.out.println("Deletion success");
+                result.put("status", "Success");
+            } else if("restoreArchivedProject".equalsIgnoreCase(action)){
+                project = gson.fromJson(json, Project.class);
+                projectDao.updateProjectEndData(project);
                 result.put("status", "Success");
             }
         } catch (Exception e) {

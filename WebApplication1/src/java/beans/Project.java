@@ -4,6 +4,7 @@
  */
 package beans;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,15 +13,15 @@ import java.time.format.DateTimeFormatter;
  *
  * @author HP
  */
-public class Project {
+public class Project implements Serializable {
 
     private int projectId, projCreatedBy;
-    private String projectName, projectDesc, projectStatus, projectType, projectClient, projStartDate,  projEndDate;
-    private LocalDateTime projCreatedAt;
+    private String projectName, projectDesc, projectStatus, projectType, projectClient, projStartDate, projEndDate, projCreatedAt;
+    private Double project_risk_score;
 
     public Project() {
     }
-    
+
     //Contructor for update project
     public Project(String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, String projStartDate, String projEndDate, int createdBy) {
         this.projectName = projectName;
@@ -32,7 +33,7 @@ public class Project {
         this.projEndDate = projEndDate;
         this.projCreatedBy = createdBy;
     }
-    
+
     //Contructor for update project
     public Project(int projectId, String projectName, String projectDesc, String projectStatus, String projectType, String projectClient, String projStartDate, String projEndDate) {
         this.projectId = projectId;
@@ -44,9 +45,9 @@ public class Project {
         this.projStartDate = projStartDate;
         this.projEndDate = projEndDate;
     }
-    
-     //Contructor for update project
-    public Project(int projectId, String projectName, String projectDesc,String projectType, String projectClient, String projStartDate, String projEndDate) {
+
+    //Contructor for update project
+    public Project(int projectId, String projectName, String projectDesc, String projectType, String projectClient, String projStartDate, String projEndDate) {
         this.projectId = projectId;
         this.projectName = projectName;
         this.projectDesc = projectDesc;
@@ -92,8 +93,12 @@ public class Project {
         this.projEndDate = projEndDate;
     }
 
-    public void setProjCreatedAt(LocalDateTime projCreatedAt) {
+    public void setProjCreatedAt(String projCreatedAt) {
         this.projCreatedAt = projCreatedAt;
+    }
+
+    public void setProject_risk_score(Double project_risk_score) {
+        this.project_risk_score = project_risk_score;
     }
 
     public int getProjectId() {
@@ -124,7 +129,6 @@ public class Project {
         return projectClient;
     }
 
-    
     public LocalDate getProjStartDate() {
         return LocalDate.parse(projStartDate);
     }
@@ -132,17 +136,21 @@ public class Project {
     public LocalDate getProjEndDate() {
         return LocalDate.parse(projEndDate);
     }
-
+    
     public String getProjCreatedAt() {
-        if (this.projCreatedAt == null) {
+        if (projCreatedAt == null || projCreatedAt.isEmpty()) {
             return "";
         }
 
-        // Define the pattern: DD MM YY HH MM
-        // dd = Day, MM = Month, yy = Year (2 digits), HH = 24hr, mm = minutes
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MM yy  HH:mm");
+        LocalDateTime dateTime = LocalDateTime.parse(projCreatedAt);
 
-        return this.projCreatedAt.format(formatter);
+        DateTimeFormatter formatter
+                = DateTimeFormatter.ofPattern("dd MM yy HH:mm");
+
+        return dateTime.format(formatter);
     }
 
+    public Double getProject_risk_score() {
+        return project_risk_score;
+    }
 }

@@ -26,6 +26,7 @@ import beans.Sprint;
 import beans.SprintBacklogLink;
 import DAO.BacklogDAO;
 import DAO.SprintDAO;
+import Service.SprintService;
 import java.time.LocalTime;
 
 /**
@@ -76,19 +77,63 @@ public class SprintServlet extends HttpServlet {
         String action = request.getParameter("action") != null
                 ? (String) request.getParameter("action")
                 : null;
+
+        Map<String, Object> result = new HashMap<>();
+        Gson gson = new Gson();
+
         try {
 
-            int project_id = request.getParameter("project_id") != null
-                    ? Integer.parseInt(request.getParameter("project_id"))
-                    : null;
+            if ("redirect".equalsIgnoreCase(action)) {
+                int project_id = request.getParameter("project_id") != null
+                        ? Integer.parseInt(request.getParameter("project_id"))
+                        : null;
 
+                request.setAttribute("project_id", project_id);
+                request.getRequestDispatcher("sprint.jsp").forward(request, response);
+            } else if ("fetchSprint".equalsIgnoreCase(action)) {
 
-            request.setAttribute("project_id", project_id);
-            request.getRequestDispatcher("sprint.jsp").forward(request, response);
+                List<Sprint> sprintList = new ArrayList<>();
+
+                int project_Id = Integer.parseInt(request.getParameter("project_id"));
+                SprintService sprintService = new SprintService();
+                sprintList = sprintService.getCheckSprintValidity(project_Id);
+
+                result.put("SprintData", sprintList);
+            } else if ("fetchBacklog".equalsIgnoreCase(action)) {
+
+                String mode = request.getParameter("mode");
+                List<Backlog> backlogList = new ArrayList<>();
+                if ("Create".equalsIgnoreCase(mode)) {
+
+                    int project_Id = Integer.parseInt(request.getParameter("project_id"));
+                    BacklogDAO backlogDao = new BacklogDAO();
+                    backlogList = backlogDao.getHighPriorityBacklog(project_Id);
+
+                } else if ("Edit".equalsIgnoreCase(mode)) {
+
+                    int project_Id = Integer.parseInt(request.getParameter("project_id"));
+                    int sprint_id = Integer.parseInt(request.getParameter("sprint_id"));
+
+                    BacklogDAO backlogDao = new BacklogDAO();
+                    backlogList = backlogDao.getHighPriorityBacklog_Edit(project_Id, sprint_id);
+
+                }
+
+                result.put("backlogData", backlogList);
+            }  else if("fetchSprint_backlog".equalsIgnoreCase(action)){
+                List<Backlog> backlogList = new ArrayList<>();
+                
+                int sprint_id = Integer.parseInt(request.getParameter("sprint_id"));
+                BacklogDAO backlogDAO = new BacklogDAO();
+                
+                backlogList = backlogDAO.getBacklog_assoSprint(sprint_id);
+                result.put("AssosiatedBacklog", backlogList);
+            }
+            result.put("status", "Success");
         } catch (Exception e) {
             System.out.println("Exception Occurs" + e);
         }
-
+        response.getWriter().write(gson.toJson(result));
     }
 
     /**
@@ -127,46 +172,14 @@ public class SprintServlet extends HttpServlet {
             String action = jsonObject.get("action").getAsString();
 
             Map<String, Object> result = new HashMap<>();
-            
+
             Sprint sprint = new Sprint();
 
-            if ("Insert".equalsIgnoreCase(action) || "Update".equalsIgnoreCase(action)){
+            if ("Insert".equalsIgnoreCase(action) || "Update".equalsIgnoreCase(action)) {
                 sprint = gson.fromJson(json, Sprint.class);
             }
 
-            if ("fetchBacklog".equalsIgnoreCase(action)) {
-
-                String mode = jsonObject.get("mode").getAsString();
-                List<Backlog> backlogList = new ArrayList<>();
-                if ("Create".equalsIgnoreCase(mode)) {
-                    
-                    project_Id = jsonObject.get("project_id").getAsInt();
-                    BacklogDAO backlogDao = new BacklogDAO();
-                    backlogList = backlogDao.getHighPriorityBacklog(project_Id);
-
-                } else if ("Edit".equalsIgnoreCase(mode)) {
-                    
-                    project_Id = jsonObject.get("project_id").getAsInt();
-                    sprint_id = jsonObject.get("sprint_id").getAsInt();
-
-                    BacklogDAO backlogDao = new BacklogDAO();
-                    backlogList = backlogDao.getHighPriorityBacklog_Edit(project_Id, sprint_id);
-
-                }
-
-                result.put("backlogData", backlogList);
-
-            } else if ("fetchSprint".equalsIgnoreCase(action)) {
-                
-                List<Sprint> sprintList = new ArrayList<>();
-
-                project_Id = jsonObject.get("project_id").getAsInt();
-                SprintDAO sprintDao = new SprintDAO();
-                sprintList = sprintDao.getSprintsData(project_Id);
-
-                result.put("SprintData", sprintList);
-                
-            } else if ("Insert".equalsIgnoreCase(action)) {
+            if ("Insert".equalsIgnoreCase(action)) {
 
                 //Mappes data to SprintBacklogLink
                 SprintBacklogLink spl = new SprintBacklogLink();
@@ -185,28 +198,32 @@ public class SprintServlet extends HttpServlet {
                 List<Backlog> backlogArr = (List<Backlog>) request.getAttribute("BacklogData");
                 result.put("backlogData", backlogArr);
                 result.put("sprint_id", sprint_id);
+                result.put("message", "Sprint added successfully");
+                
 
             } else if ("Update".equalsIgnoreCase(action)) {
-                
+
                 SprintDAO sprintDao = new SprintDAO();
                 sprintDao.updateSprintDetails(sprint);
-                
+
                 System.out.println("Backlog : " + sprint.getBacklog());
-                
+
                 SprintBacklogLink spl = new SprintBacklogLink();
                 spl = gson.fromJson(json, SprintBacklogLink.class);
-                
+
                 request.setAttribute("action", "Update");
                 request.setAttribute("SprintBacklogLinkData", spl);
                 request.getRequestDispatcher("SprintBacklogLinkServlet").include(request, response);
-                
+
                 List<Backlog> backlogArr = (List<Backlog>) request.getAttribute("BacklogData");
                 result.put("backlogData", backlogArr);
+                result.put("message", "Sprint updated successfully");
 
             } else if ("Delete".equalsIgnoreCase(action)) {
                 sprint_id = jsonObject.get("sprint_id").getAsInt();
                 SprintDAO sprintDAO = new SprintDAO();
                 sprintDAO.deleteSprintDetails(sprint_id);
+                result.put("message", "Sprint deleted successfully");
             }
             result.put("status", "Success");
             response.getWriter().write(gson.toJson(result));

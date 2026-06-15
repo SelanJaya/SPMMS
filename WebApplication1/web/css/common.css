@@ -10,8 +10,13 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 :root {
     --sidebar-width: 250px;
     --sidebar-bg: #2D1B4E;
-    --primary-blue: #6D28D9;
+    --primary-blue: #4F46E5;
     --body-bg: #f8fafc;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+    display: none;
 }
 
 body {
@@ -139,18 +144,18 @@ body {
 }
 
 #successProcessTab {
-    position: fixed;    
-    top: 20px;          
-    left: 50%; 
+    position: fixed;
+    top: 20px;
+    left: 50%;
     /* We don't put transform here because the animation will override it */
-    
-    z-index: 9999;      
+
+    z-index: 9999;
     min-width: 350px;
     max-width: 450px;
-/*    border-left: 5px solid #198754; 
-    background-color: #d1e7dd;  Bootstrap success green light */
-/*    color: #0f5132;             Dark green text for readability */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+    /*    border-left: 5px solid #198754; 
+        background-color: #d1e7dd;  Bootstrap success green light */
+    /*    color: #0f5132;             Dark green text for readability */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 
     /* Matches the name in @keyframes below */
     animation: slideDownBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
@@ -159,16 +164,41 @@ body {
 @keyframes slideDownBounce {
     from {
         /* Keep -50% horizontal to stay centered while moving -150% vertical */
-       transform: translateY(-20px);
-        opacity: 0; 
+        transform: translateY(-20px);
+        opacity: 0;
     }
-    to { 
+    to {
         /* Final state: centered and visible */
-       transform: translateY(0);
-        opacity: 1; 
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
 .alert-dismissible .btn-close {
     padding: 1.25rem;
+}
+
+/*.modal-header{
+    background-color: var(--primary-blue);
+}*/
+
+
+
+.text-danger.small {
+    min-height: 18px;
+    margin-top: 4px;
+}
+
+.validation-message {
+    margin-top: 6px;
+    padding: 8px 12px;
+    background-color: #fff5f5;
+    border-left: 3px solid #dc3545;
+    color: #dc3545;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.validation-message.show {
+    display: block;
 }

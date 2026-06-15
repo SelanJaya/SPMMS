@@ -82,11 +82,14 @@ public class TaskServices {
             // Delete task dependecy 
             TaskDependencyDAO taskDependencyDAO = new TaskDependencyDAO();
             taskDependencyDAO.deleteTaskDependency(con, task.getTask_id());
-
-            //form New Dependecy
-            for (int item : dependencyArr) {
-                TaskDependency taskDependency = new TaskDependency(task.getTask_id(), item);
-                taskDependencyDAO.insertTaskDependency(con, taskDependency);
+            
+            if (dependencyArr != null && !dependencyArr.isEmpty()) {
+                //form New Dependecy
+                for (int item : dependencyArr) {
+                    System.out.println(task.getTask_id() + " " + item);
+                    TaskDependency taskDependency = new TaskDependency(task.getTask_id(), item);
+                    taskDependencyDAO.insertTaskDependency(con, taskDependency);
+                }
             }
 
             con.commit();

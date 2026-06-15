@@ -62,7 +62,7 @@ public class BacklogDAO {
         return -1;
     }
 
-    public List getBacklogItem(int project_id) {
+    public List getBacklogItems(int project_id) {
 
         String sql = "SELECT backlog_item_id, backlog_item_title, backlog_item_desc, "
                 + "acceptance_criteria, story_points, mandays, backlog_item_priority, "
@@ -102,6 +102,41 @@ public class BacklogDAO {
         return null;
     }
 
+    public Backlog getBacklogItem(int backlog_item_id) {
+
+        String sql = """
+                    SELECT backlog_item_title, backlog_item_desc,
+                    acceptance_criteria, story_points, mandays
+                    FROM backlog_items WHERE backlog_item_id = ? 
+                    """;
+
+        Backlog backlog = null;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, backlog_item_id);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                backlog = new Backlog();
+                backlog.setBacklogI_title(rs.getString("backlog_item_title"));
+                backlog.setBacklogI_desc(rs.getString("backlog_item_desc"));
+                backlog.setAcceptance_cri(rs.getString("acceptance_criteria"));
+                backlog.setStory_point(rs.getInt("story_points"));
+                backlog.setMandays(rs.getInt("mandays"));
+
+            }
+
+            return backlog;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public void updateBacklogItem(Backlog backlog) {
         System.out.println("Backlog update DAO reporting");
         String sql = """
@@ -133,8 +168,15 @@ public class BacklogDAO {
     public void updateBacklogItem_Dev(Backlog backlog) {
         System.out.println("Backlog update DAO reporting");
         String sql = """
-                      UPDATE backlog_items SET backlog_item_title = ?, backlog_item_desc = ?, 
-                      acceptance_criteria = ?, story_points = ?, mandays = ?, status = ? , rejection_reason = ?, last_updated_by = ?
+                      UPDATE backlog_items
+                      SET backlog_item_title = COALESCE(?, backlog_item_title),
+                          backlog_item_desc = COALESCE(?, backlog_item_desc),
+                          acceptance_criteria = COALESCE(?, acceptance_criteria),
+                          story_points = COALESCE(?, story_points),
+                          mandays = COALESCE(?, mandays),
+                          status = COALESCE(?, status),
+                          rejection_reason = COALESCE(?, rejection_reason),
+                          last_updated_by = COALESCE(?, last_updated_by)
                       WHERE backlog_item_id = ?
                       """;
 
@@ -331,7 +373,77 @@ public class BacklogDAO {
             e.printStackTrace();
             throw e;
         }
-
     }
 
+    public List getBacklog_assoSprint(int sprint_id) throws Exception {
+
+        String sql = """
+                        SELECT b.backlog_item_id, b.backlog_item_title FROM
+                        backlog_items b 
+                        LEFT JOIN sprint_backlog_links spl
+                        USING(backlog_item_id)
+                        LEFT JOIN sprints s
+                        USING(sprint_id)
+                        WHERE s.sprint_id = ?;
+                        """;
+        List<Backlog> assosiatedBacklog = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, sprint_id);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Backlog backlog = new Backlog();
+                backlog.setBacklogI_id(rs.getInt("backlog_item_id"));
+                backlog.setBacklogI_title(rs.getString("backlog_item_title"));
+                assosiatedBacklog.add(backlog);
+            }
+
+            return assosiatedBacklog;
+        } catch (Exception e) {
+            System.out.println("Exception Occur in the getBacklog_assoSprint : " + e);
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public Double getBacklogCompletionRate(int project_id) throws Exception {
+        double backlogCompletionRate = 0;
+        String sql = """
+                       SELECT 
+                            COUNT(DISTINCT b.backlog_item_id) AS total_backlogs,
+                            SUM(
+                                CASE 
+                                    WHEN s.sprint_status = 'Completed' THEN 1
+                                    ELSE 0
+                                END
+                            ) AS completed_backlogs
+                        FROM backlog_items b
+                        LEFT JOIN projects p 
+                        USING(project_id)
+                        LEFT JOIN sprint_backlog_links sbl 
+                        USING(backlog_item_id)
+                        LEFT JOIN sprints s USING(sprint_id)
+                        WHERE p.project_id = ?;
+                        """;
+
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, project_id);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int completedBacklogs = rs.getInt("completed_backlogs");
+                int totalBacklogs = rs.getInt("total_backlogs");
+
+                backlogCompletionRate = (completedBacklogs / totalBacklogs) * 100;
+            }
+            return backlogCompletionRate;
+
+        } catch (Exception e) {
+            System.out.println("Exception Occur in the getBacklog_assoSprint : " + e);
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }

@@ -9,10 +9,6 @@
         <servlet-class>servlets.profileServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>dashboardServlet</servlet-name>
-        <servlet-class>servlets.dashboardServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>ProjectPageServlet</servlet-name>
         <servlet-class>servlets.ProjectPageServlet</servlet-class>
     </servlet>
@@ -48,6 +44,14 @@
         <servlet-name>BacklogDocumentServlet</servlet-name>
         <servlet-class>servlets.BacklogDocumentServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>projectAnalyticsServlet</servlet-name>
+        <servlet-class>servlets.projectAnalyticsServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DashboardServlet</servlet-name>
+        <servlet-class>servlets.DashboardServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>login_signUpServlet</servlet-name>
         <url-pattern>/login_signUpServlet</url-pattern>
@@ -55,10 +59,6 @@
     <servlet-mapping>
         <servlet-name>profileServlet</servlet-name>
         <url-pattern>/profileServlet</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>dashboardServlet</servlet-name>
-        <url-pattern>/dashboardServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ProjectPageServlet</servlet-name>
@@ -95,6 +95,14 @@
     <servlet-mapping>
         <servlet-name>BacklogDocumentServlet</servlet-name>
         <url-pattern>/BacklogDocumentServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>projectAnalyticsServlet</servlet-name>
+        <url-pattern>/projectAnalyticsServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DashboardServlet</servlet-name>
+        <url-pattern>/DashboardServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

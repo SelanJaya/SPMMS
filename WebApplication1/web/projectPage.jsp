@@ -45,7 +45,7 @@
                 </a>
 
                 <a href="teamAssignmentServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
-                <a href="projectAnalytics.jsp" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
+                <a href="projectAnalyticsServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                 <div class="mt-auto">
                     <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
                     <a href="login_signUpServlet?processType=logOut" class="nav-link text-danger">
@@ -72,16 +72,28 @@
             <div class="container-fluid p-4">
 
                 <div class="project-header-mini mb-4">
-                    <div class="header-main-row">
-                        <h1 id="projectName-badge"></h1>
+                    <div class="d-flex justify-content-between align-items-start flex-wrap">
 
-                        <div id="id-badge" class="id-badge">
-                            <i class="fas fa-fingerprint me-1"></i> ID: ${project.projectId}
+                        <div>
+                            <h1 id="projectName-badge" class="mb-2"></h1>
+
+                            <div class="d-flex gap-2 flex-wrap">
+                                <span id="id-badge" class="badge badge-soft-primary">
+                                    <i class="fas fa-fingerprint me-1"></i>
+                                    
+                                </span>
+
+                                <span id="status-badge" class="badge badge-soft-success">
+                                    <i class="fas fa-circle me-1"></i>
+                                    
+                                </span>
+
+                                <span id="risk-badge" class="badge badge-soft-warning">
+                                    <i class="fas fa-gauge-high me-1"></i>
+                                    Risk Score: <span id="riskScore"></span>
+                                </span>
+                            </div>
                         </div>
-
-                        <span id="status-badge" class="status-badge status-active">
-                            ${project.projectStatus}
-                        </span>
                     </div>
                 </div>
 
@@ -106,117 +118,193 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <form id="projectForm" >
-                                    <!--                                    <input type="hidden" name="processType" id="projectInfoUpdate" value="projectInfoUpdate">
-                                                                        <input type="hidden" name="projectId" >-->
+                                <form id="projectForm">
                                     <div class="row g-4">
-                                        <div class="col-md-4">
+
+                                        <!-- Project Name -->
+                                        <div class="col-md-4 position-relative">
                                             <span class="label-style">Project Name</span>
+
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
                                                     <i class="fas fa-folder text-muted"></i>
                                                 </span>
 
-                                                <input  type="text" name="projectName" id="projName"
-                                                        class="form-control editable-field fw-bold" value="${project.projectName}"
-                                                        readonly>
+                                                <input type="text"
+                                                       name="projectName"
+                                                       id="projName"
+                                                       class="form-control editable-field fw-bold"
+                                                       value="${project.projectName}"
+                                                       readonly>
                                             </div>
+
+                                            <p id="errorProjectName" class=" d-none validation-message"></p>
                                         </div>
-                                        <div class="col-md-4">
+
+                                        <!-- Project Type -->
+                                        <div class="col-md-4 position-relative">
                                             <span class="label-style">Project Type</span>
+
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
                                                     <i class="fas fa-briefcase text-muted"></i>
                                                 </span>
-                                                <select name="projectType" id="projectType" 
+
+                                                <select name="projectType"
+                                                        id="projectType"
                                                         class="form-select editable-field">
+
                                                     <option value="Finance" ${project.projectType == 'Finance' ? 'selected' : ''}>Finance</option>
                                                     <option value="Academic" ${project.projectType == 'Academic' ? 'selected' : ''}>Academic</option>
                                                     <option value="Student" ${project.projectType == 'Student' ? 'selected' : ''}>Student</option>
                                                     <option value="PTJ" ${project.projectType == 'PTJ' ? 'selected' : ''}>PTJ</option>
                                                 </select>
                                             </div>
+                                            <span class="position-absolute start-0 ms-3">
+                                                <p id="errorProjectType" class=" d-none validation-message"></p>
+                                            </span>
                                         </div>
-                                        <div class="col-md-4">
+
+                                        <!-- Client Name -->
+                                        <div class="col-md-4 position-relative">
                                             <span class="label-style">Client Name</span>
+
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
                                                     <i class="fas fa-user-tie text-muted"></i>
                                                 </span>
-                                                <input type="text"  name="projClient" id="projClient" 
-                                                       class="form-control editable-field" 
-                                                       value="${project.projectClient}" 
-                                                       placeholder="Enter client or stakeholder name" readonly>
-                                            </div>
-                                        </div>           
 
-                                        <div class="col-12">
+                                                <input type="text"
+                                                       name="projClient"
+                                                       id="projClient"
+                                                       class="form-control editable-field"
+                                                       value="${project.projectClient}"
+                                                       placeholder="Enter client or stakeholder name"
+                                                       readonly>
+                                            </div>
+
+                                            <span class="position-absolute start-0 ms-3">
+                                                <p id="errorClientName" class="d-none validation-message"></p>
+                                            </span>
+                                        </div>
+
+                                        <!-- Description -->
+                                        <div class="col-12 position-relative">
                                             <span class="label-style">Project Description</span>
+
                                             <div class="input-group input-group-text bg-light border-end-0">
                                                 <span class="me-2 align-items-start pt-2">
                                                     <i class="fas fa-align-left text-muted"></i>
                                                 </span>
-                                                <textarea name="projectDesc" id="projDesc" class=" px-2 form-control editable-field" rows="2"
+
+                                                <textarea name="projectDesc"
+                                                          id="projDesc"
+                                                          class="px-2 form-control editable-field"
+                                                          rows="2"
                                                           readonly>${project.projectDesc}</textarea>
                                             </div>
+
+                                            <p id="errorProjectDesc" class="d-none validation-message"></p>
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <!-- Status -->
+                                        <div class="col-md-4 position-relative">
                                             <span class="label-style">Project Status</span>
-                                            <div class="input-group input-group-text bg-light  ">
+
+                                            <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
-                                                    <i class="fas fa-circle-dot text-muted"></i> </span>
+                                                    <i class="fas fa-circle-dot text-muted"></i>
+                                                </span>
 
-
-                                                <input type="text"  name="projStatus" id="projStatus" 
-                                                       class="form-control editable-field" 
-                                                       value="${project.projectStatus}" 
-                                                       placeholder="Enter client or stakeholder name">
+                                                <input type="text"
+                                                       name="projStatus"
+                                                       id="projStatus"
+                                                       class="form-control editable-field"
+                                                       value="${project.projectStatus}">
                                             </div>
+
+                                            <p id="errorProjectStatus" class="d-none validation-message"></p>
                                         </div>
 
-
+                                        <!-- Start Date -->
                                         <div class="col-md-4 position-relative">
                                             <span class="label-style">Start Date</span>
-                                            <div class="input-group input-group-text bg-light  ">
+
+                                            <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
                                                     <i class="fas fa-calendar-days text-muted"></i>
                                                 </span>
-                                                <input type="date" name="projStartDate" id="ProjStart" class="form-control editable-field"
-                                                       value="${project.projStartDate}" readonly>
-                                            </div> <span class=" position-absolute start-0 ms-3"><p id="errorMsgStartDate"></p></span>
+
+                                                <input type="date"
+                                                       name="projStartDate"
+                                                       id="ProjStart"
+                                                       class="form-control editable-field"
+                                                       value="${project.projStartDate}"
+                                                       readonly>
+                                            </div>
+                                            <span class="position-absolute start-0 ms-3">
+                                                <p id="errorMsgStartDate" class="d-none validation-message"></p>
+                                            </span>
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <!-- Deadline -->
+                                        <div class="col-md-4 position-relative">
                                             <span class="label-style">Deadline</span>
-                                            <div class="input-group input-group-text bg-light ">
+
+                                            <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
                                                     <i class="fas fa-calendar-check text-muted"></i>
                                                 </span>
-                                                <input type="date" name="projEndDate" id="ProjEnd" class="form-control editable-field"
-                                                       value="${project.projEndDate}" readonly>
+
+                                                <input type="date"
+                                                       name="projEndDate"
+                                                       id="ProjEnd"
+                                                       class="form-control editable-field"
+                                                       value="${project.projEndDate}"
+                                                       readonly>
                                             </div>
+                                            <span class="position-absolute start-0 ms-3">
+                                                <p id="errorDateRange" class="d-none validation-message"></p>
+                                            </span>
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <!-- Date Created -->
+                                        <div class="col-md-4 position-relative">
                                             <span class="label-style">Date Created</span>
+
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
                                                     <i class="fas fa-calendar-plus text-muted"></i>
                                                 </span>
 
-                                                <input type="text" name="projDate" id="projDate" class="form-control editable-field"
-                                                       value="${project.projCreatedAt}" readonly>
-
+                                                <input type="text"
+                                                       name="projDate"
+                                                       id="projDate"
+                                                       class="form-control editable-field"
+                                                       value="${project.projCreatedAt}"
+                                                       readonly>
                                             </div>
+
+                                            <p id="errorProjDate" class="d-none validation-message"></p>
                                         </div>
+
                                     </div>
 
                                     <div id="editActions" class="d-none mt-4 pt-3 border-top text-end">
-                                        <button id="formCanbtn" type="button" class="btn btn-sm btn-light px-3 me-2 fw-bold"
-                                                style="font-size: 0.8rem;" onclick="toggleEdit(false)">Cancel</button>
-                                        <button id="formSubbtn" type="submit" class="btn btn-sm btn-primary px-4 fw-bold"
-                                                style="font-size: 0.8rem;" >Save Changes</button>
+                                        <button id="formCanbtn"
+                                                type="button"
+                                                class="btn btn-sm btn-light px-3 me-2 fw-bold"
+                                                style="font-size: 0.8rem;"
+                                                onclick="toggleEdit(false)">
+                                            Cancel
+                                        </button>
+
+                                        <button id="formSubbtn"
+                                                type="submit"
+                                                class="btn btn-sm btn-primary px-4 fw-bold"
+                                                style="font-size: 0.8rem;">
+                                            Save Changes
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -352,6 +440,7 @@
                                                 <option value="Stakeholder Register">Stakeholder Register</option>
                                                 <option value="Project Sign Off">Project Sign Off</option>
                                             </select>
+                                            <p id="errorDocType" class="d-none validation-message"></p>
                                         </div>
 
                                         <div class="mb-2">
@@ -370,6 +459,10 @@
                                                     </span>
                                                 </div>
                                             </div>
+
+                                            <!-- Validation Message -->
+                                            <p id="errorAttachment"
+                                               class="validation-message d-none"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -436,7 +529,7 @@
         console.log(projectId);
         console.log("User Role : ", user_role);
     </script>
-    <script src="js/common.js"></script>
+    <!--    <script src="js/common.js"></script>-->
     <script src="js/projectPage.js"></script>
 </body>
 

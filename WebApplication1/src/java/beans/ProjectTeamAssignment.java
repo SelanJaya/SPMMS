@@ -16,7 +16,8 @@ public class ProjectTeamAssignment {
     private int project_id;
     private int assign_to;
     private int assign_by;
-    private String assigned_at;
+    private int removed_by;
+    private String assigned_at, asign_to_Email, assign_to_username, removed_at, removal_reason;
 
     public ProjectTeamAssignment() {
     }
@@ -47,6 +48,26 @@ public class ProjectTeamAssignment {
         this.assigned_at = assigned_at;
     }
 
+    public void setAsign_to_Email(String asign_to_Email) {
+        this.asign_to_Email = asign_to_Email;
+    }
+
+    public void setAssign_to_username(String assign_to_username) {
+        this.assign_to_username = assign_to_username;
+    }
+
+    public void setRemoved_by(int removed_by) {
+        this.removed_by = removed_by;
+    }
+
+    public void setRemoved_at(String removed_at) {
+        this.removed_at = removed_at;
+    }
+
+    public void setRemoval_reason(String removal_reason) {
+        this.removal_reason = removal_reason;
+    }
+    
     public int getProjectTeam_id() {
         return projectTeam_id;
     }
@@ -63,8 +84,29 @@ public class ProjectTeamAssignment {
         return assign_by;
     }
 
+    public String getAsign_to_Email() {
+        return asign_to_Email;
+    }
+
+    public String getAssign_to_username() {
+        return assign_to_username;
+    }
+
     public LocalDateTime getAssigned_at() {
         return LocalDateTime.parse(assigned_at);
     }
+    
+    public int getRemoved_by() {
+        return removed_by;
+    }
+
+    public String getRemoved_at() {
+        return removed_at;
+    }
+
+    public String getRemoval_reason() {
+        return removal_reason;
+    }
+    
 
 }

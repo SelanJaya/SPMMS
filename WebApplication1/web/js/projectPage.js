@@ -7,13 +7,15 @@
 let fileNameDisplay;
 let fileInfo;
 let isEditTask = false;
+let cacheData;
+
 document.addEventListener("DOMContentLoaded", async function () {
     console.log("DOM LOADED");
     const response = await fetch(`ProjectPageServlet?action=fetchProjectinfo&project_id=${projectId}`);
     const result = await response.json();
     console.log("Project Data", result);
-    document.getElementById("id-badge").innerText = result.projectData.projectId;
-    document.getElementById("status-badge").innerText = result.projectData.projectStatus;
+document.getElementById("id-badge").innerText = "ID: " + result.projectData.projectId;
+    document.getElementById("status-badge").innerText = "Status: " + result.projectData.projectStatus;
     document.getElementById("projectName-badge").innerText = result.projectData.projectName;
     document.getElementById("projName").value = result.projectData.projectName;
     document.getElementById("projectType").value = result.projectData.projectType;
@@ -23,31 +25,218 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("ProjStart").value = result.projectData.projStartDate;
     document.getElementById("ProjEnd").value = result.projectData.projEndDate;
     document.getElementById("projDate").value = result.projectData.projCreatedAt;
+    
+    const riskScore = result.projectData.project_risk_score;
+    const riskBadgeClass =
+            riskScore <= 30
+            ? "badge-soft-success"
+            : riskScore <= 60
+            ? "badge-soft-warning"
+            : "badge-soft-danger";
+            
+    document.getElementById("riskScore").innerText = riskScore;
+
     console.log("project Date", result.projectData.projEndDate);
 });
-document.getElementById("formSubbtn").addEventListener("click", async function (e) {
 
-    e.preventDefault();
-    console.log("UpdateInstantiated");
+function validateProjectForm() {
+
+    console.log("check 2");
+    // Retrieve Input Values   
+    const projectName = document.getElementById("projName").value.trim();
+    const projectType = document.getElementById("projectType").value.trim();
+    const projectClient = document.getElementById("projClient").value.trim();
+    const projectDesc = document.getElementById("projDesc").value.trim();
+    const projectStatus = document.getElementById("projStatus").value.trim();
+    const projStartDate = document.getElementById("ProjStart").value;
+    const projEndDate = document.getElementById("ProjEnd").value;
+
+    // Error Elements
+    const errorProjectName = document.getElementById("errorProjectName");
+    const errorProjectType = document.getElementById("errorProjectType");
+    const errorClientName = document.getElementById("errorClientName");
+    const errorProjectDesc = document.getElementById("errorProjectDesc");
+    const errorProjectStatus = document.getElementById("errorProjectStatus");
+    const errorMsgStartDate = document.getElementById("errorMsgStartDate");
+    const errorDateRange = document.getElementById("errorDateRange");
+
+    // Clear Previous Errors
+    errorProjectName.textContent = "";
+    errorProjectType.textContent = "";
+    errorClientName.textContent = "";
+    errorProjectDesc.textContent = "";
+    errorProjectStatus.textContent = "";
+    errorMsgStartDate.textContent = "";
+    errorDateRange.textContent = "";
+
+    let isValid = true;
+
+
+    // Project Name Validation
+    if (projectName === "") {
+        errorProjectName.textContent = "Project name is required";
+        errorProjectName.classList.remove("d-none");
+        isValid = false;
+    } else if (projectName.length < 3) {
+        errorProjectName.textContent = "Project name must be at least 3 characters";
+        errorProjectName.classList.remove("d-none");
+        isValid = false;
+    }
+
+    // Project Type Validation
+    if (projectType === "") {
+        errorProjectType.textContent = "Please select project type";
+        errorProjectType.classList.remove("d-none");
+        isValid = false;
+    }
+
+    // Client Name Validation
+    if (projectClient === "") {
+        errorClientName.textContent = "Client name is required";
+        errorClientName.classList.remove("d-none");
+        isValid = false;
+    } else if (projectClient.length < 3) {
+        errorClientName.textContent = "Client name is too short";
+        errorClientName.classList.remove("d-none");
+        isValid = false;
+    }
+
+    // Description Validation
+    if (projectDesc === "") {
+        errorProjectDesc.textContent = "Project description is required";
+        errorProjectDesc.classList.remove("d-none");
+        isValid = false;
+    } else if (projectDesc.length < 10) {
+        errorProjectDesc.textContent = "Description must be at least 10 characters";
+        errorProjectDesc.classList.remove("d-none");
+        isValid = false;
+    }
+
+    // Project Status Validation
+    if (projectStatus === "") {
+        errorProjectStatus.textContent = "Project status is required";
+        errorProjectStatus.classList.remove("d-none");
+        isValid = false;
+    }
+
+    // Start Date Validation
+    if (projStartDate === "") {
+        errorMsgStartDate.textContent = "Start date is required";
+        errorMsgStartDate.classList.remove("d-none");
+        isValid = false;
+    }
+
+    // Deadline Validation
+    if (projEndDate === "") {
+        errorDateRange.textContent = "Deadline is required";
+        errorDateRange.classList.remove("d-none");
+        isValid = false;
+    }
+
+    // Date Range Validation
+    if (projStartDate !== "" && projEndDate !== "") {
+
+        const start = new Date(projStartDate);
+        const end = new Date(projEndDate);
+
+        if (end < start) {
+            errorDateRange.textContent =
+                    "Deadline cannot be earlier than start date";
+            errorDateRange.classList.remove("d-none");
+            isValid = false;
+        }
+    }
+
     const data = {
         action: "projectInfoUpdate",
         projectId: projectId,
-        projectName: document.getElementById("projName").value,
-        projectDesc: document.getElementById("projDesc").value,
-        projectType: document.getElementById("projectType").value,
-        projectClient: document.getElementById("projClient").value,
-        projStartDate: document.getElementById("ProjStart").value,
-        projEndDate: document.getElementById("ProjEnd").value
+        projectName: projectName,
+        projectDesc: projectDesc,
+        projectType: projectType,
+        projectClient: projectClient,
+        projStartDate: projStartDate,
+        projEndDate: projEndDate
     };
-    const result = await sendData_project(data);
-    if (result.status === "Success") {
-        populateProjectDetails(data);
-        toggleEdit(false);
-        displayMessage(result.message, result.status);
+
+    if (isValid) {
+        return data;
+    } else {
+        return;
     }
 
-    console.log(result);
+}
+document.getElementById("projectForm").addEventListener("click", async function (e) {
+
+    // =====================================
+    // Hide Validation Message On Click
+    // =====================================
+
+    const field = e.target;
+
+    const errorMap = {
+        "projName": "errorProjectName",
+        "projectType": "errorProjectType",
+        "projClient": "errorClientName",
+        "projDesc": "errorProjectDesc",
+        "projStatus": "errorProjectStatus",
+        "ProjStart": "errorMsgStartDate",
+        "ProjEnd": "errorDateRange"
+    };
+
+    if (errorMap[field.id]) {
+
+        const errorElement =
+                document.getElementById(errorMap[field.id]);
+
+        errorElement.classList.add("d-none");
+        errorElement.textContent = "";
+    }
+
+    // =====================================
+    // Submit Button Click
+    // =====================================
+
+    const formSubbtn = e.target.closest("#formSubbtn");
+    const formCanbtn = e.target.closest("#formCanbtn");
+
+    if (formSubbtn) {
+
+        e.preventDefault();
+
+        console.log("UpdateInstantiated");
+
+        const data = validateProjectForm();
+
+        console.log(data);
+
+        // Stop if validation failed
+        if (!data) {
+            return;
+        }
+
+        const result = await sendData_project(data);
+
+        console.log(result);
+
+        if (result.status === "Success") {
+
+            populateProjectDetails(data);
+
+            toggleEdit(false);
+
+            displayMessage(result.message, result.status);
+        }
+    } else if (formCanbtn) {
+        populateProjectDetails(cacheData);
+        document.querySelectorAll(".validation-message").forEach(error => {
+
+            error.classList.add("d-none");
+            error.textContent = "";
+        });
+    }
 });
+
+
 function populateProjectDetails(data) {
 
     document.getElementById("projName").value = data.projectName;
@@ -76,8 +265,20 @@ async function sendData_project(data) {
 }
 
 if (user_role === "Project Manager") {
+
     let uploadModel;
     document.getElementById("editBtn").addEventListener("click", function () {
+        //save the old data 
+        cacheData = {
+            projectName: document.getElementById("projName").value.trim(),
+            projectType: document.getElementById("projectType").value.trim(),
+            projectClient: document.getElementById("projClient").value.trim(),
+            projectDesc: document.getElementById("projDesc").value.trim(),
+            projectStatus: document.getElementById("projStatus").value.trim(),
+            projStartDate: document.getElementById("ProjStart").value,
+            projEndDate: document.getElementById("ProjEnd").value,
+        };
+
         toggleEdit(true);
     });
 }
@@ -144,7 +345,7 @@ document.getElementById("deleteBtn").addEventListener("click", async function ()
         document.getElementById('successBody').classList.remove('d-none');
         // 4. Final Redirect after 2 seconds
         setTimeout(() => {
-            window.location.href = "dashboardServlet?processType=projectInfo";
+            window.location.href = "dashboard.jsp";
         }, 2000);
     } else if (result.status === "failed") {
         displayFile(result.message, result.status);
@@ -335,6 +536,8 @@ const taskModel = document.getElementById("uploadModal");
 async function handleModalUpload() {
     let action = "insert";
     const docType = taskModel.querySelector("#docType").value;
+
+    // creation formdata to send data 
     const formData = new FormData();
     if (isEditTask) {
         action = "edit";
@@ -347,10 +550,13 @@ async function handleModalUpload() {
     formData.append("action", action);
     formData.append("document_name", taskModel.querySelector("#docLabel").value);
     formData.append("document_type", docType);
-    const document_pdf = taskModel.querySelector("#actualFile").files[0] || null;
     formData.append("document_nameSys", docType + "_" + projectId);
+
+    const document_pdf = taskModel.querySelector("#actualFile").files[0] || null;
     formData.append("document_pdf", document_pdf);
+
     const result = await sendData(formData);
+
     if (action === "insert" && result.status === "Success") {
         formData.append("document_id", result.document_id);
         formData.append("document_path", result.document_path);
@@ -393,6 +599,9 @@ projectDocModel.addEventListener("click", function (e) {
     const documentViewbtn = e.target.closest(".docViewBtn");
     const documentDownloadbtn = e.target.closest(".docDownloadBtn");
     const link = e.target.closest(".doc-edit-link");
+    const docType = e.target.closest("#docType");
+    const dropZone = e.target.closest("#dropZone");
+
     // VIEW button clicked
     if (viewNavBtn) {
         projectDocModel.querySelector("#confirmDocBtn")
@@ -405,6 +614,7 @@ projectDocModel.addEventListener("click", function (e) {
     }
     // UPLOAD button clicked
     else if (uploadNavBtn) {
+        cleanUploadPane();
         projectDocModel.querySelector("#confirmDocBtn").innerText = "Confirm Upload";
         projectDocModel.querySelector("#confirmDocBtn")
                 .classList.remove("d-none");
@@ -412,6 +622,12 @@ projectDocModel.addEventListener("click", function (e) {
     // Submit upload form   
     else if (confirmDocBtn) {
         console.log("Doc Submit btn is clicked");
+
+        const isvalid = validateDocumentForm();
+        if (!isvalid) {
+            return;
+        }
+
         handleModalUpload();
     } else if (confirmDocDeletion) {
 
@@ -425,7 +641,7 @@ projectDocModel.addEventListener("click", function (e) {
         deletionModal.dataset.id = docId;
         const modal = new bootstrap.Modal(deletionModal);
         modal.show();
-        
+
     } else if (documentDownloadbtn) {
         console.log("document Download initialized ");
         const row = e.target.closest("tr");
@@ -439,8 +655,166 @@ projectDocModel.addEventListener("click", function (e) {
         console.log("Link Edit Initiated  for id: ", docName, docId);
         editForm(docId);
     }
+    // Hide category error
+    else if (docType) {
+
+        const errorDocType =
+                document.getElementById("errorDocType");
+
+        errorDocType.classList.add("d-none");
+        errorDocType.textContent = "";
+    }
+
+    // Hide attachment error
+    else if (dropZone) {
+
+        const errorAttachment =
+                document.getElementById("errorAttachment");
+
+        errorAttachment.classList.add("d-none");
+        errorAttachment.textContent = "";
+    }
+
+
 
 });
+
+
+function validateDocumentForm() {
+
+    // =====================================
+    // Retrieve Values
+    // =====================================
+
+    const docType =
+            document.getElementById("docType").value;
+
+    const actualFile =
+            document.getElementById("actualFile").files[0];
+
+    // =====================================
+    // Error Elements
+    // =====================================
+
+    const errorDocType =
+            document.getElementById("errorDocType");
+
+    const errorAttachment =
+            document.getElementById("errorAttachment");
+
+    // =====================================
+    // Clear Previous Errors
+    // =====================================
+
+    errorDocType.textContent = "";
+    errorDocType.classList.add("d-none");
+
+    errorAttachment.textContent = "";
+    errorAttachment.classList.add("d-none");
+
+    let isValid = true;
+
+    // =====================================
+    // Document Category Validation
+    // =====================================
+
+    if (!docType || docType.trim() === "") {
+
+        errorDocType.textContent =
+                "Please select document category";
+
+        errorDocType.classList.remove("d-none");
+
+        isValid = false;
+    }
+
+    // =====================================
+    // File Validation
+    // =====================================
+
+    if (!actualFile) {
+
+        errorAttachment.textContent =
+                "Please upload an attachment";
+
+        errorAttachment.classList.remove("d-none");
+
+        isValid = false;
+    } else {
+
+        // =====================================
+        // File Type Validation
+        // =====================================
+
+        const allowedTypes = [
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        ];
+
+        if (!allowedTypes.includes(actualFile.type)) {
+
+            errorAttachment.textContent =
+                    "Only PDF or Word documents are allowed";
+
+            errorAttachment.classList.remove("d-none");
+
+            isValid = false;
+        }
+
+        // =====================================
+        // File Size Validation
+        // 5MB Limit
+        // =====================================
+
+        const maxSize = 5 * 1024 * 1024;
+
+        if (actualFile.size > maxSize) {
+
+            errorAttachment.textContent =
+                    "File size cannot exceed 5MB";
+
+            errorAttachment.classList.remove("d-none");
+
+            isValid = false;
+        }
+    }
+
+    // =====================================
+    // Return Result
+    // =====================================
+
+    return isValid;
+}
+
+
+function cleanUploadPane() {
+
+    console.log("cleanUploadPane executed");
+
+    document.getElementById("actualFile").value = "";
+
+    document.getElementById("selectedFileName")
+            .textContent = "";
+
+    document.getElementById("docLabel").innerText = "";
+
+    document.getElementById("docType").value = "";
+
+    document.getElementById("fileInfo")
+            .classList.add("d-none");
+
+
+    document.querySelectorAll(".validation-message")
+            .forEach(error => {
+
+                error.classList.add("d-none");
+
+                error.textContent = "";
+            });
+}
+
+
 document.getElementById("deletedocBtnCfm").addEventListener("click", async function () {
 
     const formData = new FormData();

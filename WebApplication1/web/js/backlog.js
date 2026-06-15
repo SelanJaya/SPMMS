@@ -16,8 +16,9 @@ let isEdit;
 
 // fetch the backlog data from the db after the backlog page is displayed
 document.addEventListener("DOMContentLoaded", async function () {
+    console.log(document.querySelector('.top-nav').offsetHeight);
 
-    const response = await fetch(`BacklogServlet?project_id=${projectId}&action=fetchData`);
+    const response = await fetch(`BacklogServlet?project_id=${projectId}&action=fetchBacklogs`);
     const result = await response.json();
 
 
@@ -94,6 +95,7 @@ async function getBacklogRowData(e, option) {
         console.log("PO");
 
         const cells = row.querySelectorAll(".editable-cell");
+        console.log(cells);
         cells.forEach(cell => {
 
             field = cell.dataset.field;
@@ -115,26 +117,31 @@ async function getBacklogRowData(e, option) {
                     }
                 }
             } else {
-                value = cell.dataset.status;
+                value = cell.textContent.trim();
             }
 
             console.log(value);
 
-            if (field === "priority" || field === "storyPoint") {
-                // filter out the ui ...
-                if (!value || value.trim() === "..." || isNaN(value)) {
-                    value = 0;
-                }
+//            if (field === "priority" || field === "storyPoint") {
+//                // filter out the ui ...
+//                if (!value || value.trim() === "..." || isNaN(value)) {
+//                    value = 0;
+//                }
+//            }
+
+            if ((field === "mandays" || field === "story_point") &&
+                    (value === "..." || value.trim() === "")) {
+                value = 0;
             }
 
             rowData[field] = value;
         });
     } else if (userRole === "Developer") {
         const cells = row.querySelectorAll(".editable-cell.dev-editable");
-
+        
         cells.forEach(cell => {
             const field = cell.dataset.field;
-
+            console.log(field);
             if (field === "backlogI_desc") {
                 rowData["status"] = "Refined";
                 rowData["last_updated_by"] = userId;
@@ -144,43 +151,53 @@ async function getBacklogRowData(e, option) {
             let value = cell.textContent.trim();
             console.log(field, value);
 
+            if ((field === "mandays" || field === "story_point") &&
+                    (value === "..." || value.trim() === "")) {
+                value = 0;
+            }
 
             // filter out the ui ...
-            if (field === "story_point" || field === "mandays") {
-                if (!value || value.trim() === "..." || isNaN(value)) {
-                    value = 0;
-                }
-            }
             rowData[field] = value;
             option = row.querySelector(".status-dropdown");
             console.log(option);
+
+
         });
         rowData.action = "Update_Dev";
     }
 
     console.log(rowData);
 
-    try {
-        //call cervlet to update the field
-        const result = await updateBacklogRow(rowData);
+//    try {
+    //call cervlet to update the field
+    const result = await updateBacklogRow(rowData);
 
-        if (result.status === "Success") {
-            console.log("Option : ", option);
-            if (option) {
-                //after user select option
-                const newStatus = option.dataset.value || rowData.status ;
-                console.log(newStatus);
+    if (result.status === "Success") {
+        console.log("Option : ", option);
+        // 🔒 Lock developer editable fields after update
+        if (userRole === "Developer") {
+            const editableCells = row.querySelectorAll(".editable-cell.dev-editable");
 
-                //insert in the ui to fetch later
-                const container = option.closest(".status-container");
-                console.log(container);
-                applyStatusUI(container, newStatus);
-            }
+            editableCells.forEach(cell => {
+                cell.classList.remove("dev-editable");
+                cell.setAttribute("contenteditable", "false");
+            });
         }
-    } catch (err) {
-        console.error("Update Failed:", err);
-        alert("Failed to save change");
+        if (option) {
+            //after user select option
+            const newStatus = option.dataset.value || rowData.status || row.status.dataset.status;
+            console.log(newStatus);
+
+            //insert in the ui to fetch later
+            const container = option.closest(".status-container");
+            console.log(container);
+            applyStatusUI(container, newStatus);
+        }
     }
+//    } catch (err) {
+//        console.error("Update Failed:", err);
+//        alert("Failed to save change");
+//    }
 }
 ;
 
@@ -226,17 +243,17 @@ $(document).ready(function () {
         table.column('.action-col').visible(false);
     }
 
-    const sidebar = document.getElementById('sidebar');
-    // 1. Sidebar Toggle
-    function toggleSidebar() {
-        sidebar.classList.toggle('collapsed');
-        setTimeout(() => {
-            table.columns.adjust().draw();
-        }, 400);
-    }
+//    const sidebar = document.getElementById('sidebar');
+//    // 1. Sidebar Toggle
+//    function toggleSidebar() {
+//        sidebar.classList.toggle('collapsed');
+//        setTimeout(() => {
+//            table.columns.adjust().draw();
+//        }, 400);
+//    }
 
-    sidebar.addEventListener('dblclick', toggleSidebar);
-    $('#sidebarToggle').on('click', toggleSidebar);
+    //sidebar.addEventListener('dblclick', toggleSidebar);
+    //$('#sidebarToggle').on('click', toggleSidebar);
 
     if (userRole === "Product Owner") {
         // 2. Drag & Drop Reordering
@@ -316,6 +333,7 @@ $(document).ready(function () {
     });
 
 });
+
 // START INSET ADD listener to the form submit button
 document.getElementById('confirmAddBtn').addEventListener('click', handleAddBacklog);
 
@@ -415,7 +433,7 @@ async function handleReasonModel(backlogI_id) {
 
     if (userRole === "Developer") {
         reasonField.readOnly = true;
-        document.getElementById("rejectionPrompMessagae").innerText = "This Backlog Item is rejected by Product Owner due to the reason below";
+        document.getElementById("rejectionPromptMessage").innerText = "This Backlog Item is rejected by Product Owner due to the reason below";
         document.getElementById("buttonDiv").classList.add("d-none");
     } else {
         const submitModelElBtn = modalEl.querySelector("#confirmRejectBtn");
@@ -487,12 +505,14 @@ function applyStatusUI(container, newStatus) {
 
     // 1. Update visible text
     text.textContent = newStatus;
-    
+
     const noclick_refined = newStatus === "Refined" ? `no-click` : ``;
     // 2. Update class (VERY IMPORTANT for color/style)
-    pill.classList.remove("status-pending", "status-approved", "status-rejected", "status-pending");
-    pill.className = `status-pill status-${newStatus.toLowerCase()} ${noclick_refined}`;
 
+    if (newStatus) {
+        pill.classList.remove("status-pending", "status-approved", "status-rejected", "status-pending");
+        pill.className = `status-pill status-${newStatus.toLowerCase()} ${noclick_refined}`;
+    }
     // 3. Store value in dataset (THIS is your injected value)
     container.dataset.selectedStatus = newStatus;
 }
@@ -658,8 +678,139 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 });
 
-function getBacklogData(key) {
+document.getElementById("addNewBacklogBtn").addEventListener("click", () => {
+    const addItemModal = new bootstrap.Modal(document.getElementById("addItemModal"));
 
+    if (userRole !== "Developer") {
+        document.getElementById("devBacklogField").classList.add("d-none");
+    }
+
+    hideAllErrorMsg_backlog();
+    addItemModal.show();
+});
+
+const addItemForm = document.getElementById("addItemForm");
+
+function hideAllErrorMsg_backlog() {
+
+    const errorIds = [
+        "errorBacklogTitle",
+        "errorBacklogDescription",
+        "errorAcceptanceCriteria",
+        "errorStoryPoints",
+        "errorMandays"
+    ];
+
+    errorIds.forEach(id => {
+        document.getElementById(id).classList.add("d-none");
+    });
+
+}
+
+document.getElementById("addItemForm").addEventListener("input", function (e) {
+
+    const fieldMap = {
+        backlog_title: "backlogTitleError",
+        backlog_description: "backlogDescriptionError",
+        backlog_ACriteria: "backlogCriteriaError",
+        backlog_SPts: "storyPointsError",
+        backlog_Mdys: "mandaysError"
+    };
+
+    const errorId = fieldMap[e.target.id];
+
+    if (errorId) {
+        document.getElementById(errorId)?.classList.add("d-none");
+    }
+});
+
+function validateBacklogForm(data) {
+
+    let isValid = true;
+
+    const title = data.backlogI_title;
+    const description = data.backlogI_desc;
+    const criteria = data.acceptance_cri;
+    const storyPoints = data.story_point;
+    const mandays = data.mandays;
+
+    document.querySelectorAll("#addItemForm .validation-message")
+            .forEach(error => error.classList.add("d-none"));
+
+    if (!title || title.trim() === "") {
+        const error = document.getElementById("errorBacklogTitle");
+        error.textContent = "Backlog title is required.";
+        error.classList.remove("d-none");
+        isValid = false;
+    }
+
+    if (!description || description.trim() === "") {
+        const error = document.getElementById("errorBacklogDescription");
+        error.textContent = "Description is required.";
+        error.classList.remove("d-none");
+        isValid = false;
+    }
+
+    if (!criteria || criteria.trim() === "") {
+        const error = document.getElementById("errorAcceptanceCriteria");
+        error.textContent = "Acceptance criteria is required.";
+        error.classList.remove("d-none");
+        isValid = false;
+    }
+
+    if (storyPoints !== undefined) {
+
+        const sp = parseInt(storyPoints);
+
+        if (isNaN(sp) || sp < 0 || sp > 10) {
+            const error = document.getElementById("errorStoryPoints");
+            error.textContent = "Story points must be between 0 and 10.";
+            error.classList.remove("d-none");
+            isValid = false;
+        }
+    }
+
+    if (mandays !== undefined) {
+
+        const md = parseInt(mandays);
+
+        if (isNaN(md) || md < 0 || md > 10) {
+            const error = document.getElementById("errorMandays");
+            error.textContent = "Mandays must be between 0 and 10.";
+            error.classList.remove("d-none");
+            isValid = false;
+        }
+    }
+
+    return isValid;
+}
+
+function showError(id, message) {
+    const error = document.getElementById(id);
+    error.textContent = message;
+    error.classList.remove("d-none");
+}
+
+document.getElementById("addItemForm").addEventListener("input", function (e) {
+
+    const errorMap = {
+        backlog_title: "errorBacklogTitle",
+        backlog_description: "errorBacklogDescription",
+        backlog_ACriteria: "errorAcceptanceCriteria",
+        backlog_SPts: "errorStoryPoints",
+        backlog_Mdys: "errorMandays"
+    };
+
+    const errorId = errorMap[e.target.id];
+
+    if (errorId) {
+        document.getElementById(errorId)
+                ?.classList.add("d-none");
+    }
+});
+
+function getBacklogData(key) {
+    console.log("getbacklogData");
     const data = {
         //get the vales form the backlog form
         action: "Create",
@@ -669,8 +820,15 @@ function getBacklogData(key) {
         acceptance_cri: $('#backlog_ACriteria').val(),
         mandays: $('#backlog_Mdys').val(),
         story_point: $('#backlog_SPts').val(),
-        createdBy: `${userId}`
+        created_by: `${userId}`
     };
+
+    const isValid = validateBacklogForm(data);
+    console.log(isValid);
+
+    if (!isValid) {
+        return false;
+    }
 
     if (userRole === "Product Owner") {
         data.status = "Approved";
@@ -693,24 +851,42 @@ async function handleAddBacklog() {
 
     console.log("handleAddBacklog 1");
 
-    try {
+//    try {
 
-        const backlogData = getBacklogData();
+    const backlogData = getBacklogData();
 
-        // Call Server API
-        const result = await sendBacklog(backlogData);
-        console.log("Server response:", result);
-
-
-        if (result.status === "Success") {
-            backlogData.backlogI_id = result.key;
-            addbacklogToTable(backlogData);
-        }
-
-    } catch (err) {
-        console.error("Save Failed", err);
-        alert("Failed to save backlog");
+    if (backlogData === false) {
+        return;
     }
+    console.log(backlogData);
+    // Call Server API
+    const result = await sendBacklog(backlogData);
+    console.log("Server response:", result);
+
+
+    if (result.status === "Success") {
+        backlogData.backlogI_id = result.key;
+        addbacklogToTable(backlogData);
+        displaySuccessProcessTab(result.status);
+    } else if (result.status === "Failed") {
+        displayFailedProcessTab(result.status);
+    }
+
+//    } catch (err) {
+//        console.error("Save Failed", err);
+//    }
+}
+
+function displaySuccessProcessTab(msg) {
+    const successProcessTabDOM = document.getElementById("successProcessTab");
+    document.getElementById("successProcessmsg").innerText = msg;
+    successProcessTabDOM.classList.remove("d-none");
+}
+
+function displayFailedProcessTab(msg) {
+    const failedProcessTabDOM = document.getElementById("failedProcessTab");
+    document.getElementById("failedProcessmsg").innerText = msg;
+    failedProcessTabDOM.classList.remove("d-none");
 }
 
 //Send data to servlet to save
@@ -752,7 +928,7 @@ function addbacklogToTable(data) {
     const actionPermitted = (userRole === "Developer" && data.created_by === userId);
 
     const canDelete = userRole === "Product Owner";
-    const canManageDoc = (userRole === "Product Owner") || (userRole === "Developer" && data.created_by === userId);
+    const canManageDoc = (userRole === "Product Owner") || (userRole === "Developer");
 
     const actionHtml = `<div class="d-flex justify-content-center align-items-center gap-2">
                             ${canManageDoc ? `<button type="button"  
@@ -845,6 +1021,64 @@ function addbacklogToTable(data) {
     $('#addItemModal').modal('hide');
     $('#addItemForm')[0].reset();
 }
+//
+//function showEmptyBacklogUI() {
+//    // Replace this ID with the ID of the div wrapping your <table>
+//    const tableContainer = document.getElementById('tableWrapperId');
+//    let emptyStateDiv = document.getElementById('emptyBacklogState');
+//
+//    if (isEmpty) {
+//        // Hide the table container
+//        if (tableContainer)
+//            tableContainer.style.display = 'none';
+//
+//        // Create the empty state UI if it doesn't exist yet
+//        if (!emptyStateDiv) {
+//            emptyStateDiv = document.createElement('div');
+//            emptyStateDiv.id = 'emptyBacklogState';
+//            emptyStateDiv.className = 'd-flex flex-column align-items-center justify-content-center py-5 my-5 bg-white rounded-4 shadow-sm';
+//            emptyStateDiv.style.border = '2px dashed #dee2e6';
+//
+//            const isProductOwner = (userRole === "Product Owner");
+//
+//            emptyStateDiv.innerHTML = `
+//                <div class="text-muted mb-3 mt-4">
+//                    <i class="fas fa-list-ul fa-4x opacity-25"></i>
+//                </div>
+//                <h4 class="fw-bold text-secondary mb-2">No Backlog Items Yet</h4>
+//                <p class="text-muted mb-4 text-center" style="max-width: 400px;">
+//                    ${isProductOwner
+//                    ? "Start building your project's foundation by adding user stories, tasks, or bugs."
+//                    : "The product backlog is currently empty. Please wait for the Product Owner to add items."
+//                    }
+//                </p>
+//                
+//                ${isProductOwner ? `
+//                    <button class="btn btn-primary px-4 py-2 mb-4 rounded-pill fw-bold shadow-sm" 
+//                            data-bs-toggle="modal" 
+//                            data-bs-target="#addItemModal">
+//                        <i class="fas fa-plus me-2"></i> Add First Item
+//                    </button>
+//                ` : ``}
+//            `;
+//
+//            // Insert the empty state right next to the table container
+//            if (tableContainer && tableContainer.parentNode) {
+//                tableContainer.parentNode.insertBefore(emptyStateDiv, tableContainer.nextSibling);
+//            }
+//        } else {
+//            // If it already exists, just make sure it's visible
+//            emptyStateDiv.style.display = 'flex';
+//        }
+//    } else {
+//        // Not empty: show the table, hide the empty state
+//        if (tableContainer)
+//            tableContainer.style.display = 'block';
+//        if (emptyStateDiv)
+//            emptyStateDiv.style.display = 'none';
+//    }
+//}
+
 
 function getExistingPriorities() {
     let priorities = [];

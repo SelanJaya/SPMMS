@@ -139,7 +139,7 @@ public class UserDAO {
 
         return rowUpdated;
     }
-    
+
     public boolean updateProfileWithPassword(User user) {
         boolean rowUpdated = false;
         // We don't update created_at because that should stay the same forever
@@ -213,8 +213,8 @@ public class UserDAO {
 
         return userList;
     }
-    
-     public List<User> getUsersByRole(String role, int project_id) {
+
+    public List<User> getUsersByRole(String role, int project_id) {
         List<User> userList = new ArrayList<>();
         // Use a placeholder '?' for the role parameter
         String sql = """
@@ -252,8 +252,6 @@ public class UserDAO {
 
         return userList;
     }
-    
-    
 
     public User getUserSessionDataRoleById(int userId) {
         String role = null;
@@ -266,19 +264,45 @@ public class UserDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    
+
                     user.setUsername(rs.getString("username"));
                     user.setUser_role(rs.getString("user_role"));
-                    
+
                 }
             }
-            
+
             return user;
         } catch (SQLException e) {
             System.err.println("Error fetching user role: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
+    }
+
+    // for email
+    public String getUsernameById(int userId) {
+         String userName = null;
+
+        String sql = "SELECT username FROM users WHERE user_id = ?";
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                     userName = rs.getString("username");
+                }
+            }
+
+            System.out.println("DAO Log: User found for ID: " + userId);
+
+        } catch (SQLException e) {
+            System.err.println("SQL Error in getUserById: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return userName;
     }
 
 }

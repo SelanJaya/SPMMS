@@ -12,6 +12,11 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     --body-bg: #f8fafc;
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+    display: none;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--body-bg);
@@ -239,4 +244,92 @@ body {
 .form-select {
     border-radius: 6px !important;
     font-size: 0.9rem;
+}
+
+
+Lifts the KPI card slightly when hovered
+.pending-card-hover {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.pending-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+/*
+.modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.modal-header {
+    min-height: 60px;
+}*/
+
+.recruitment-row {
+    transition: background-color 0.2s ease;
+}
+
+.recruitment-row:hover {
+    background-color: #f8f9fa;
+}
+
+.position-item {
+    padding: 4px 0;
+    color: #495057;
+}
+
+.position-item::before {
+    content: "• ";
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+.modal-content {
+    border-radius: 12px;
+}
+
+.modal-header {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+#pendingRecruitmentModal .modal-dialog {
+    transform: translateX(140px);
+}
+
+.text-danger.small {
+    min-height: 18px;
+    margin-top: 4px;
+}
+
+.validation-message {
+    display: none;
+    margin-top: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: #fff5f5;
+    border-left: 3px solid #dc3545;
+    color: #dc3545;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.validation-message.show {
+    display: block;
+}
+
+#projectContainer {
+    max-height: 75vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+}
+
+
+#projectContainer::-webkit-scrollbar {
+    width: 6px;
+}
+
+#projectContainer::-webkit-scrollbar-thumb {
+    border-radius: 20px;
 }

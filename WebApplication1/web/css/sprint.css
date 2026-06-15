@@ -374,7 +374,7 @@ body {
 
     display: inline-flex;
     align-items: center;
-    
+
     cursor: pointer;
     transition: 0.15s;
 }
@@ -392,4 +392,147 @@ body {
 
 .backlog-chip:hover {
     background:#dde6f7;
+}
+
+/* --- TABLE SPECIFICS --- */
+.drag-handle {
+    cursor: grab;
+    color: #cbd5e1;
+    width: 30px;
+    text-align: center;
+}
+
+.priority-rank {
+    font-weight: 700;
+    color: var(--primary-blue);
+    text-align: center;
+    width: 60px;
+}
+
+.editable-cell {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    min-height: 34px;
+}
+
+.editable-cell[contenteditable="true"]:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    cursor: text;
+}
+
+.table-responsive {
+    overflow: visible !important;
+}
+
+/* Styling for modal form elements to match your theme */
+.modal-content input:focus,
+.modal-content textarea:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.1) !important;
+    outline: none;
+}
+
+/* Matching the primary button style from your image */
+#confirmAddBtn:hover {
+    background-color: #1d4ed8 !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+.label-style {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    /* Matching the muted labels in your project image */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Adds a small margin between the search bar and the table */
+.dataTables_filter {
+    margin-bottom: 15px !important;
+}
+
+/* Fixed Size & Draggable Modal */
+#backlogDocModal .modal-dialog {
+    max-width: 800px;
+    margin: 1.75rem auto;
+}
+
+#backlogDocModal .modal-content {
+    min-height: 580px;
+    border-radius: 12px;
+    border: none;
+    /*    overflow: hidden !important;*/
+}
+
+/* Label Styling */
+.label-style {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--label-gray);
+}
+
+/* Tab Styling */
+.nav-tabs .nav-link {
+    border: none;
+    color: #9ca3af;
+    font-weight: 600;
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--spmms-blue);
+    background: none;
+    border-bottom: 3px solid var(--spmms-blue);
+}
+
+.dropdown-menu {
+    position: absolute !important;
+    z-index: 2000 !important;
+}
+
+
+/* 2. Allow the tab containers to show overflowing content */
+
+.bg-gradient {
+    background: linear-gradient(90deg, #0d6efd, #6c63ff); /* fading blue */
+}
+
+.modal-content {
+    border-radius: 1rem; /* consistent rounded corners */
+}
+/* Force the modal header to behave */
+.modal-header {
+    padding: 0.75rem 0.5rem !important; /* Give it enough space */
+    height: 60px !important; /* Force it to have a height */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-top-left-radius: 1rem !important;
+    border-top-right-radius: 1rem !important;
+    border: none !important; /* Ensure no hidden borders */
+    color: white !important; /* Ensure text is visible */
+}
+
+.modal-body {
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+}
+
+.d-flex .btn {
+    width: 100%;
+}
+
+#sprintModal .btn {
+    width: auto !important;
+}
+
+/*    background: linear-gradient(90deg, #0d6efd, #6c63ff) !important;  Force the color */
+
+.cursor-pointer {
+    cursor: pointer;
 }

@@ -47,7 +47,7 @@
                         <i class="fas fa-list-check me-3"></i><span>Backlog</span>
                     </a>
                     <a href="teamAssignmentServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-users-gear me-3"></i> Team</a>
-                    <a href="projectAnalytics.jsp" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
+                    <a href="projectAnalyticsServlet?action=redirect&project_id=${project_id}" class="nav-link"><i class="fas fa-chart-line me-3"></i> Reports</a>
                     <div class="mt-auto">
                         <div class="nav-divider my-2 mx-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
                         <a href="login_signUpServlet?processType=logOut" class="nav-link text-danger">
@@ -58,18 +58,48 @@
                 </div>
             </nav>
 
+
+            <div id="successProcessTab" class="d-none alert alert-success alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                <div class="icon-container me-3">
+                    <i class="fas fa-check-circle fa-lg"></i>
+                </div>
+                <div class="message-content">
+                    <h6 class="alert-heading mb-0 fw-bold" style="font-size: 0.9rem;"></h6>
+                    <p id="successProcessmsg" class="mb-0 small"></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+
+            <div id="failedProcessTab" class="d-none alert alert-danger alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                <div class="icon-container me-3">
+                    <i class="fas fa-times-circle fa-lg"></i>
+                </div>
+                <div class="message-content">
+                    <h6 class="alert-danger mb-0 fw-bold" style="font-size: 0.9rem;"></h6>
+                    <p id="failedProcessmsg" class="mb-0 small"></p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+
             <div id="content-wrapper">
+
                 <nav class="top-nav">
                     <div class="d-flex align-items-center">
-                        <button id="sidebarToggle" class="btn btn-sm text-dark me-3 border-0 bg-transparent"
-                                style="font-size: 1.2rem;">
-                            <i class="fas fa-bars"></i>
-                        </button>
                         <div class="small text-muted">Management / <span class="fw-semibold text-dark">Product Backlog</span></div>
 
                     </div>
-                    <div class="user-info d-flex align-items-center">
-                        <div class="user-details me-3 text-end d-none d-sm-block">
+                    <!--                    <div class="user-info d-flex align-items-center">
+                                            <div class="user-details text-end d-none d-sm-block">
+                                                <span class="user-name">${user.username}</span>
+                                                <span class="user-role">${user.user_role}</span>
+                                            </div>
+                                            <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
+                                                 class="rounded-circle border" width="34">
+                                        </div>-->
+                    <div class="user-info">
+                        <div class="user-details d-none d-sm-block">
                             <span class="user-name">${user.username}</span>
                             <span class="user-role">${user.user_role}</span>
                         </div>
@@ -82,8 +112,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h1 class="h3 fw-bold mb-0">Project Backlog</h1>
                         <c:if test="${user.user_role == 'Product Owner' || user.user_role == 'Developer'}">
-                            <button class="btn btn-primary px-4 shadow-sm" data-bs-toggle="modal"
-                                    data-bs-target="#addItemModal">
+                            <button id="addNewBacklogBtn" class="btn btn-primary px-4 shadow-sm">
                                 <i class="fas fa-plus me-2"></i>New Backlog Item
                             </button>
                         </c:if>
@@ -116,58 +145,118 @@
         <div class="modal fade" id="addItemModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+
                     <div class="modal-header border-0 pb-0 pt-4 px-4 justify-content-center">
                         <h5 class="fw-bold text-dark" style="font-size: 1.25rem;">Create Backlog Item</h5>
                     </div>
 
-                    <div class="modal-body p-4">
+                    <div class="modal-body p-4 mx-2">
+
                         <form id="addItemForm" action="backlogServlet" method="post">
-                            <div class="mb-3">
-                                <label class="label-stylxae d-block mb-2">Backlog Title</label>
-                                <input type="text" id="backlog_title" class="form-control" placeholder="Enter title..."
-                                       style="border-radius: 8px; padding: 10px; border: 1px solid #e2e8f0;" required>
-                            </div>
 
-                            <div class="mb-3">
-                                <label class="label-style d-block mb-2">Description</label>
-                                <textarea id="backlog_description" class="form-control" rows="3" placeholder="Describe the task... example:
-                                          As a [role],
-                                          I want [feature],
-                                          So that [business value]." style="border-radius: 8px; border: 1px solid #e2e8f0;" required></textarea>
-                            </div>
+                            <!-- BACKLOG DETAILS -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-secondary border-bottom pb-1">
+                                    Backlog Details
+                                </h6>
 
-                            <div class="mb-3">
-                                <label class="label-style d-block mb-2">Acceptance Criteria</label>
-                                <textarea id="backlog_ACriteria" class="form-control" rows="2"
-                                          placeholder="Conditions for completion..."
-                                          style="border-radius: 8px; border: 1px solid #e2e8f0;" required></textarea>
-                            </div>
+                                <!-- TITLE -->
+                                <div class="mb-3">
+                                    <label class="small fw-semibold text-secondary">
+                                        Backlog Title
+                                    </label>
 
-                            <c:if test="${user.user_role == 'Developer'}">
-                                <div class="row mb-4">
+                                    <input type="text"
+                                           id="backlog_title"
+                                           class="form-control" placeholder="Enter title...">
+
+                                    <p id="errorBacklogTitle"
+                                       class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    <label class="small fw-semibold text-secondary">
+                                        Description
+                                    </label>
+
+                                    <textarea id="backlog_description"
+                                              class="form-control"
+                                              rows="4"  placeholder="Describe the task... example:
+                                              As a [role],
+                                              I want [feature],
+                                              So that [business value]."></textarea>
+
+                                    <p id="errorBacklogDescription"
+                                       class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+                                </div>
+
+                                <!-- Acceptance Criteria -->
+                                <div class="mb-3">
+                                    <label class="small fw-semibold text-secondary">
+                                        Acceptance Criteria
+                                    </label>
+
+                                    <textarea id="backlog_ACriteria"
+                                              class="form-control"
+                                              rows="3"  placeholder="Conditions for completion..."></textarea>
+
+                                    <p id="errorAcceptanceCriteria"
+                                       class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+                                </div>
+
+                                <!-- ESTIMATION -->
+                                <div id="devBacklogField" class="mb-4">
+                                    <h6 class="fw-bold text-secondary border-bottom pb-1">
+                                        Estimation
+                                    </h6>
+
+                                    <!-- Story Points -->
                                     <div class="col-md-6">
-                                        <label class="label-style d-block mb-2">Story Points</label>
-                                        <input type="number" id="backlog_SPts" class="form-control" value="0" min="0" max="10"
-                                               style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
+                                        <label class="small fw-semibold text-secondary">
+                                            Story Points
+                                        </label>
+
+                                        <input type="number"
+                                               id="backlog_SPts"
+                                               style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;"
+                                               class="form-control" value="0" min="0" max="10">
+
+                                        <p id="errorStoryPoints"
+                                           class="validation-message text-danger small mt-1 mb-0 d-none"></p>
                                     </div>
 
+                                    <!-- Mandays -->
                                     <div class="col-md-6">
-                                        <label class="label-style d-block mb-2">Mandays</label>
-                                        <input type="number" id="backlog_Mdys" class="form-control" value="0" min="0" max="10"
-                                               style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;" required>
+                                        <label class="small fw-semibold text-secondary">
+                                            Mandays
+                                        </label>
+
+                                        <input type="number"
+                                               style="border-radius: 8px; border: 1px solid #e2e8f0; padding: 10px;"
+                                               id="backlog_Mdys"
+                                               class="form-control" value="0" min="0" max="10">
+
+                                        <p id="errorMandays"
+                                           class="validation-message text-danger small mt-1 mb-0 d-none"></p>
                                     </div>
                                 </div>
-                            </c:if>
 
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary fw-bold py-2 " id="confirmAddBtn"
-                                        style="background-color: #2563eb; border-radius: 25px; border: none;">
-                                    Create Item
-                                </button>
-                                <button type="button" class="btn btn-link text-muted text-decoration-none"
-                                        data-bs-dismiss="modal">
-                                    Cancel
-                                </button>
+
+                                <!-- ACTIONS -->
+                                <div class="d-flex gap-2">
+                                    <button type="button"
+                                            class="btn btn-secondary flex-fill"
+                                            data-bs-dismiss="modal">
+                                        Cancel
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-primary flex-fill fw-bold"
+                                            id="confirmAddBtn">
+                                        Create Item
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -175,22 +264,25 @@
             </div>
         </div>
 
-        <div class="modal fade" id="rejectBacklogModal" data-action="insert" data-backlogI_id ="" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal fade" id="rejectBacklogModal" data-action="insert" data-backlogI_id="" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-modal px-3 py-2">
-                    <div class="modal-header border-0 pb-0 position-relative">
-                        <h5 class="modal-title fw-bold w-100 text-center" id="rejectModalLabel">Reject Backlog Item</h5>
-                        <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                <div class="modal-content custom-modal border-0 shadow-lg rounded-4 overflow-hidden">
+
+                    <div class="modal-header position-relative border-0 py-2" style="background-color: #5a5eb9; color: white;">
+                        <h5 class="modal-title fw-bold w-100 text-center" id="rejectModalLabel">
+                            Reject Backlog Item
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                    <div class="modal-body">
-                        <p id="rejectionPrompMessagae" class="text-muted">Please provide a reason for rejecting this item. This will be visible to
-                            the Scrum Master and Team.</p>
+                    <div class="modal-body px-4 pt-4 pb-3">
+                        <p id="rejectionPromptMessage" class="text-muted mb-4">
+                            This Backlog Item is rejected by Product Owner due to the reason below
+                        </p>
                         <form id="rejectBacklogForm">
-                            <div class="">
-                                <label for="rejectionReason" class="form-label fw-bold">Rejection Reason</label>
-                                <textarea class="form-control" id="rejectionReason" rows="4"
+                            <div>
+                                <label for="rejectionReason" class="form-label fw-bold text-dark">Rejection Reason</label>
+                                <textarea class="form-control rounded-3" id="rejectionReason" rows="4"
                                           placeholder="e.g., Missing acceptance criteria or out of scope for this sprint..."
                                           required></textarea>
                             </div>
@@ -209,9 +301,49 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
+
+        <!--        <div class="modal fade" id="rejectBacklogModal" data-action="insert" data-backlogI_id ="" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content custom-modal px-3 py-2">
+        
+                            <div class="modal-header border-0 pb-0 m-0 justify-content-center">
+                                <h5 class="modal-title fw-bold w-100 text-center" id="rejectModalLabel">Reject Backlog Item</h5>
+                                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+        
+                            <div class="modal-body">
+                                <p id="rejectionPromptMessage" class="text-muted">Please provide a reason for rejecting this item. This will be visible to
+                                    the Scrum Master and Team.</p>
+                                <form id="rejectBacklogForm">
+                                    <div class="">
+                                        <label for="rejectionReason" class="form-label fw-bold">Rejection Reason</label>
+                                        <textarea class="form-control" id="rejectionReason" rows="4"
+                                                  placeholder="e.g., Missing acceptance criteria or out of scope for this sprint..."
+                                                  required></textarea>
+                                    </div>
+                                    <input type="hidden" id="rejectBacklogId" value="">
+                                </form>
+                            </div>
+        
+                            <div class="modal-footer border-0 pb-2">
+                                <div id="buttonDiv" class="row w-100 justify-content-center">
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-cancel w-100" data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" id="confirmRejectBtn" class="btn btn-danger w-100">Confirm
+                                            Rejection</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
 
         <!--Backlog level document pop up tab -->
         <div class="modal fade" id="backlogDocModal" tabindex="-1" data-bs-backdrop="false">
@@ -427,6 +559,74 @@
             </div>
         </div>
 
+        <div class="modal fade" id="taskRejectionModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+
+                    <!-- Header -->
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title fw-bold" style="font-size: 1rem;">
+                            <i class="fas fa-comment-dots me-2"></i>
+                            Task Rejection Feedback
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal">
+                        </button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="modal-body p-4">
+
+                        <div class="text-center mb-3">
+                            <i class="fas fa-comment-dots text-warning fa-4x opacity-50"></i>
+                        </div>
+
+                        <h5 class="fw-bold text-center mb-3">
+                            Rejection Feedback
+                        </h5>
+
+                        <p class="text-muted text-center mb-4">
+                            Please review the feedback below before resubmitting the task.
+                        </p>
+
+                        <div class="mb-3">
+                            <label class="small fw-semibold text-secondary">
+                                Rejection Reason
+                            </label>
+
+                            <textarea id="taskRejectionReason"
+                                      class="form-control"
+                                      rows="5"></textarea>
+
+                            <p id="errorTaskRejectionReason"
+                               class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer bg-light">
+
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Close
+                        </button>
+
+                        <button type="button"
+                                id="updateTaskRejectionBtn"
+                                class="btn btn-warning fw-bold">
+                            Update Feedback
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
         <script>
             var projectId = ${project_id};
             console.log(projectId);
@@ -437,6 +637,7 @@
         </script>
 
         <script src="js/backlog.js"></script>
+        <script src="js/common.js"></script>
     </body>
 
 </html>

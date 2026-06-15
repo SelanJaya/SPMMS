@@ -47,19 +47,19 @@ public class ProjectTeamDAO {
         }
     }
 
-    public void assignTeamMember(ProjectTeamAssignment teamAssignment) throws Exception{
+    public void assignTeamMember(ProjectTeamAssignment teamAssignment) throws Exception {
         String sql = "INSERT INTO project_assignments (project_id, proj_assign_to, proj_assign_by) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, teamAssignment.getProject_id()); //
             ps.setInt(2, teamAssignment.getAssign_to());    //
             ps.setInt(3, teamAssignment.getAssign_by());  //
-            
+
             int status = ps.executeUpdate();
-            if(!( status > 0)){
+            if (!(status > 0)) {
                 throw new Exception("Team Assignment Failed");
             }
-            
+
         } catch (SQLException e) {
             System.out.println("Exception ocuured in insertion : " + e);
             e.printStackTrace();
@@ -67,12 +67,12 @@ public class ProjectTeamDAO {
         }
     }
 
-    public List<User> getAssignedMembers(int projectId) throws Exception{
+    public List<User> getAssignedMembers(int projectId) throws Exception {
         List<User> assignedUsers = new ArrayList<>();
         // SQL targets the columns from your user and team schemas
         String sql = "SELECT u.user_id, u.username, u.email, u.user_role FROM project_assignments pa "
                 + "JOIN users u ON pa.proj_assign_to = u.user_id "
-                + "WHERE pa.project_id = ? ";
+                + "WHERE pa.project_id = ? AND pa.proj_assign_status = 'ACTIVE' ";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -97,20 +97,29 @@ public class ProjectTeamDAO {
         return assignedUsers;
     }
 
-    public void removeTeamMember(ProjectTeamAssignment teamAssignment) throws Exception{
+    public void removeTeamMember(ProjectTeamAssignment teamAssignment) throws Exception {
         // SQL targets the primary key 'projectTeamID'
-        String sql = "DELETE FROM project_assignments WHERE project_id = ? AND proj_assign_by  = ? AND proj_assign_to  = ?";
+        String sql = """
+                    UPDATE project_assignments
+                    SET proj_assign_status = 'REMOVED',
+                        removed_by = ?,
+                        removed_at = NOW(),
+                        removal_reason = ?
+                    WHERE project_id = ?
+                    AND proj_assign_to = ?;
+                    """;
 
+        //"DELETE FROM project_assignments WHERE project_id = ? AND proj_assign_by  = ? AND proj_assign_to  = ?";
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, teamAssignment.getProject_id()); 
-            ps.setInt(2, teamAssignment.getAssign_by()); 
-            ps.setInt(3, teamAssignment.getAssign_to()); 
+            ps.setInt(1, teamAssignment.getRemoved_by());
+            ps.setString(2, teamAssignment.getRemoval_reason());
+            ps.setInt(3, teamAssignment.getProject_id());
+            ps.setInt(4, teamAssignment.getAssign_to());
 
             int rowsAffected = ps.executeUpdate();
 
             if (rowsAffected > 0) {
-                System.out.println("DAO Log: Assignment ID " +  teamAssignment.getProject_id() + "  " + teamAssignment.getAssign_to() + " removed.");
+                System.out.println("DAO Log: Assignment ID " + teamAssignment.getProject_id() + "  " + teamAssignment.getAssign_to() + " removed.");
             }
 
         } catch (SQLException e) {
@@ -119,6 +128,5 @@ public class ProjectTeamDAO {
             throw e;
         }
     }
-    
-    
+
 }

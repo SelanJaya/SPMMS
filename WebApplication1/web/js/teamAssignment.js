@@ -95,6 +95,7 @@ $(document).ready(function () {
                     document.getElementById('employeeSearch').value = user.username;
 
                     document.getElementById('finalUserInput').value = user.user_id; // <-- inject here
+                    document.getElementById('finalAssigntoEmail').value = user.email;
                     container.classList.add('d-none'); // Hide after selection
                     window.selectedUserId = user.user_id; // Store for the Invite button
                 };
@@ -106,34 +107,6 @@ $(document).ready(function () {
         // FINAL STEP: Ensure it is visible
         container.classList.remove('d-none');
     }
-
-//    function renderResultsList(users) {
-//        const container = document.getElementById('searchSuggestions');
-//        container.innerHTML = "";
-//
-//        if (users.length === 0) {
-//            container.innerHTML = '<div class="list-group-item text-muted p-3">No matching employees found.</div>';
-//        } else {
-//            users.forEach(user => {
-//                const item = document.createElement("div");
-//                item.className = "list-group-item list-group-item-action";
-//                item.innerHTML = `
-//                <span class="suggestion-name">${user.username}</span>
-//                <span class="suggestion-email">${user.email}</span>
-//            `;
-//
-//                // Interaction: Select the user on click
-//                item.onclick = () => {
-//                    document.getElementById('employeeSearch').value = user.username;
-//                    container.classList.add('d-none');
-//                    window.selectedUserId = user.user_id; // Store for invitation
-//                };
-//
-//                container.appendChild(item);
-//            });
-//        }
-//        container.classList.remove('d-none');
-//    }
 
     function selectUser(user) {
         document.getElementById('employeeSearch').value = user.username;
@@ -191,16 +164,17 @@ function appendUser_Role(data) {
 
     const selected_div = roleDiveMap[data.user_role];
     console.log(selected_div);
-    const action = (user_role === "Project Manager" && data.user_role !== "Project Manager" )? `<button type="button" class="btn-delete-member" data-bs-toggle="modal" 
+    const action = (user_role === "Project Manager" && data.user_role !== "Project Manager") ? `<button type="button" class="btn-delete-member" data-bs-toggle="modal" 
                                                     data-bs-target="#deleteMemberModal" 
                                                     name="Delete" value="Delete"
-                                                    > Delete
-                                            </button>` : ``;
+                                                    > Delete </button>` : ``;
 
     if (selected_div) {
         createdDiv = document.createElement("div");
         createdDiv.className = "col-xl-3 col-md-6";
         createdDiv.id = data.user_id;
+        createdDiv.dataset.email = data.email;
+        createdDiv.dataset.assignToUsername = data.username;
         createdDiv.innerHTML = `
                                 
                                     <div class="team-card p-3 d-flex align-items-center position-relative">
@@ -231,6 +205,9 @@ document.addEventListener("click", (e) => {
         console.log("delete is clicked");
         deleteDocModel = document.getElementById("deleteMemberModal");
         deleteDocModel.dataset.id = capsule.id;
+        console.log(capsule.id);
+        deleteDocModel.dataset.email = capsule.dataset.email;
+        deleteDocModel.dataset.assigntoUsername = capsule.dataset.assignToUsername;
     }
 });
 
@@ -239,26 +216,50 @@ document.addEventListener("click", (e) => {
 // Use delegation $(document).on('click', 'selector') to ensure it works with JSTL loops
 document.getElementById("deleteCfmBtn").addEventListener("click", async function deleteAssignment(e) {
     console.log("Delete Button Clicked");
-    console.log(e);
 
     const assign_to = deleteDocModel.dataset.id;
+    const assigntoUsername = deleteDocModel.dataset.assigntoUsername;
+    const assigntoEmail = deleteDocModel.dataset.email;
+    const removalReason = document.getElementById("removalReason").value.trim();
+    console.log(removalReason);
+
+    // 2. Check for an empty string ("") instead of null
+    if (removalReason === "") {
+        const validationMessage = document.getElementById("validationMessage");
+        validationMessage.innerText = "Please enter the rejection reason to proceed!";
+        validationMessage.classList.remove("d-none");
+        // Highlight the box red (optional, based on our previous setup)
+        document.getElementById("removalReason").classList.add("is-invalid");
+        // THIS will successfully block the rest of your code from running
+        return;
+    }
 
     const data = {
         action: "delete",
         project_id: project_id,
         assign_to: assign_to,
-        assign_by: user_id
+        asign_to_Email: assigntoEmail,
+        assign_to_username: assigntoUsername,
+        assign_by: user_id,
+        removed_by: user_id, 
+        removal_reason: removalReason
     };
 
+    console.log(data);
     const result = await sendData_Assigment(data);
 
     cleanseAssignedData();
     populateAssignedUser();
 
-    const deleteDocModelBoot = new bootstrap.Modal(deleteDocModel);
+    const deleteDocModelBoot = new bootstrap.Modal.getInstance(deleteDocModel);
     deleteDocModelBoot.hide();
+});
 
-
+document.getElementById("removalReason").addEventListener("click", () => {
+    const validationMessage = document.getElementById("validationMessage");
+    validationMessage.classList.add("d-none");
+    // Highlight the box red (optional, based on our previous setup)
+    document.getElementById("removalReason").classList.remove("is-invalid");
 });
 
 async function sendData_Assigment(data) {
@@ -284,12 +285,17 @@ let inviteModal;
 document.getElementById("inviteMemberSubmit_btn").addEventListener("click", async function handleSubmitForm() {
 
     console.log(document.getElementById("finalUserInput"));
+    console.log(selectedUser);
+
     const data = {
         action: "teamAssignment",
         project_id: project_id,
         assign_to: document.getElementById("finalUserInput").value,
+        asign_to_Email: selectedUser.email,
+        assign_to_username: selectedUser.username,
         assign_by: user_id
     };
+    console.log(data);
 
     const result = await sendData_Assigment(data);
 
@@ -304,8 +310,25 @@ document.getElementById("inviteMemberSubmit_btn").addEventListener("click", asyn
     }
 
     inviteModal = document.getElementById("inviteModal");
-    const inviteModalBoot = new bootstrap.ModalgetOrCreateInstance(inviteModal);
-    ;
+    const inviteModalBoot = bootstrap.Modal.getOrCreateInstance(inviteModal);
     inviteModalBoot.hide();
 
 });
+
+function prepareDeleteReason(data) {
+    document.getElementById("usernameRemove").innerHTML = data.assign_to_username;
+
+    const removeProjectMember = document.getElementById("removeProjectMember");
+    removeProjectMember.dataset.data = data;
+    const removeProjectMemberBoot = new bootstrap.Modal.getOrCreateInstance(removeProjectMember);
+    removeProjectMemberBoot.show();
+}
+
+async function deleteAssignmentReason() {
+    const removeProjectMember = document.getElementById("removeProjectMember");
+    const data = removeProjectMember.dataset.data;
+    data.reason = document.getElementById("rejectionReason").value;
+    console.log(dara.reason);
+    const removeProjectMemberBoot = new bootstrap.Modal.getOrCreateInstance(removeProjectMember);
+    removeProjectMemberBoot.show();
+}

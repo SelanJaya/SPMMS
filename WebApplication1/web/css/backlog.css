@@ -521,3 +521,13 @@ code {
     background-color: #6c757d;
     border-radius: 50%;
 }
+
+.top-nav {
+    height: 61px;
+    min-height: 61px;
+    max-height: 61px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

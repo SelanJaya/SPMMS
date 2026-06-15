@@ -6,6 +6,7 @@ package beans;
 
 import java.time.LocalDate;
 import beans.TaskAssignment;
+import beans.TaskApproval;
 import java.util.List;
 
 /**
@@ -15,10 +16,14 @@ import java.util.List;
 public class Task {
 
     private int task_id, sprint_Id;
+    private Integer backlog_id;
     //private Integer task_dependency;
-    private String task_name, task_desc, task_status, task_start_date, task_end_date;
+    private String task_name, task_desc, task_status, task_start_date, task_end_date, actual_endDate, actual_startDate, taskApproval_status;
     private TaskAssignment taskAssignment;
     private List<TaskDependency> taskDependencies;
+   
+    Backlog backlog;
+    TaskApproval taskApproval;
 
     public Task() {
     }
@@ -41,8 +46,20 @@ public class Task {
 //    public void setTask_dependency(Integer task_dependency) {
 //        this.task_dependency = task_dependency;
 //    }
+    public void setBacklog(Backlog backlog) {
+        this.backlog = backlog;
+    }
+
+    public void setTaskApproval(TaskApproval taskApproval) {
+        this.taskApproval = taskApproval;
+    }
+
     public void setSprint_Id(int sprint_Id) {
         this.sprint_Id = sprint_Id;
+    }
+
+    public void setBacklog_id(Integer backlog_id) {
+        this.backlog_id = backlog_id;
     }
 
     public void setTask_name(String task_name) {
@@ -65,6 +82,14 @@ public class Task {
         this.task_end_date = task_end_date;
     }
 
+    public void setActual_endDate(String actual_endDate) {
+        this.actual_endDate = actual_endDate;
+    }
+
+    public void setActual_startDate(String actual_startDate) {
+        this.actual_startDate = actual_startDate;
+    }
+
     public void setTaskAssignment(TaskAssignment taskAssignment) {
         this.taskAssignment = taskAssignment;
     }
@@ -77,11 +102,23 @@ public class Task {
         return task_id;
     }
 
+    public Backlog getBacklog() {
+        return backlog;
+    }
+
+    public TaskApproval getTaskApproval() {
+        return taskApproval;
+    }
+
 //    public Integer getTask_dependency() {
 //        return task_dependency;
 //    }
     public int getSprint_Id() {
         return sprint_Id;
+    }
+
+    public int getBacklog_id() {
+        return backlog_id;
     }
 
     public String getTask_name() {
@@ -104,6 +141,14 @@ public class Task {
         return LocalDate.parse(task_end_date);
     }
 
+    public LocalDate getActual_endDate() {
+        return LocalDate.parse(actual_endDate) ;
+    }
+
+    public LocalDate getActual_startDate() {
+        return LocalDate.parse(actual_startDate) ;
+    }
+    
     public TaskAssignment getTaskAssignment() {
         return taskAssignment;
     }
