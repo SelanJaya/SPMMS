@@ -66,17 +66,42 @@ public class ProjectDAO {
             e.printStackTrace();
             throw e;
         }
+        return projectArr;
+    }
 
-//        // Print the results
-//        if (projectArr.isEmpty()) {
-//            System.out.println("No projects found for user ID: " + user_id);
-//        } else {
-//            System.out.println("--- Project Info for User " + user_id + " ---");
-//            for (Project project : projectArr) {
-//                System.out.println(project);
-//            }
-//            System.out.println("-----------------------------------");
-//        }
+    // Get projects info to disply in the dashboard
+    public List<Project> getProjectStatusInfo_check() throws Exception {
+        // FIX 1: Corrected SQL syntax (added missing comma after project_id)
+        // FIX 2: Filter by 'proj_created_by' instead of 'project_id' to get ALL user projects
+        String sql = """
+                     SELECT p.project_id, p.proj_start_date, p.proj_end_date
+                     FROM projects p  
+                     WHERE p.project_status != 'Archive'
+                     """;
+
+        // FIX 3: Initialize the list properly (Do NOT set to null)
+        List<Project> projectArr = new ArrayList<>();
+
+        try (Connection connection = DBConnection.getConnection(); PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Project project = new Project();
+
+                // FIX 4: Map the correct columns to the correct setters
+                project.setProjectId(rs.getInt("project_id"));
+
+                // FIX 5: Use distinct setters for Start and End dates
+                project.setProjStartDate(rs.getDate("proj_start_date").toString());
+                project.setProjEndDate(rs.getDate("proj_end_date").toString());
+
+                projectArr.add(project);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception occured in projectInfo : " + e);
+            e.printStackTrace();
+            throw e;
+        }
         return projectArr;
     }
 
@@ -213,7 +238,7 @@ public class ProjectDAO {
             throw e;
         }
     }
-    
+
     public void updateProjectEndData(Project project) throws Exception {
         String sql = """
                      UPDATE projects SET proj_end_date = ?, project_status = ?
@@ -224,7 +249,7 @@ public class ProjectDAO {
 
             ps.setObject(1, project.getProjEndDate());
             ps.setString(2, "Active");
-            
+
             // The WHERE clause ID
             ps.setInt(3, project.getProjectId());
 
@@ -266,7 +291,7 @@ public class ProjectDAO {
     public List<Project> getArchivedProjectsByUserId(int userId) throws Exception {
         List<Project> archivedList = new ArrayList<>();
         String sql = "SELECT project_id, project_name, project_desc, proj_created_at, proj_end_date FROM projects WHERE proj_created_by = ? AND "
-                     + "project_status = 'Archive'";
+                + "project_status = 'Archive'";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -299,7 +324,7 @@ public class ProjectDAO {
 
     public void updateProjectStatus(String projectStatus, int project_id) throws Exception {
         // Standard SQL for updating a specific column
-        String sql = "UPDATE projects SET project_status = '?' WHERE project_id = ?";
+        String sql = "UPDATE projects SET project_status = ? WHERE project_id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -1083,14 +1108,14 @@ public class ProjectDAO {
         String sql = "UPDATE projects SET project_risk_score = ? WHERE project_id = ?";
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+
             System.out.println("IN DOA :" + predictions.getFirst().getProjectId() + " " + predictions.getFirst().getRiskScore());
-            
+
             for (RiskPredictionResponse riskScore : predictions) {
-                ps.setDouble(1, riskScore.getRiskScore() ); // adjust type if needed
-                System.out.println("1 " + riskScore.getRiskScore() );
+                ps.setDouble(1, riskScore.getRiskScore()); // adjust type if needed
+                System.out.println("1 " + riskScore.getRiskScore());
                 ps.setInt(2, riskScore.getProjectId());
-                System.out.println("2 " + riskScore.getProjectId() );
+                System.out.println("2 " + riskScore.getProjectId());
                 ps.addBatch();
             }
 

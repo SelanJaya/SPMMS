@@ -27,7 +27,7 @@
                 <div class="nav flex-column mt-3">
                     <a href="profile.jsp" class="nav-link active"><i class="fas fa-user-circle me-3"></i> Profile</a>
                     <a href="dashboard.jsp" class="nav-link "><i class="fas fa-chart-pie me-3"></i> Dashboard</a>
-                    <a href="dashboardServlet?userId=${user.user_id}&processType=achivedProject" class="nav-link active-archive"><i class="fas fa-box-archive me-3"></i>
+                    <a href="projectArchive.jsp" class="nav-link active-archive"><i class="fas fa-box-archive me-3"></i>
                         Archived Projects</a>
                 </div>
                 <div class="mt-auto">
@@ -40,7 +40,7 @@
 
             <div id="content-wrapper">
                 <nav class="top-nav">
-                    <div class="small text-muted">User Settings / <span class="fw-bold text-dark">Profile</span></div>
+                    <div class="small text-muted">Management/<span class="fw-bold text-dark">Profile</span></div>
                     <img src="https://ui-avatars.com/api/?name=Douglas+McGee&background=2563eb&color=fff"
                          class="rounded-circle border" width="34">
                 </nav>

@@ -79,7 +79,7 @@
 
             <div id="statusTab"></div>
             <nav class="top-nav px-4 d-flex justify-content-between align-items-center">
-                <div class="small text-muted">Management / <span class="fw-semibold text-dark">Project Console</span></div>
+                <div class="small text-muted">Management/Dashboard/Project_${project_id}/<span class="fw-semibold text-dark">Sprint</span></div>
                 <!--                <div class="d-flex align-items-center">
                                     <div class="text-end me-3">
                                         <div class="small fw-bold lh-1">${user.username}</div>
@@ -361,33 +361,67 @@
                             </div>
                         </div>
 
+
                         <div class="mb-4">
-                            <h6 class="fw-bold text-secondary border-bottom pb-1">Assignment</h6>
+                            <label class="small fw-semibold text-secondary mb-2">Assignment</label>
+                            <div class="col-md-6">
 
-                            <div class="row g-3">
+                                <div class="position-relative w-100" id="assignmentDropdownWrapper">
 
-                                <div class="col-md-6">
-                                    <label class="small fw-semibold text-secondary">Role</label>
+                                    <div class="d-flex align-items-center justify-content-between p-2 border rounded-4 bg-white shadow-sm" style="min-height: 48px;">
 
-                                    <select class="form-select rounded-4 shadow-sm"
-                                            id="t_user_role">
-                                        <option>Developer</option>
-                                        <option>Designer</option>
-                                        <option>QA Tester</option>
-                                    </select>
+                                        <div id="assignedNamesContainer" class="d-flex flex-wrap gap-2 align-items-center flex-grow-1 ps-1">
+                                        </div>
+                                        <p id="errorTaskAssignee"
+                                           class="validation-message text-danger small mt-1 mb-0 d-none"></p>
+
+                                        <button type="button" 
+                                                class="d-none btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center text-secondary border add-assignee-btn flex-shrink-0 ms-2" 
+                                                id="manageAssignmentBtn"
+                                                style="width: 32px; height: 32px;"
+                                                title="Add Assignee">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+
+                                    </div>
+
+                                    <ul class="dropdown-menu shadow-lg border-0 rounded-4 p-2 mt-1 position-absolute" 
+                                        id="assigneeDropdownMenu"
+                                        style="width: 100%; top: 100%; left: 0; z-index: 1050;">
+
+                                        <li class="px-2 py-1 text-muted small fw-bold text-uppercase">Available Users</li>
+
+                                        <li class="px-2 pb-2 mb-2 border-bottom">
+                                            <div class="position-relative">
+                                                <i class="fas fa-search position-absolute text-secondary" style="top: 50%; left: 16px; transform: translateY(-50%); font-size: 0.8rem;"></i>
+                                                <input type="text" class="form-control form-control-sm rounded-pill ps-5 bg-light border-0 shadow-none" id="assigneeSearchInput" placeholder="Search name or ID...">
+                                            </div>
+                                        </li>
+
+                                        <div id="assigneeListContainer" style="max-height: 200px; overflow-y: auto; overflow-x: hidden;">
+
+                                            <li class="assignee-item mb-1">
+                                                <div class="user-list-row d-flex align-items-center justify-content-between rounded-3 px-2 py-2" style="cursor: default;">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border rounded-pill" style="font-size: 0.65rem;">ID: 103</span>
+                                                        <span class="fw-medium small assignee-name">Alice Johnson</span>
+                                                    </div>
+                                                    <button type="button" class="btn btn-primary btn-sm rounded-pill py-0 px-3 assign-btn flex-shrink-0" style="font-size: 0.75rem; height: 26px; width: max-content;">
+                                                        Assign
+                                                    </button>
+                                                </div>
+                                            </li>
+
+                                            <div id="noUsersFoundMessage" class="text-center py-4 text-muted" style="display: none;">
+                                                <i class="fas fa-search text-secondary mb-2" style="font-size: 1.2rem; opacity: 0.5;"></i>
+                                                <p class="small mb-0 fw-medium">No users found</p>
+                                                <span class="small" style="font-size: 0.75rem;">Try a different ID or name</span>
+                                            </div>
+
+                                        </div>
+                                    </ul>
+
                                 </div>
-
-                                <div class="col-md-6">
-                                    <label class="small fw-semibold text-secondary">Assignee</label>
-
-                                    <select class="form-select rounded-4 shadow-sm"
-                                            id="assignee">
-                                    </select>
-
-                                    <p id="errorTaskAssignee"
-                                       class="validation-message text-danger small mt-1 mb-0 d-none"></p>
-                                </div>
-
                             </div>
                         </div>
 
@@ -428,7 +462,7 @@
 
                         <div class="d-flex justify-content-end gap-2 mt-1">
 
-                            <button class="btn btn-secondary rounded-pill px-4 fw-semibold shadow-sm"
+                            <button id="taskModel_Cancle" class="btn btn-secondary rounded-pill px-4 fw-semibold shadow-sm"
                                     data-bs-dismiss="modal">
                                 Cancel
                             </button>
@@ -742,6 +776,50 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="assignmentRemovalModal" data-action="rejection" data-task_id="" tabindex="-1" aria-labelledby="rejectAssignmentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-modal border-0 shadow-lg rounded-4 overflow-hidden">
+
+                    <div class="modal-header position-relative border-0 py-3" style="background-color: #5a5eb9; color: white;">
+                        <h5 class="modal-title fw-bold w-100 text-center" id="rejectAssignmentModalLabel">
+                            Decline Assignment
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body px-4 pt-4 pb-3">
+                        <p id="rejectionAssignmentPromptMessage" class="text-muted mb-4">
+                            You are declining this task assignment. Please provide a reason so the project manager can reassign it appropriately.
+                        </p>
+                        <form id="rejectAssignmentForm">
+                            <div>
+                                <label for="rejectionAssignmentReason" class="form-label fw-bold text-dark">Reason for Declining</label>
+                                <textarea class="form-control rounded-3" id="rejectionAssignmentReason" rows="4"
+                                          placeholder="e.g., Currently overloaded with other sprint tasks, conflicting schedule, or requires different domain expertise..."
+                                          required></textarea>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer border-0 px-4 pb-4 pt-0">
+                        <div class="row w-100 mx-0 g-2">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-outline-secondary w-100 fw-bold rounded-pill" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" id="confirmAssignmentRejectBtn" class="btn btn-danger w-100 fw-bold rounded-pill">
+                                    Confirm Decline
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

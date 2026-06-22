@@ -87,7 +87,7 @@
 
                 <nav class="top-nav">
                     <div class="d-flex align-items-center">
-                        <div class="small text-muted">Management / <span class="fw-semibold text-dark">Product Backlog</span></div>
+                        <div class="small text-muted">Management/Dashbaord/Project_${project_id}/<span class="fw-semibold text-dark">Product_Backlog</span></div>
 
                     </div>
                     <!--                    <div class="user-info d-flex align-items-center">

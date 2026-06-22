@@ -176,9 +176,8 @@ public class TaskDAO {
                             END
                          WHERE task_id = ?;
                      """;
-        
-//        
 
+//        
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, task_status);
             ps.setString(2, task_status);
@@ -193,31 +192,112 @@ public class TaskDAO {
         }
     }
 
+//    public Task getTaskByTaskId(int task_id) throws Exception {
+//
+//        String sql = """
+//                        SELECT t.task_id, 
+//                            t.task_name, 
+//                            t.task_description, 
+//                            t.task_start_date,
+//                            t.task_end_date, 
+//                            t.backlog_item_id,
+//                            td.depends_on_task_id,
+//                            dt.task_name AS dependency_name,
+//                            ta.task_assigned_to, 
+//                            u.username, 
+//                            u.user_role
+//                        FROM tasks t
+//                        LEFT JOIN task_dependencies td
+//                        ON t.task_id = td.task_id
+//                        LEFT JOIN tasks dt                          
+//                        ON td.depends_on_task_id = dt.task_id
+//                        LEFT JOIN task_assignments ta
+//                        ON t.task_id = ta.task_id
+//                        LEFT JOIN users u
+//                        ON ta.task_assigned_to = u.user_id
+//                        WHERE t.task_id = ?;
+//                     """;
+//
+//        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+//
+//            ps.setInt(1, task_id);
+//
+//            ResultSet rs = ps.executeQuery();
+//
+//            Task task = null;
+//            List<TaskAssignment> taskAssignments = new ArrayList<>();
+//            while (rs.next()) {
+//
+//                if (task == null) {
+//
+//                    task = new Task();
+//                    task.setTask_id(rs.getInt("task_id"));
+//                    task.setTask_name(rs.getString("task_name"));
+//                    task.setTask_desc(rs.getString("task_description"));
+//                    task.setTask_start_date(rs.getObject("task_start_date", String.class));
+//                    task.setTask_end_date(rs.getObject("task_end_date", String.class));
+//                    task.setBacklog_id(rs.getInt("backlog_item_id"));
+//                    
+//                    task.setTaskDepedencies(new ArrayList<>());
+//                    
+//                    
+//                    TaskAssignment taskAssignment = new TaskAssignment();
+//                    taskAssignment.setTask_assigned_to(rs.getInt("task_assigned_to"));
+//                    taskAssignment.setUser_name(rs.getString("username"));
+//                    taskAssignment.setTask_assigned_to_Role(rs.getString("user_role"));
+//                    
+//                    
+//                    task.setTaskAssignment(taskAssignment);
+//                    System.out.println("Task data : " + task.getTask_name() + " " + task.getTask_desc());
+//                }
+//
+//                //get the depends on task id
+//                Integer depId = rs.getObject("depends_on_task_id", Integer.class);
+//
+//                // null checker
+//                if (depId != null) {
+//                    TaskDependency taskDependency = new TaskDependency();
+//                    taskDependency.setDepend_on_task_id(depId);
+//                    taskDependency.setDepend_on_task_Name(rs.getString("dependency_name"));
+//                    // add to the taskdependecy arrayList
+//                    task.getTaskDepedencies().add(taskDependency);
+//                }
+//            }
+//
+//            if (task == null) {
+//                throw new Exception("Task not found");
+//            }
+//
+//            return task;
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//    }
     public Task getTaskByTaskId(int task_id) throws Exception {
 
         String sql = """
-                        SELECT t.task_id, 
-                            t.task_name, 
-                            t.task_description, 
-                            t.task_start_date,
-                            t.task_end_date, 
-                            t.backlog_item_id,
-                            td.depends_on_task_id,
-                            dt.task_name AS dependency_name,
-                            ta.task_assigned_to, 
-                            u.username, 
-                            u.user_role
-                        FROM tasks t
-                        LEFT JOIN task_dependencies td
+                    SELECT t.task_id,
+                           t.task_name,
+                           t.task_description,
+                           t.task_start_date,
+                           t.task_end_date,
+                           t.backlog_item_id,
+                           td.depends_on_task_id,
+                           dt.task_name AS dependency_name,
+                           ta.task_assigned_to,
+                           u.username,
+                           u.user_role
+                    FROM tasks t
+                    LEFT JOIN task_dependencies td
                         ON t.task_id = td.task_id
-                        LEFT JOIN tasks dt                          
+                    LEFT JOIN tasks dt
                         ON td.depends_on_task_id = dt.task_id
-                        LEFT JOIN task_assignments ta
+                    LEFT JOIN task_assignments ta
                         ON t.task_id = ta.task_id
-                        LEFT JOIN users u
+                    LEFT JOIN users u
                         ON ta.task_assigned_to = u.user_id
-                        WHERE t.task_id = ?;
-                     """;
+                    WHERE t.task_id = ? AND ta.task_assignment_status = "ACTIVE"
+                 """;
 
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -226,6 +306,10 @@ public class TaskDAO {
             ResultSet rs = ps.executeQuery();
 
             Task task = null;
+
+            List<TaskDependency> dependencies = new ArrayList<>();
+            //List<TaskAssignment> assignments = new ArrayList<>();
+
             while (rs.next()) {
 
                 if (task == null) {
@@ -237,28 +321,47 @@ public class TaskDAO {
                     task.setTask_start_date(rs.getObject("task_start_date", String.class));
                     task.setTask_end_date(rs.getObject("task_end_date", String.class));
                     task.setBacklog_id(rs.getInt("backlog_item_id"));
-                    
-                    task.setTaskDepedencies(new ArrayList<>());
 
-                    TaskAssignment taskAssignment = new TaskAssignment();
-                    taskAssignment.setTask_assigned_to(rs.getInt("task_assigned_to"));
-                    taskAssignment.setUser_name(rs.getString("username"));
-                    taskAssignment.setTask_assigned_to_Role(rs.getString("user_role"));
+                    task.setTaskDepedencies(dependencies);
+                    // task.setTaskAssignments(assignments);
 
-                    task.setTaskAssignment(taskAssignment);
                     System.out.println("Task data : " + task.getTask_name() + " " + task.getTask_desc());
                 }
 
-                //get the depends on task id
+                // Dependencies
                 Integer depId = rs.getObject("depends_on_task_id", Integer.class);
 
-                // null checker
                 if (depId != null) {
-                    TaskDependency taskDependency = new TaskDependency();
-                    taskDependency.setDepend_on_task_id(depId);
-                    taskDependency.setDepend_on_task_Name(rs.getString("dependency_name"));
-                    // add to the taskdependecy arrayList
-                    task.getTaskDepedencies().add(taskDependency);
+
+                    boolean dependencyExists = dependencies.stream().anyMatch(d -> d.getDepend_on_task_id() == depId);
+
+                    if (!dependencyExists) {
+
+                        TaskDependency dependency
+                                = new TaskDependency();
+
+                        dependency.setDepend_on_task_id(depId);
+                        dependency.setDepend_on_task_Name(
+                                rs.getString("dependency_name"));
+
+                        dependencies.add(dependency);
+                    }
+                }
+
+                // Assignments
+                Integer assignedUserId = rs.getObject("task_assigned_to", Integer.class);
+
+                if (assignedUserId != null) {
+
+                    //boolean assignmentExists = assignments.stream().anyMatch(a -> a.getTask_assigned_to()== assignedUserId);
+                    TaskAssignment assignment = new TaskAssignment();
+
+                    assignment.setTask_id(rs.getInt("task_id"));
+                    assignment.setTask_assigned_to(assignedUserId);
+                    assignment.setUser_name(rs.getString("username"));
+                    assignment.setTask_assigned_to_Role(rs.getString("user_role"));
+                    
+                    task.setTaskAssignment(assignment);
                 }
             }
 
@@ -267,6 +370,7 @@ public class TaskDAO {
             }
 
             return task;
+
         } catch (Exception e) {
             throw e;
         }
@@ -348,9 +452,9 @@ public class TaskDAO {
             throw e;
         }
     }
-    
-    public List getTask_Backlog(int sprint_id) throws Exception{
-        
+
+    public List getTask_Backlog(int sprint_id) throws Exception {
+
         String sql = """
                     SELECT 
                          t.task_id, 
@@ -373,50 +477,50 @@ public class TaskDAO {
                      WHERE t.sprint_id = ?
                      ORDER BY t.backlog_item_id;
                      """;
-        
+
         List<Task> taskArr = new ArrayList<>();
-        try(Connection con =  DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)){
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, sprint_id);
-            
-            ResultSet rs =  ps.executeQuery();
-            while(rs.next()){
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
                 Task task = new Task();
                 task.setTask_id(rs.getInt("task_id"));
                 task.setTask_name(rs.getString("task_name"));
                 task.setTask_status(rs.getString("task_status"));
-                
+
                 TaskApproval taskApproval = new TaskApproval();
                 taskApproval.setApproval_id(rs.getInt("approval_id"));
                 String status = rs.getString("taskApproval_status");
-                
-                if(status == null){
+
+                if (status == null) {
                     taskApproval.setTaskApproval_status(null);
-                }else{
+                } else {
                     taskApproval.setTaskApproval_status(status);
                 }
-                
+
                 task.setTaskApproval(taskApproval);
-                
+
                 Backlog backlog = new Backlog();
                 backlog.setBacklogI_id(rs.getInt("backlog_item_id"));
                 backlog.setBacklogI_title(rs.getString("backlog_item_title"));
-                
+
                 task.setBacklog(backlog);
                 taskArr.add(task);
             }
-            
+
             return taskArr;
-            
-        }catch(Exception e){
+
+        } catch (Exception e) {
             System.out.println("Exception ocured at getTask_Backlog : " + e);
             e.printStackTrace();
             throw e;
         }
-        
+
     }
-    
-    public List getMyActiveTask(int user_id) throws Exception{
-        
+
+    public List getMyActiveTask(int user_id) throws Exception {
+
         String sql = """
                     SELECT
                     p.project_name,
@@ -430,28 +534,29 @@ public class TaskDAO {
                     WHERE pa.proj_assign_to = ?
                     GROUP BY p.project_name;
                      """;
-        
+
         List<DashboardInsight> dashboardInsightArr = new ArrayList<>();
-        try(Connection con =  DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)){
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, user_id);
-            
-            ResultSet rs =  ps.executeQuery();
-            while(rs.next()){
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
                 DashboardInsight dashboardInsight = new DashboardInsight();
                 dashboardInsight.setProject_name(rs.getString("project_name"));
                 dashboardInsight.setTaskDone(rs.getInt("taskDone"));
                 dashboardInsight.setTaskInProgress(rs.getInt("taskInProgress"));
                 dashboardInsight.setTaskToDo(rs.getInt("taskToDo"));
-                
+
                 dashboardInsightArr.add(dashboardInsight);
             }
             return dashboardInsightArr;
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Exception ocured at getTask_Backlog : " + e);
             e.printStackTrace();
             throw e;
         }
-        
-    };
-   
+
+    }
+;
+
 }

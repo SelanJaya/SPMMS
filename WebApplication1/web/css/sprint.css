@@ -536,3 +536,42 @@ body {
 .cursor-pointer {
     cursor: pointer;
 }
+
+.remove-assignee-btn {
+    transition: all 0.2s ease-in-out;
+}
+.remove-assignee-btn:hover {
+    color: #dc3545 !important; /* Bootstrap's standard danger red */
+    transform: scale(1.15); /* Gives it a tiny 'pop' effect */
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* Custom hover effect to replace Bootstrap's full-width .dropdown-item */
+.user-list-row {
+    transition: background-color 0.2s ease;
+}
+.user-list-row:hover {
+    background-color: #f8f9fa; /* Very light gray hover */
+}
+
+
+.add-assignee-btn {
+    transition: all 0.2s ease-in-out;
+}
+.add-assignee-btn:hover {
+    background-color: #0d6efd !important; /* Bootstrap Primary Blue */
+    color: white !important; /* Turns the + icon white */
+    border-color: #0d6efd !important;
+    transform: scale(1.15); /* The 15% pop effect */
+    box-shadow: 0 0.25rem 0.5rem rgba(13, 110, 253, 0.25); /* Adds a soft blue shadow */
+}
+
+/* Displays the placeholder only when the container is completely empty */
+    #assignedNamesContainer:empty::before {
+        content: "Click '+' to assign user...";
+        color: #6c757d; /* Bootstrap text-muted */
+        font-size: 0.875em; /* Bootstrap small */
+        padding-left: 0.25rem; /* Bootstrap ps-1 */
+        pointer-events: none; /* Ensures the text doesn't block mouse clicks */
+    }

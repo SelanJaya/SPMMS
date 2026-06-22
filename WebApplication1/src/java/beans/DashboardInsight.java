@@ -5,6 +5,7 @@
 package beans;
 import beans.Project;
 import beans.Task;
+import beans.Activity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ public class DashboardInsight {
     private Map <String, ArrayList<String>> assignmentPending_project;
     private List<DashboardInsight> activeProjects, activeTasks, tasksOverdue;
     private int taskOverdue, sumTaskOverdue, totalProject, noMissingRole, taskDone, taskInProgress, taskToDo;
+    List<Activity> activitys;
     //private Project project;
 
     public DashboardInsight() {
@@ -85,6 +87,10 @@ public class DashboardInsight {
 
     public void setTaskToDo(int taskToDo) {
         this.taskToDo = taskToDo;
+    }
+
+    public void setActivitys(List<Activity> activitys) {
+        this.activitys = activitys;
     }
     
 //    public void setProject(Project project) {
@@ -158,5 +164,9 @@ public class DashboardInsight {
 
     public int getTaskToDo() {
         return taskToDo;
+    }
+
+    public List<Activity> getActivitys() {
+        return activitys;
     }
 }

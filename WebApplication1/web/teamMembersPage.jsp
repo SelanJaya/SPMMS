@@ -60,7 +60,7 @@
 
             <div id="content-wrapper">
                 <nav class="top-nav">
-                    <div class="small text-muted fw-medium">Management / <span class="text-dark fw-bold">Team</span></div>
+                    <div class="small text-muted fw-medium">Management/Dashboard/Project_${project_id}/<span class="text-dark fw-bold">Team</span></div>
 
                     <div class="user-info">
                         <div class="user-details d-none d-sm-block">

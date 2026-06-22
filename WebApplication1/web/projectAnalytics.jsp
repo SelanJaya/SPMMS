@@ -42,7 +42,7 @@
 
             <div id="content-wrapper">
                 <nav class="top-nav">
-                    <div class="small text-muted">Analytics / <span class="fw-semibold text-dark">Performance Reports</span></div>
+                    <div class="small text-muted">Management/Dashboard/Project_${project_id}/<span class="fw-semibold text-dark">Project_Analytics</span></div>
                     <div class="flex items-center gap-3">
                         <div class="user-info">
                             <div class="user-details d-none d-sm-block">

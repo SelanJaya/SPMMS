@@ -27,7 +27,22 @@ public class TeamAssignmentService {
         try {
 
             String subject = "Project Recruitment Notification";
-
+            
+            ProjectTeamDAO projectTeamDAO = new ProjectTeamDAO();
+            
+            //logic to assignment 
+            Boolean assignmentStatus = projectTeamDAO.findProjectAssignment(projectTeamAssignment.getProject_id(), projectTeamAssignment.getAssign_to());
+            
+            if (assignmentStatus) {
+                projectTeamDAO.reactivateProjectAssignment(projectTeamAssignment.getProject_id(), projectTeamAssignment.getAssign_to());
+            } else if (!assignmentStatus){
+                 projectTeamDAO.assignTeamMember(projectTeamAssignment);
+            } else {
+                throw new Error("Insertion Failed");
+            }
+            
+            
+            
             ProjectDAO projectDAO = new ProjectDAO();
             String projectName = projectDAO.getProjectNameById(projectTeamAssignment.getProject_id());
 
@@ -67,9 +82,6 @@ public class TeamAssignmentService {
                     e.printStackTrace();
                 }
             });
-
-            ProjectTeamDAO projectTeamDao = new ProjectTeamDAO();
-            projectTeamDao.assignTeamMember(projectTeamAssignment);
 
             //EmailService emailService = new EmailService( projectTeamAssignment.getAsign_to_Email(), );
             //emailService.sendEmail(taskAssignment., subject, messageText);

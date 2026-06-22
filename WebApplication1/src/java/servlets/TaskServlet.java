@@ -213,8 +213,9 @@ public class TaskServlet extends HttpServlet {
 
                 // System.out.println("Dependency received: " + task.getTask_dependency());
 //                int task_id = taskDao.insertTask(task);
-                TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
-                task.setTaskAssignment(taskAssignment);
+
+//                TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
+//                task.setTaskAssignment(taskAssignment);
 
                 Type type = new TypeToken<List<Integer>>() {
                 }.getType();
@@ -245,9 +246,9 @@ public class TaskServlet extends HttpServlet {
             } else if ("UpdateTaskDetials".equalsIgnoreCase(action)) {
                 System.out.println("Updated executed");
                 Task task = gson.fromJson(json, Task.class);
-
-                TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
-                task.setTaskAssignment(taskAssignment);
+                System.out.println("TASK ASSIGNMENT ASSIGNTO : " + task.getTaskAssignment().getTask_assigned_to());
+//                TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
+//                task.setTaskAssignment(taskAssignment);
 
                 Type type = new TypeToken<List<Integer>>() {
                 }.getType();

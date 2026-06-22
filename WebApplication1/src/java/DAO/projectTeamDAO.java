@@ -23,6 +23,48 @@ public class ProjectTeamDAO {
     public ProjectTeamDAO() {
     }
 
+    public boolean findProjectAssignment(int projectId, int proj_assign_to) throws Exception {
+
+        String sql = """
+                 SELECT *
+                 FROM project_assignments
+                 WHERE project_id = ?
+                 AND proj_assign_to = ?
+                 """;
+
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, projectId);
+            ps.setInt(2, proj_assign_to);
+
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public boolean reactivateProjectAssignment(int projectId, int proj_assign_to) throws Exception {
+
+        String sql = """
+                        UPDATE project_assignments
+                        SET proj_assign_status = 'ACTIVE',
+                            removal_reason = NULL
+                        WHERE project_id = ?
+                        AND proj_assign_to = ?
+                    """;
+
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, projectId);
+            ps.setInt(2, proj_assign_to);
+
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     public boolean createProject(Project project) {
         // SQL query matching your schema columns
         String sql = "INSERT INTO project (project_name, project_desc, proj_start_date, proj_end_date, project_status, proj_created_by) "

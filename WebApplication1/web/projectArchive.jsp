@@ -45,7 +45,7 @@
 
         <div id="content-wrapper">
             <nav class="top-nav">
-                <div class="small text-muted">Management / <span class="fw-semibold text-dark">Archive Vault</span></div>
+                <div class="small text-muted">Management/<span class="fw-semibold text-dark">Archive_Vault</span></div>
                 <div class="user-info">
                     <!--                    <div class="user-details d-none d-sm-block">
                                             <span class="user-name">${user.username}</span>

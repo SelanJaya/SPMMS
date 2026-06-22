@@ -8,6 +8,7 @@ import DAO.ProjectDAO;
 import DAO.ProjectTeamDAO;
 import DAO.UserDAO;
 import DAO.TaskDAO;
+import DAO.ProjectAnalyticsDAO;
 import Service.DashboardInsightsService;
 import beans.DashboardInsight;
 import beans.Project;
@@ -78,7 +79,7 @@ public class DashboardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         int user_id;
         String processType;
         List<Project> profileInfo;
@@ -106,14 +107,14 @@ public class DashboardServlet extends HttpServlet {
                 //DashboardInsightsService dashboardInsightsService = new DashboardInsightsService();
                 //dashboardInsightsService.ProjectRisk_MLService(user.getUser_id());
 
-               // result.put("riskScore", predictions);
+                // result.put("riskScore", predictions);
                 if ("Project Manager".equalsIgnoreCase(user.getUser_role())) {
                     // DISPLAY ALL PROJECT FOLDER
                     profileInfo = projectDao.projectInfo(user.getUser_id());
                 } else {
                     profileInfo = projectDao.getProjectsByNonPMUserId(user.getUser_id());
                 }
-                
+
                 result.put("profileInfo", profileInfo);
                 user = userDao.profileInformation(user.getUser_id());
                 session.setAttribute("user", user);
@@ -122,10 +123,9 @@ public class DashboardServlet extends HttpServlet {
             } else if ("achivedProject".equalsIgnoreCase(processType)) {
                 System.out.println("Archived Project");
                 System.out.println("user _id : " + user.getUser_id());
-                
+
                 profileInfo = projectDao.getArchivedProjectsByUserId(user.getUser_id());
 
-                
                 result.put("profileInfo", profileInfo);
             } else if ("dashboardInsights".equalsIgnoreCase(processType)) {
                 user_id = Integer.parseInt(request.getParameter("user_id"));
@@ -141,16 +141,28 @@ public class DashboardServlet extends HttpServlet {
                 if ("Project Manager".equalsIgnoreCase(userRole)) {
                     System.out.println("PM executed");
                     dashboardInsight = dashboardInsightsService.getDashboardInsightService_PM(user_id, userRole);
+
+                    ProjectAnalyticsDAO projectAnalyticsDAO = new ProjectAnalyticsDAO();
+                    dashboardInsight.setActivitys(projectAnalyticsDAO.getRecentActivities_PM(user_id));
+
                 } else if ("Product Owner".equalsIgnoreCase(userRole) || "Scrum Master".equalsIgnoreCase(userRole)) {
                     //My Active Project
                     System.out.println("PO Executed");
                     ProjectDAO projectDAO = new ProjectDAO();
                     dashboardInsight.setActiveProjects(projectDAO.getMYActiveProject_PO(user_id));
                     System.out.println("AAAA " + dashboardInsight.getActiveProjects().getFirst());
+                    
+                    if("Scrum Master".equalsIgnoreCase(userRole)){
+                        ProjectAnalyticsDAO projectAnalyticsDAO = new ProjectAnalyticsDAO();
+                        dashboardInsight.setActivitys(projectAnalyticsDAO.getRecentActivities_SM(user_id));
+                    }
 
                 } else if ("Developer".equalsIgnoreCase(userRole)) {
                     TaskDAO taskDAO = new TaskDAO();
                     dashboardInsight.setActiveTasks(taskDAO.getMyActiveTask(user_id));
+
+                    ProjectAnalyticsDAO projectAnalyticsDAO = new ProjectAnalyticsDAO();
+                    dashboardInsight.setActivitys(projectAnalyticsDAO.getRecentActivities_Dev(user_id));
                 }
                 result.put("DashboardInsightData", dashboardInsight);
             }

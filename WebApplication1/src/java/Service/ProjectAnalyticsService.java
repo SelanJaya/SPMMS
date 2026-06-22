@@ -4,14 +4,18 @@
  */
 package Service;
 
+import java.time.LocalDate;
 import beans.ProjectAnalytics;
+import beans.Project;
 import DAO.ProjectAnalyticsDAO;
+import DAO.ProjectDAO;
 import beans.Task;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 import java.sql.Date;
+import org.apache.jasper.tagplugins.jstl.core.Catch;
 
 /**
  *
@@ -170,51 +174,7 @@ public class ProjectAnalyticsService {
         }
     }
 
-//    public List<ProjectAnalytics> calculateBurnDownChart(Integer sprint_id, Integer project_id) throws Exception {
-//
-//        List<ProjectAnalytics> projectAnalyticsesArr = new ArrayList<>();
-//        try {
-//
-//            ProjectAnalyticsDAO projectAnalyticsDAO = new ProjectAnalyticsDAO();
-//
-//            // Fetch data
-//            if (sprint_id != null) {
-//                projectAnalyticsesArr = projectAnalyticsDAO.getBurnDownData(sprint_id);
-//
-//            } else if (project_id != null) {
-//                projectAnalyticsesArr = projectAnalyticsDAO.getBurnDownData_Default(project_id);
-//            }
-//
-//            // No data
-//            if (projectAnalyticsesArr.isEmpty()) {
-//                return projectAnalyticsesArr;
-//            }
-//
-//            // Remaining task count
-//            int remainingTask = 0;
-//
-//            // Loop through timeline data
-//            for (ProjectAnalytics item : projectAnalyticsesArr) {
-//
-//                // Task becomes active when task_start_date exists
-//                if (item.getTaskStartDate() != null) {
-//                    remainingTask++;
-//                }
-//
-//                /* Task completed */
-//                if (item.getTaskEndDate() != null) {
-//                    remainingTask--;
-//                }
-//
-//                item.setRemainingTask(remainingTask);
-//            }
-//        } catch (Exception e) {
-//            throw e;
-//        }
-//        return projectAnalyticsesArr;
-//    }
-    
-    public List<ProjectAnalytics> calculateBurnDownChart(Integer sprint_id , Integer project_id) throws Exception {
+    public List<ProjectAnalytics> calculateBurnDownChart(Integer sprint_id, Integer project_id) throws Exception {
 
         List<ProjectAnalytics> rawData = new ArrayList<>();
         List<ProjectAnalytics> burnDownChart = new ArrayList<>();
@@ -234,7 +194,7 @@ public class ProjectAnalyticsService {
             if (rawData.isEmpty()) {
                 return burnDownChart;
             }
-     
+
             // Sprint info
             LocalDate sprintStartDate = rawData.get(0).getSprintStartDate();
 
@@ -243,7 +203,7 @@ public class ProjectAnalyticsService {
             LocalDate today = LocalDate.now();
 
             // Stop at today OR sprint end date
-            LocalDate chartEndDate= today.isBefore(sprintEndDate)? today : sprintEndDate;
+            LocalDate chartEndDate = today.isBefore(sprintEndDate) ? today : sprintEndDate;
 
             // Generate every day in sprint timeline
             for (LocalDate currentDate = sprintStartDate;
@@ -274,7 +234,7 @@ public class ProjectAnalyticsService {
 
                 // Chart point
                 ProjectAnalytics chartData = new ProjectAnalytics();
-                
+
                 chartData.setSprintId(rawData.getFirst().getSprintId());
                 chartData.setSprintStartDate(sprintStartDate);
 
@@ -292,4 +252,28 @@ public class ProjectAnalyticsService {
         }
         return burnDownChart;
     }
+
+    public void projectStatusCheckingService() throws Exception{
+        System.out.println("projectStatusCheckingService Executed \n");
+        List<Project> projectsList = new ArrayList<>();
+        try {
+            ProjectDAO projectDAO = new ProjectDAO();
+
+            LocalDate today = LocalDate.now();
+            projectsList = projectDAO.getProjectStatusInfo_check();
+
+            for (Project item : projectsList) {
+
+                if (today.equals(item.getProjEndDate())  || today.isAfter(item.getProjEndDate())) {
+                    System.out.println("");
+                    projectDAO.updateProjectStatus("Delayed", item.getProjectId());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Exception occurs in service calulateApproveRateChart : " + e);
+            e.printStackTrace();
+            throw  e;
+        }
+    }
+
 }

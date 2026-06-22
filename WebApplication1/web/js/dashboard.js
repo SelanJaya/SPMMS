@@ -60,6 +60,9 @@ async function populateMyActive_PM_PO() {
     }
 
     result = await response.json();
+    if(userRole !== "Product Owner"){
+        populateRecentActivity_PMSM(result.DashboardInsightData.activitys);
+    }
     console.log(result);
 
 
@@ -551,7 +554,7 @@ async function populateProjectFolder() {
     //add the project folder
     result.profileInfo.forEach((item, index) => {
         const riskScoreIcon =
-                item.project_risk_score <= 30 ? '<i class="fas fa-gauge-high text-success"></i>' : 
+                item.project_risk_score <= 30 ? '<i class="fas fa-gauge-high text-success"></i>' :
                 item.project_risk_score <= 60 ? '<i class="fas fa-gauge-high text-warning"></i>' : '<i class="fas fa-gauge-high text-danger"></i>';
         projectContainerDiv.innerHTML += `
                                 <div class="col-xl-4 col-md-6 col-sm-12 mb-4">
@@ -602,6 +605,10 @@ async function populateMyActive_Dev() {
     }
 
     result = await response.json();
+
+    populateRecentActivity_Dev(result.DashboardInsightData.activitys);
+
+
     console.log(result);
     const myActiveTitle = document.getElementById("myActiveTitle");
     myActiveTitle.innerText = "My Active Project";
@@ -632,5 +639,115 @@ async function populateMyActive_Dev() {
                                         </span>
                                     </div>
                                 </div>`;
+    });
+}
+
+function populateRecentActivity_Dev(activities) {
+    const container = document.getElementById("recentActivitiesCollapse");
+
+    container.innerHTML = "";
+
+    activities.forEach(activity => {
+
+        let color = "bg-primary";
+
+        switch (activity.activityType) {
+            case "PROJECT_JOIN":
+                color = "bg-success";
+                break;
+
+            case "PROJECT_REMOVE":
+                color = "bg-danger";
+                break;
+
+            case "TASK_ASSIGN":
+                color = "bg-warning";
+                break;
+
+            case "TASK_REMOVE":
+                color = "bg-danger";
+                break;
+        }
+
+        container.innerHTML += `
+        <div class="d-flex mb-3 pb-3 border-bottom">
+            <div class="mt-1 me-3">
+                <span class="d-inline-block ${color} rounded-circle shadow-sm"
+                      style="width:10px;height:10px;"></span>
+            </div>
+
+            <div>
+                <p class="mb-0 text-dark lh-sm" style="font-size:0.85rem;">
+                    ${activity.activity}
+                </p>
+
+                <small class="text-muted" style="font-size:0.7rem;">
+                    ${activity.activityDate}
+                </small>
+            </div>
+        </div>
+    `;
+    });
+}
+
+function populateRecentActivity_PMPO(activities) {
+    const container = document.getElementById("recentActivitiesCollapse");
+
+    container.innerHTML = "";
+
+    activities.forEach(activity => {
+
+        let color = "bg-primary";
+        let actionButton = "";
+
+        switch (activity.activityType) {
+            case "PROJECT_JOIN":
+                color = "bg-success";
+                break;
+
+            case "PROJECT_REMOVE":
+                color = "bg-danger";
+
+                actionButton = `
+                    <button class="btn btn-sm btn-outline-primary"
+                            onclick="editRemovalReason('${activity.assignmentId}')">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                `;
+                break;
+
+            case "TASK_ASSIGN":
+                color = "bg-warning";
+                break;
+
+            case "TASK_REMOVE":
+                color = "bg-danger";
+                break;
+        }
+
+        container.innerHTML += `
+            <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+
+                <div class="d-flex">
+                    <div class="mt-1 me-3">
+                        <span class="d-inline-block ${color} rounded-circle shadow-sm"
+                              style="width:10px;height:10px;"></span>
+                    </div>
+
+                    <div>
+                        <p class="mb-0 text-dark lh-sm" style="font-size:0.85rem;">
+                            ${activity.activity}
+                        </p>
+
+                        <small class="text-muted" style="font-size:0.7rem;">
+                            ${activity.activityDate}
+                        </small>
+                    </div>
+                </div>
+
+                ${actionButton}
+
+            </div>
+        `;
     });
 }

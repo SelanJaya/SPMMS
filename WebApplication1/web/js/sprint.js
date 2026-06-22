@@ -4,6 +4,9 @@
  */
 let pendingBacklogIds = null;
 let sprint_id = null;
+
+let newAssignments = null;
+let removedAssignments = null;
 document.addEventListener("DOMContentLoaded", function () {
 
     if (typeof project_id !== "undefined") {
@@ -557,6 +560,8 @@ function showEmptySprintUI() {
 //#################################################### TASK SECTION #############################################################################
 
 let isTaskEdit = false;
+
+//populate board with task
 async function insertTask_Board(sprint_id) {
 
     const response = await fetch(`TaskServlet?action=fetchTasks_Sprint&sprint_id=${sprint_id}`);
@@ -610,31 +615,7 @@ async function insertTask_Board(sprint_id) {
     }
 }
 ;
-//
-//function displayEmptyBoardUI(sprint_id) {
-//    // Find the specific board and target its "TO DO" column
-//    const board = document.getElementById(sprint_id);
-//    if (board) {
-//        const todoList = [
-//            board.querySelector('[data-status="TO DO"] .task-list'),
-//            board.querySelector('[data-status="IN PROGRESS"] .task-list'),
-//            board.querySelector('[data-status="DONE"] .task-list')
-//        ];
-//
-//        todoList.forEach(item => {
-//            if (item) {
-//                item.innerHTML = `
-//                                    <div class="text-center p-3 text-muted small rounded-3 mt-2 emptyTasks"
-//                                         style="border: 1px dashed #dee2e6; background-color: #f8f9fa;">
-//                                        <i class="fas fa-tasks mb-1 opacity-50 d-block fa-lg"></i>
-//                                        No tasks added yet
-//                                    </div>
-//                                    `;
-//            }
-//        });
-//    }
-//}
-//;
+
 
 function displayEmptyBoardUI(sprint_id) {
     const board = document.getElementById(sprint_id);
@@ -655,27 +636,6 @@ function displayEmptyBoardUI(sprint_id) {
         }
     });
 }
-
-//
-//function removeEmptyBoardUI(sprint_id) {
-//    console.log("yup");
-//    // Find the specific board and target its "TO DO" column
-//    const board = document.getElementById(sprint_id);
-//    if (board) {
-//        const todoList = [
-//            board.querySelector('[data-status="TO DO"] .task-list'),
-//            board.querySelector('[data-status="IN PROGRESS"] .task-list'),
-//            board.querySelector('[data-status="DONE"] .task-list')
-//        ];
-//
-//        todoList.forEach(item => {
-//            if (item) {
-//                item.querySelector(".emptyTasks").classList.add("d-none");
-//            }
-//        });
-//    }
-//}
-//;
 
 function removeEmptyBoardUI(sprint_id) {
     const board = document.getElementById(sprint_id);
@@ -711,8 +671,8 @@ const bsTaskModal = new bootstrap.Modal(document.getElementById('taskModal'));
 function addTask(btn) {
     isTaskEdit = false;
     hideAllErrorMsg_Task();
-    document.querySelectorAll("#taskModal input, #taskModal textarea, #taskModal select")
-            .forEach(el => el.disabled = false);
+    document.querySelectorAll("#taskModal input, #taskModal textarea, #taskModal select").forEach(el => el.disabled = false);
+
     // Identify the target column and board
     const taskModel = document.querySelector("#taskModal");
     taskModel.querySelector("#taskModel_title").innerText = "Add Task";
@@ -732,35 +692,73 @@ function addTask(btn) {
     document.getElementById('t_column_id').value = columnHeader;
     document.getElementById("taskModel_Sbt").onclick = confirmAddTask;
 
+    //Clear the main form container to show an empty state placeholder
+    const assignedNamesContainer = document.getElementById("assignedNamesContainer");
+    assignedNamesContainer.innerHTML = "";
+    // 2. Clear the hidden input values
+    document.getElementById("selectedAssigneeIds").value = "";
+
+    // 3. Reset the dropdown list container back to a clean state
+    const assigneeListContainer = document.getElementById("assigneeListContainer");
+    assigneeListContainer.innerHTML = ` 
+    <div id="noUsersFoundMessage" class="text-center py-3 text-muted">
+        <i class="fas fa-search text-secondary mb-2" style="font-size: 1rem; opacity: 0.5;"></i>
+        <p class="small mb-0 fw-medium">Search for a team member</p>
+    </div>`;
+
+
     loadTaskDepenecy();
     handleTaskBacklog();
     bsTaskModal.show();
 }
 
-document.querySelector("#taskModal .modal-body")
-        .addEventListener("click", function (e) {
-
-            const mapping = {
-                "t_name": "errorTaskName",
-                "t_desc": "errorTaskDesc",
-                "t_backlog": "errorTaskBacklog",
-                "assignee": "errorTaskAssignee",
-                "t_start": "errorTaskStart",
-                "t_end": "errorTaskEnd"
-            };
-            const field = e.target.id;
-            if (mapping[field]) {
-
-                document.getElementById(mapping[field])
-                        .classList.add("d-none");
-                // Special case for date range
-                if (field === "t_start" || field === "t_end") {
-                    document.getElementById("errorTaskDateRange")
-                            .classList.add("d-none");
-                }
-            }
-        });
-
+//
+//document.querySelector("#taskModal .modal-body").addEventListener("click", function (e) {
+//
+//    const targetId = e.target.id;
+//    const errorMap = {
+//        t_name: "errorTaskName",
+//        t_desc: "errorTaskDesc",
+//        t_backlog: "errorTaskBacklog",
+//        assignee: "errorTaskAssignee",
+//        t_start: "errorTaskStart",
+//        t_end: "errorTaskEnd"
+//    };
+//    if (errorMap[targetId]) {
+//        document.getElementById(errorMap[targetId])
+//                .classList.add("d-none");
+//    }
+//
+//    if (targetId === "t_start" || targetId === "t_end") {
+//        document.getElementById("errorTaskDateRange")
+//                .classList.add("d-none");
+//    }
+//});
+//
+//document.querySelector("#taskModal .modal-body")
+//        .addEventListener("click", function (e) {
+//
+//            const mapping = {
+//                "t_name": "errorTaskName",
+//                "t_desc": "errorTaskDesc",
+//                "t_backlog": "errorTaskBacklog",
+//                "assignee": "errorTaskAssignee",
+//                "t_start": "errorTaskStart",
+//                "t_end": "errorTaskEnd"
+//            };
+//            const field = e.target.id;
+//            if (mapping[field]) {
+//
+//                document.getElementById(mapping[field])
+//                        .classList.add("d-none");
+//                // Special case for date range
+//                if (field === "t_start" || field === "t_end") {
+//                    document.getElementById("errorTaskDateRange")
+//                            .classList.add("d-none");
+//                }
+//            }
+//        });
+//
 function hideAllErrorMsg_Task() {
 
     const errorField = [
@@ -800,34 +798,207 @@ async function loadTaskDepenecy() {
     select.trigger('change');
 }
 ;
-// Get assignee details after user selected role
-document.getElementById("assignee").addEventListener("focus", async function () {
 
-    const user_role = document.getElementById("t_user_role").value;
-    const response = await fetch(`TaskServlet?action=fetch_user&project_id=${project_id}&user_role=${user_role}`);
-    const assignee = document.getElementById("assignee");
-    console.log(response);
-    if (!response.ok) {
-        throw new Error(response.status);
-    }
+// 1. Target the '+' button
+const manageBtn = document.getElementById('manageAssignmentBtn');
+const dropdownMenu = document.getElementById('assigneeDropdownMenu');
 
-    const result = await response.json();
-    assignee.innerHTML = "";
-    result.userData.forEach((d) => {
-        const option = document.createElement("option");
-        option.value = d.user_id;
-        option.textContent = d.username;
-        assignee.append(option);
+if (manageBtn && dropdownMenu) {
+
+    // 1. Listen for clicks on the '+' button
+    manageBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation(); // Stops the click from bubbling up to the document
+
+        loadAsignmentDropDown();
     });
-    if (!result.userData || result.userData.length === 0) {
-        assignee.innerHTML = "";
-        const option = document.createElement("option");
-        option.textContent = "No user found";
-        option.disabled = true;
-        option.selected = true;
-        assignee.append(option);
+
+    // 2. Close the dropdown if the user clicks anywhere else on the page
+    document.addEventListener('click', function (e) {
+
+
+        // Check if the click happened outside both the button and the menu
+        if (!manageBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.remove('show');
+        }
+
+    });
+}
+
+//Get assignee details after user selected role
+async function loadAsignmentDropDown() {
+    console.log("loadAsignmentDropDown triggered");
+
+    try {
+        // Removed the extra quotes around "Developer"
+        const response = await fetch(`TaskServlet?action=fetch_user&project_id=${project_id}&user_role=Developer`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log(result);
+
+        const assigneeListContainer = document.getElementById("assigneeListContainer");
+        assigneeListContainer.innerHTML = "";
+
+        const visibleAssignments =
+                document.querySelectorAll(
+                        "#assignmentDropdownWrapper #assignedNamesContainer > span:not(.d-none)"
+                        );
+
+        if (visibleAssignments.length > 0) {
+
+            assigneeListContainer.innerHTML = `
+                                                <div class="text-center py-4 text-muted">
+                                                    <i class="fas fa-user-check text-secondary mb-2"
+                                                       style="font-size: 1.2rem; opacity: 0.5;"></i>
+                                                    <p class="small mb-0 fw-medium">
+                                                        Assignee already selected
+                                                    </p>
+                                                    <span class="small" style="font-size: 0.75rem;">
+                                                        Remove the current assignee before assigning another developer
+                                                    </span>
+                                                </div>`;
+
+            const dropdownMenu =
+                    document.getElementById("assigneeDropdownMenu");
+
+            if (dropdownMenu) {
+                dropdownMenu.classList.add("show");
+            }
+
+            return;
+        }
+
+        // 1. Handle the Empty State Properly
+        if (!result.userData || result.userData.length === 0) {
+            // Removed 'display: none' so it actually shows up!
+            assigneeListContainer.innerHTML = `
+                <div id="noUsersFoundMessage" class="text-center py-4 text-muted">
+                    <i class="fas fa-search text-secondary mb-2" style="font-size: 1.2rem; opacity: 0.5;"></i>
+                    <p class="small mb-0 fw-medium">No users found</p>
+                    <span class="small" style="font-size: 0.75rem;">Try a different role or project</span>
+                </div>
+            `;
+
+            // Toggle the menu open even if it's empty, then stop the function
+            const dropdownMenu = document.getElementById('assigneeDropdownMenu');
+            if (dropdownMenu)
+                dropdownMenu.classList.add('show');
+            return;
+        }
+
+        // 2. Build the List if Users Exist
+        let dropDownItem = "";
+        result.userData.forEach((d) => {
+            dropDownItem += `
+                <li class="assignee-item mb-1">
+                    <div class="user-list-row d-flex align-items-center justify-content-between rounded-3 px-2 py-2" style="cursor: default;">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary border rounded-pill" style="font-size: 0.65rem;">ID: ${d.user_id}</span>
+                            <span class="fw-medium small assignee-name">${d.username}</span>
+                        </div>
+                        <button type="button" data-userid='${d.user_id}' class="btn btn-primary btn-sm rounded-pill py-0 px-3 assign-btn flex-shrink-0 taskMemberAssignBtn" style="font-size: 0.75rem; height: 26px; width: max-content;">
+                            Assign
+                        </button>
+                    </div>
+                </li>`;
+        });
+
+        // 3. Inject the HTML
+        assigneeListContainer.innerHTML = dropDownItem;
+
+        // 4. Safely grab the dropdown menu and toggle it open
+        const dropdownMenu = document.getElementById('assigneeDropdownMenu');
+        if (dropdownMenu) {
+            dropdownMenu.classList.add('show'); // Use 'add' instead of 'toggle' so clicking it rapidly doesn't accidentally close it
+        }
+
+    } catch (error) {
+        console.error("Failed to load users:", error);
     }
+}
+
+document.getElementById("assigneeListContainer").addEventListener("click", function (e) {
+
+    const assignBtn = e.target.closest(".taskMemberAssignBtn");
+    const assign_Name = e.target.closest(".user-list-row").querySelector(".assignee-name").textContent;
+    console.log(assignBtn);
+
+    newAssignments = {
+        task_assigned_to: assignBtn.dataset.userid,
+        task_assigned_by: user_id
+    };
+    newAssignments.user_name = assign_Name;
+
+    addAssignedPill("initialize", newAssignments);
+
+    e.target.closest(".assignee-item").classList.add("d-none");
+    console.log(newAssignments);
 });
+
+function addAssignedPill(action, data) {
+    const assignedNamesContainer = document.getElementById("assignedNamesContainer");
+    const deleteBtn = action !== "initialize" ? `<i id="removeAssignment" data-task-id=${data.task_id} data-task-assigned-to=${data.task_assigned_to} class="fas fa-times ms-1 text-secondary remove-assignee-btn"
+                            role="button"
+                            title="Remove Assignee"
+                            onclick="displayAssignmentRejectionModal(this)">
+                       </i>` : ``;
+
+    const assignedNamesDiv = `
+        <span id="assignmentTo_${data.task_assigned_to}" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill ps-2 pe-2 py-2 d-flex align-items-center gap-2 shadow-sm">
+
+            <span class="badge bg-white text-primary border border-primary-subtle rounded-pill shadow-sm"
+                  style="font-size: 0.7rem;">
+                ID: ${data.task_assigned_to}
+            </span>
+
+            <span class="fw-semibold"
+                  style="font-size: 0.85rem;">
+                ${data.user_name}
+            </span>
+    
+            ${deleteBtn}
+        </span>
+    `;
+
+    assignedNamesContainer.innerHTML += assignedNamesDiv;
+
+}
+
+// Grab the new search input and the list of user items
+const searchInput = document.getElementById('assigneeSearchInput');
+const assigneeItems = document.querySelectorAll('.assignee-item');
+
+if (searchInput) {
+    searchInput.addEventListener('input', function (e) {
+        // Convert whatever the user typed to lowercase for easy matching
+        const searchTerm = e.target.value.toLowerCase().trim();
+
+        // Loop through every user in the list
+        assigneeItems.forEach(item => {
+            // Grab the text of the ID and the Name inside this specific list item
+            const idText = item.querySelector('.badge').innerText.toLowerCase();
+            const nameText = item.querySelector('.assignee-name').innerText.toLowerCase();
+
+            // If the search term is found in either the ID or the Name, show it. Otherwise, hide it.
+            if (idText.includes(searchTerm) || nameText.includes(searchTerm)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+
+    // Optional UI touch: Clear the search bar every time the dropdown is opened
+    const manageBtn = document.getElementById('manageAssignmentBtn');
+    manageBtn.addEventListener('show.bs.dropdown', () => {
+        searchInput.value = '';
+        assigneeItems.forEach(item => item.style.display = 'block'); // Reset the list visibility
+    });
+}
 
 function validateTaskForm(data) {
 
@@ -866,7 +1037,7 @@ function validateTaskForm(data) {
     }
 
     // Assignee
-    if (!assigneeId || assigneeId === "") {
+    if (!newAssignments || newAssignments.length === 0) {
         document.getElementById("errorTaskAssignee").innerText =
                 "Please select an assignee.";
         document.getElementById("errorTaskAssignee")
@@ -914,16 +1085,16 @@ async function confirmAddTask() {
 
     console.log("confirmAddTask");
     console.log(isTaskEdit);
+
     const data = {
         action: "Insert",
         task_name: document.getElementById('t_name').value,
         task_desc: document.getElementById('t_desc').value,
-        assignee: document.getElementById('assignee').value,
         task_start_date: document.getElementById('t_start').value,
         task_end_date: document.getElementById('t_end').value,
         sprint_Id: document.getElementById('t_board_id').value,
         task_status: document.getElementById('t_column_id').value,
-        task_assigned_to: document.getElementById('assignee').value,
+        taskAssignment: newAssignments,
         task_assigned_by: user_id,
         taskDepedencies: $('#t_dependency').val().map(Number) || null,
         backlog_id: document.getElementById("t_backlog").value.trim() || null
@@ -937,20 +1108,27 @@ async function confirmAddTask() {
     if (isTaskEdit) {
         data.action = "UpdateTaskDetials";
         task_id = document.getElementById("task_id").value.replace("task-", "");
-        ;
         console.log("Task id", task_id);
         data.task_id = task_id;
+        console.log("Removed Assignment : " , removedAssignments )
+        data.removedAssignment = removedAssignments;
         const oldTask = document.getElementById("task-" + task_id);
         console.log("Task old :", oldTask);
         if (oldTask)
             oldTask.remove();
     }
 
+    console.log(data);
     const result = await sendData_Task(data);
     if (result.status !== "Success") {
         bsTaskModal.hide();
         return;
     }
+
+    //clean the array
+    newAssignments = null;
+    removedAssignments = null;
+
 
     removeEmptyBoardUI(data.sprint_Id);
     displayMessage(result.status, result.message);
@@ -996,27 +1174,11 @@ async function confirmAddTask() {
     }
 }
 
-document.querySelector("#taskModal .modal-body").addEventListener("click", function (e) {
-
-    const targetId = e.target.id;
-    const errorMap = {
-        t_name: "errorTaskName",
-        t_desc: "errorTaskDesc",
-        t_backlog: "errorTaskBacklog",
-        assignee: "errorTaskAssignee",
-        t_start: "errorTaskStart",
-        t_end: "errorTaskEnd"
-    };
-    if (errorMap[targetId]) {
-        document.getElementById(errorMap[targetId])
-                .classList.add("d-none");
-    }
-
-    if (targetId === "t_start" || targetId === "t_end") {
-        document.getElementById("errorTaskDateRange")
-                .classList.add("d-none");
-    }
+document.getElementById("taskModel_Cancle").addEventListener("click", () => {
+    newAssignments.length = 0;
+    removedAssignments.length = 0;
 });
+
 const bsViewModal = new bootstrap.Modal(document.getElementById('viewTaskModal'));
 // Global Modal Instance
 const taskModalElem = document.getElementById('viewTaskModal');
@@ -1130,15 +1292,16 @@ async function drop(ev) {
     }
 }
 
+
+//#################################################################### Task ###############################################################################
+//
 //prepare the form for edit
+
 async function getTaskDetails(task_id) {
 
     console.log("getTaskDetails Execute");
     console.log("Task Id : ", task_id);
-    const response = await fetch(`TaskServlet?action=fetchTask_Edit&task_id=${task_id}`);
-    const result = await response.json();
-    console.log("Result : ", result);
-    console.log(typeof result);
+
     const taskModel = document.querySelector("#taskModal");
     taskModel.querySelector("#taskModel_title").innerText = "Task Information";
     const subBtn = taskModel.querySelector("#taskModel_Sbt");
@@ -1148,6 +1311,9 @@ async function getTaskDetails(task_id) {
     const deletebtn = document.getElementById("deleteTaskBtn");
     deletebtn.style.display = "none";
     deletebtn.onclick = () => deleteTask(task_id);
+    document.querySelector(".add-assignee-btn").classList.add("d-none");
+
+    // display task dependency
     const task = document.getElementById("task-" + task_id);
     console.log("task during edit : ", task);
     const taskStatus = task.closest('.column').dataset.status;
@@ -1156,24 +1322,64 @@ async function getTaskDetails(task_id) {
     const sprint_id = task.closest('.scrum-board-card').id;
     taskModel.querySelector("#t_board_id").value = sprint_id;
     console.log("Sprint id", sprint_id);
+
+    //get the task details
+    const response = await fetch(`TaskServlet?action=fetchTask_Edit&task_id=${task_id}`);
+    const result = await response.json();
+    console.log("Result : ", result);
+    console.log(typeof result);
+
     const input = document.createElement("input");
     input.value = task_id;
     input.type = "hidden";
     input.id = "task_id";
     taskModel.append(input);
+
     taskModel.querySelector("#t_name").value = result.taskData.task_name;
     taskModel.querySelector("#t_desc").value = result.taskData.task_desc;
-    taskModel.querySelector("#t_user_role").value = result.taskData.task_assigned_to_Role;
+
+
+    addAssignedPill("display", result.taskData.taskAssignment);
+
+//    taskModel.querySelector("#t_user_role").value = result.taskData.task_assigned_to_Role
     const assiosiatedBacklog = taskModel.querySelector("#t_backlog");
     console.log("Backlog id selected : ", result.taskData.backlog_id);
+
+
+
+    // task assignment fields
+    const assignedNamesContainer = document.getElementById("assignedNamesContainer");
+    assignedNamesContainer.innerHTML = "";
+    let assignedNamesDiv = "";
+    
+    const item =  result.taskData.taskAssignment;
+        assignedNamesDiv = `
+        <span id="assignmentTo_${item.task_assigned_to}" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill ps-2 pe-2 py-2 d-flex align-items-center gap-2 shadow-sm">
+
+            <span class="badge bg-white text-primary border border-primary-subtle rounded-pill shadow-sm"
+                  style="font-size: 0.7rem;">
+                ID: ${item.task_assigned_to}
+            </span>
+
+            <span class="fw-semibold"
+                  style="font-size: 0.85rem;">
+                ${item.user_name}
+            </span>
+
+            <i id="removeAssignment" data-task-id=${task_id} data-task-assigned-to=${item.task_assigned_to} class="d-none fas fa-times ms-1 text-secondary remove-assignee-btn"
+               role="button"
+               title="Remove Assignee"
+               onclick="displayAssignmentRejectionModal(this)">
+            </i>
+
+        </span>
+    `;
+
+    assignedNamesContainer.innerHTML = assignedNamesDiv;
+
+
     handleTaskBacklog(result.taskData.backlog_id);
-    const role = taskModel.querySelector("#t_user_role");
-    role.value = result.taskData.taskAssignment.task_assigned_to_Role;
-    const assignee = taskModel.querySelector("#assignee");
-    const option = document.createElement("option");
-    option.value = result.taskData.taskAssignment.task_assigned_to;
-    option.textContent = result.taskData.taskAssignment.user_name;
-    assignee.append(option);
+
     taskModel.querySelector("#t_start").value = result.taskData.task_start_date;
     taskModel.querySelector("#t_end").value = result.taskData.task_end_date;
     const select = $('#t_dependency');
@@ -1220,6 +1426,39 @@ async function getTaskDetails(task_id) {
     bsTaskModal.show();
 }
 
+
+//get the assignment removal reason
+const assignmentRemovalModalDOM = document.getElementById("assignmentRemovalModal");
+function displayAssignmentRejectionModal(btn) {
+    
+    const assignmentRemovalModal = bootstrap.Modal.getOrCreateInstance(assignmentRemovalModalDOM);
+    document.getElementById("rejectionAssignmentReason").innerText = "";
+    assignmentRemovalModalDOM.dataset.task_Id = btn.dataset.taskId;
+    assignmentRemovalModalDOM.dataset.taskAssignedTo = btn.dataset.taskAssignedTo;
+
+    assignmentRemovalModal.show();
+}
+
+// get the data from the rejection module
+document.getElementById("confirmAssignmentRejectBtn").addEventListener("click", async function removeAssignedMember_task() {
+
+    removedAssignments = {
+        task_id: assignmentRemovalModalDOM.dataset.taskId,
+        task_assigned_to: assignmentRemovalModalDOM.dataset.taskAssignedTo,
+        removal_reason: document.getElementById("rejectionAssignmentReason").value
+    };
+
+    const assigneeBadge = document.getElementById(`assignmentTo_${removedAssignments.task_assigned_to}`);
+
+    if (assigneeBadge) {
+        assigneeBadge.classList.add("d-none");
+    }
+
+    const assignmentRemovalModal = bootstrap.Modal.getOrCreateInstance(assignmentRemovalModalDOM);
+    assignmentRemovalModal.hide();
+});
+
+
 // delete task
 async function deleteTask(task_id) {
 
@@ -1259,6 +1498,9 @@ function editTask() {
     const subBtn = taskModel.querySelector("#taskModel_Sbt");
     subBtn.innerText = "Edit Task";
     subBtn.onclick = () => confirmAddTask();
+
+    document.querySelector(".add-assignee-btn").classList.remove("d-none");
+    document.querySelector(".remove-assignee-btn").classList.remove("d-none");
     document.getElementById("deleteTaskBtn").style.display = "block";
     isTaskEdit = true;
     console.log(isTaskEdit);

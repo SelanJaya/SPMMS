@@ -23,6 +23,12 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: var(--body-bg);
     margin: 0;
+    
+   
+    background-color: #f3f5f9; /* A crisp, clean cool-gray that makes white panels pop */
+    /* Or a very soft gradient running top-to-bottom across the whole screen */
+    background: linear-gradient(180deg, #f8f9fa 0%, #eef1f6 100%);
+    min-height: 100vh;
 }
 
 /* --- SIDEBAR --- */

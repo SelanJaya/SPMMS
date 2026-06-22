@@ -70,7 +70,7 @@
                 <nav class="top-nav">         
                     <%-- Clear message after displaying --%>
 
-                    <div class="small text-muted">Management / <span class="fw-semibold text-dark">Dashboard</span></div>
+                    <div class="small text-muted">Management/<span class="fw-semibold text-dark">Dashboard</span></div>
                     <div class="user-info">
                         <div class="user-details d-none d-sm-block">
                             <span class="user-name">${userInfo.username}</span>

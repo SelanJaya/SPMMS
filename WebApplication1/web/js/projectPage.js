@@ -14,8 +14,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     const response = await fetch(`ProjectPageServlet?action=fetchProjectinfo&project_id=${projectId}`);
     const result = await response.json();
     console.log("Project Data", result);
-document.getElementById("id-badge").innerText = "ID: " + result.projectData.projectId;
-    document.getElementById("status-badge").innerText = "Status: " + result.projectData.projectStatus;
+    document.getElementById("id-badge").innerText = "ID: " + result.projectData.projectId;
+
+    const statusBadge = document.getElementById("status-badge");
+    const projStatus = result.projectData.projectStatus;
+    console.log(projStatus);
+    if (projStatus === "Active") {
+        statusBadge.classList.add("badge-soft-success");
+    } else if (projStatus === "Delayed") {
+        statusBadge.classList.add("badge-soft-danger");
+    } else if (projStatus === "Archive") {
+        statusBadge.classList.add("badge-soft-archive");
+    }
+
+    statusBadge.innerHTML =
+            `<i class="fas fa-circle me-1"></i> Status: ${projStatus}`;
+
     document.getElementById("projectName-badge").innerText = result.projectData.projectName;
     document.getElementById("projName").value = result.projectData.projectName;
     document.getElementById("projectType").value = result.projectData.projectType;
@@ -24,8 +38,26 @@ document.getElementById("id-badge").innerText = "ID: " + result.projectData.proj
     document.getElementById("projStatus").value = result.projectData.projectStatus;
     document.getElementById("ProjStart").value = result.projectData.projStartDate;
     document.getElementById("ProjEnd").value = result.projectData.projEndDate;
-    document.getElementById("projDate").value = result.projectData.projCreatedAt;
+    //document.getElementById("projDate").value = result.projectData.projCreatedAt;
+
+    // 1. Grab the raw date string from your database result
+    const rawDateString = result.projectData.projCreatedAt;
+
+    // 2. Format it nicely (e.g., "Jan 21, 2026, 12:49 PM")
+    const formattedDate = new Date(rawDateString).toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+    console.log(formattedDate);
+
+    // 3. Target your clean text element using textContent instead of .value
+    document.getElementById("projDate").value = formattedDate;
     
+    //for status Badge
     const riskScore = result.projectData.project_risk_score;
     const riskBadgeClass =
             riskScore <= 30
@@ -33,7 +65,7 @@ document.getElementById("id-badge").innerText = "ID: " + result.projectData.proj
             : riskScore <= 60
             ? "badge-soft-warning"
             : "badge-soft-danger";
-            
+
     document.getElementById("riskScore").innerText = riskScore;
 
     console.log("project Date", result.projectData.projEndDate);

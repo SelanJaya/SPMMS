@@ -5,6 +5,7 @@
 package DAO;
 
 import DAO.DBConnection;
+import beans.Activity;
 import beans.ProjectAnalytics;
 import beans.Task;
 import java.sql.Connection;
@@ -319,7 +320,6 @@ public class ProjectAnalyticsDAO {
 //            throw e;
 //        }
 //    }
-    
     public List getBurnDownData_Default(int project_id) throws Exception {
 
         List<ProjectAnalytics> projectAnalyticsesArr = new ArrayList<>();
@@ -371,12 +371,12 @@ public class ProjectAnalyticsDAO {
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, project_id);
             ps.setInt(2, project_id);
-            
+
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 ProjectAnalytics projectAnalytics = new ProjectAnalytics();
-                
+
                 projectAnalytics.setTaskStartDate(rs.getObject("task_start_date", LocalDate.class));
                 projectAnalytics.setTaskEndDate(rs.getObject("task_end_Date", LocalDate.class));
                 projectAnalytics.setSprintStartDate(rs.getObject("sprint_start_date", LocalDate.class));
@@ -436,8 +436,8 @@ public class ProjectAnalyticsDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-               ProjectAnalytics projectAnalytics = new ProjectAnalytics();
-                
+                ProjectAnalytics projectAnalytics = new ProjectAnalytics();
+
                 projectAnalytics.setTaskStartDate(rs.getObject("task_start_date", LocalDate.class));
                 projectAnalytics.setTaskEndDate(rs.getObject("task_end_Date", LocalDate.class));
                 projectAnalytics.setSprintStartDate(rs.getObject("sprint_start_date", LocalDate.class));
@@ -454,4 +454,264 @@ public class ProjectAnalyticsDAO {
         }
     }
 
+    public List<Activity> getRecentActivities_Dev(int userId) {
+
+        List<Activity> activities = new ArrayList<>();
+
+        String sql = """
+                        (
+                            SELECT
+                                CONCAT('Joined project ', p.project_name) AS activity,
+                                pa.proj_assigned_at AS activity_date,
+                                'PROJECT_JOIN' AS activity_type
+                            FROM project_assignments pa
+                            JOIN projects p
+                                ON pa.project_id = p.project_id
+                            WHERE pa.proj_assign_to = ?
+                              AND pa.proj_assign_status = 'ACTIVE'
+                        )
+
+                        UNION ALL
+
+                        (
+                            SELECT
+                                CONCAT(
+                                    'Removed from project ',
+                                    p.project_name,
+                                    CASE
+                                        WHEN pa.removal_reason IS NOT NULL
+                                        THEN CONCAT(' (', pa.removal_reason, ')')
+                                        ELSE ''
+                                    END
+                                ) AS activity,
+                                pa.removed_at AS activity_date,
+                                'PROJECT_REMOVE' AS activity_type
+                            FROM project_assignments pa
+                            JOIN projects p
+                                ON pa.project_id = p.project_id
+                            WHERE pa.proj_assign_to = ?
+                              AND pa.proj_assign_status = 'REMOVED'
+                        )
+
+                        UNION ALL
+
+                        (
+                            SELECT
+                                CONCAT(
+                                    'Assigned to task "',
+                                    t.task_name,
+                                    '"'
+                                ) AS activity,
+                                ta.task_assigned_at AS activity_date,
+                                'TASK_ASSIGN' AS activity_type
+                            FROM task_assignments ta
+                            JOIN tasks t
+                                ON ta.task_id = t.task_id
+                            WHERE ta.task_assigned_to = ?
+                              AND ta.task_assignment_status = 'ACTIVE'
+                        )
+
+                        UNION ALL
+
+                        (
+                            SELECT
+                                CONCAT(
+                                    'Removed from task "',
+                                    t.task_name,
+                                    '"',
+                                    CASE
+                                        WHEN ta.removal_reason IS NOT NULL
+                                        THEN CONCAT(' (', ta.removal_reason, ')')
+                                        ELSE ''
+                                    END
+                                ) AS activity,
+                                ta.removed_at AS activity_date,
+                                'TASK_REMOVE' AS activity_type
+                            FROM task_assignments ta
+                            JOIN tasks t
+                                ON ta.task_id = t.task_id
+                            WHERE ta.task_assigned_to = ?
+                              AND ta.task_assignment_status = 'REMOVED'
+                        )
+
+                        ORDER BY activity_date DESC
+                        LIMIT 20
+                    """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, userId);
+            ps.setInt(3, userId);
+            ps.setInt(4, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Activity activity = new Activity();
+
+                activity.setActivity(
+                        rs.getString("activity"));
+
+                activity.setActivityDate(
+                        rs.getString("activity_date"));
+
+                activity.setActivityType(
+                        rs.getString("activity_type"));
+
+                activities.add(activity);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return activities;
+    }
+
+    public List<Activity> getRecentActivities_PM(int userId) {
+
+        List<Activity> activities = new ArrayList<>();
+
+        String sql = """
+                        SELECT
+                            CONCAT('Assigned ', u.username, ' to project') AS activity,
+                            pa.proj_assigned_at AS activity_date,
+                            'PROJECT_JOIN' AS activity_type
+                        FROM project_assignments pa
+                        JOIN users u
+                            ON pa.proj_assign_to = u.user_id
+                        WHERE pa.proj_assign_by = ?
+                        AND pa.proj_assign_status = 'ACTIVE'
+
+                        UNION ALL
+
+                        SELECT
+                            CONCAT(
+                                'Removed ',
+                                u.username,
+                                ' from project',
+                                CASE
+                                    WHEN pa.removal_reason IS NOT NULL
+                                    THEN CONCAT(' (', pa.removal_reason, ')')
+                                    ELSE ''
+                                END
+                            ) AS activity,
+                            pa.removed_at AS activity_date,
+                            'PROJECT_REMOVE' AS activity_type
+                        FROM project_assignments pa
+                        JOIN users u
+                            ON pa.proj_assign_to = u.user_id
+                        WHERE pa.proj_assign_by = ?
+                        AND pa.proj_assign_status = 'REMOVED'
+
+                        ORDER BY activity_date DESC
+                        LIMIT 20
+                    """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Activity activity = new Activity();
+
+                activity.setActivity(
+                        rs.getString("activity"));
+
+                activity.setActivityDate(
+                        rs.getString("activity_date"));
+
+                activity.setActivityType(
+                        rs.getString("activity_type"));
+
+                activities.add(activity);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return activities;
+    }
+
+    public List<Activity> getRecentActivities_SM(int userId) {
+
+        List<Activity> activities = new ArrayList<>();
+
+        String sql = """
+        SELECT
+            CONCAT('Assigned task "', t.task_name, '" to ', u.username) AS activity,
+            ta.task_assigned_at AS activity_date,
+            'TASK_ASSIGN' AS activity_type
+        FROM task_assignments ta
+        JOIN tasks t
+            ON ta.task_id = t.task_id
+        JOIN users u
+            ON ta.task_assigned_to = u.user_id
+        WHERE ta.task_assigned_by = ?
+
+        UNION ALL
+
+        SELECT
+            CONCAT(
+                'Removed ',
+                u.username,
+                ' from task "',
+                t.task_name,
+                '"',
+                CASE
+                    WHEN ta.removal_reason IS NOT NULL
+                    THEN CONCAT(' (', ta.removal_reason, ')')
+                    ELSE ''
+                END
+            ) AS activity,
+            ta.removed_at AS activity_date,
+            'TASK_REMOVE' AS activity_type
+        FROM task_assignments ta
+        JOIN tasks t
+            ON ta.task_id = t.task_id
+        JOIN users u
+            ON ta.task_assigned_to = u.user_id
+        WHERE ta.task_assigned_by = ?
+        AND ta.task_assignment_status = 'REMOVED'
+
+        ORDER BY activity_date DESC
+        LIMIT 20
+        """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ps.setInt(2, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Activity activity = new Activity();
+
+                activity.setActivity(
+                        rs.getString("activity"));
+
+                activity.setActivityDate(
+                        rs.getString("activity_date"));
+
+                activity.setActivityType(
+                        rs.getString("activity_type"));
+
+                activities.add(activity);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return activities;
+    }
 }

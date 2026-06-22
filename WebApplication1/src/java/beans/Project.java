@@ -18,6 +18,8 @@ public class Project implements Serializable {
     private int projectId, projCreatedBy;
     private String projectName, projectDesc, projectStatus, projectType, projectClient, projStartDate, projEndDate, projCreatedAt;
     private Double project_risk_score;
+    private boolean isProjectSignOff;
+    
 
     public Project() {
     }
@@ -101,6 +103,10 @@ public class Project implements Serializable {
         this.project_risk_score = project_risk_score;
     }
 
+    public void setIsProjectSignOff(boolean isProjectSignOff) {
+        this.isProjectSignOff = isProjectSignOff;
+    }
+
     public int getProjectId() {
         return projectId;
     }
@@ -152,5 +158,9 @@ public class Project implements Serializable {
 
     public Double getProject_risk_score() {
         return project_risk_score;
+    }
+
+    public boolean isIsProjectSignOff() {
+        return isProjectSignOff;
     }
 }

@@ -58,7 +58,7 @@
         <div id="content-wrapper">
             <div id="statusTab"></div>
             <nav class="top-nav">
-                <div class="small text-muted">Management / <span class="fw-semibold text-dark">Project Console</span></div>
+                <div class="small text-muted">Management/Dashboard/Project_${project_id}/<span class="fw-semibold text-dark">Project Console</span></div>
                 <div class="user-info">
                     <div class="user-details d-none d-sm-block">
                         <span class="user-name">${user.username}</span>
@@ -71,29 +71,57 @@
 
             <div class="container-fluid p-4">
 
+                <!--                <div class="project-header-mini mb-4">
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap">
+                
+                                        <div>
+                                            <h1 id="projectName-badge" class="mb-2"></h1>
+                
+                                            <div class="d-flex gap-2 flex-wrap">
+                                                <span id="id-badge" class="badge badge-soft-primary">
+                                                    <i class="fas fa-fingerprint me-1"></i>
+                                                    
+                                                </span>
+                
+                                                <span id="status-badge" class="badge">
+                                                    <i class="fas fa-circle me-1"></i>
+                                                    
+                                                </span>
+                
+                                                <span id="risk-badge" class="badge badge-soft-warning">
+                                                    <i class="fas fa-gauge-high me-1"></i>
+                                                    Risk Score: <span id="riskScore"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>-->
+
                 <div class="project-header-mini mb-4">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
                         <div>
-                            <h1 id="projectName-badge" class="mb-2"></h1>
+                            <h1 id="projectName-badge" class="project-title mb-1"></h1>
+                            <small class="text-muted">
 
-                            <div class="d-flex gap-2 flex-wrap">
-                                <span id="id-badge" class="badge badge-soft-primary">
-                                    <i class="fas fa-fingerprint me-1"></i>
-                                    
-                                </span>
-
-                                <span id="status-badge" class="badge badge-soft-success">
-                                    <i class="fas fa-circle me-1"></i>
-                                    
-                                </span>
-
-                                <span id="risk-badge" class="badge badge-soft-warning">
-                                    <i class="fas fa-gauge-high me-1"></i>
-                                    Risk Score: <span id="riskScore"></span>
-                                </span>
-                            </div>
+                            </small>
                         </div>
+
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span id="id-badge" class="badge badge-soft-primary">
+                                <i class="fas fa-fingerprint me-1"></i>
+                            </span>
+
+                            <span id="status-badge" class="badge">
+                                <i class="fas fa-circle me-1"></i>
+                            </span>
+
+                            <span id="risk-badge" class="badge badge-soft-warning">
+                                <i class="fas fa-gauge-high me-1"></i>
+                                Risk Score: <span id="riskScore"></span>
+                            </span>
+                        </div>
+
                     </div>
                 </div>
 
@@ -103,14 +131,22 @@
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6 class="m-0 fw-bold text-primary" style="font-size: 0.9rem;">General Information</h6>
                                 <div class="d-flex gap-2">
-                                    <button id="manageDocBtn" 
-                                            class="btn btn-sm btn-primary px-2 rounded-pill fw-bold"
-                                            <i class="fas fa-folder-open me-1"></i> Documents
+                                    <!--                                    <button id="manageDocBtn" class="btn btn-sm btn-primary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">
+                                                                            <i class="fas fa-folder-open me-1"></i> Documents
+                                                                        </button>-->
+
+                                    <button id="manageDocBtn" class="btn btn-sm px-3 rounded-pill fw-bold" 
+                                            style="font-size: 0.75rem; background-color: #e7f1ff; color: #0d6efd; border: 1px solid #e7f1ff;">
+                                        <i class="fas fa-folder-open me-1"></i> Documents
                                     </button>
+
                                     <c:if test="${user.user_role == 'Project Manager'}">
-                                        <button id="editBtn" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-bold"
-                                                style="font-size: 0.75rem;">Edit Details</button>
-                                        <button id="deleteBtnHeader" class="btn btn-sm btn-delete-folder px-3 rounded-pill fw-bold" 
+                                        <button id="editBtn" class="btn btn-sm btn-outline-primary px-3 rounded-pill fw-bold" style="font-size: 0.75rem;">
+                                            <i class="fas fa-edit me-1"></i> Edit Details
+                                        </button>
+
+                                        <button id="deleteBtnHeader" class="btn btn-sm btn-outline-danger px-3 rounded-pill fw-bold" 
+                                                style="font-size: 0.75rem;"
                                                 data-bs-toggle="modal" data-bs-target="#deleteFolderModal">
                                             <i class="fas fa-folder-minus me-1"></i> Delete Project Folder
                                         </button>
@@ -123,7 +159,7 @@
 
                                         <!-- Project Name -->
                                         <div class="col-md-4 position-relative">
-                                            <span class="label-style">Project Name</span>
+                                            <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.8px;">Project Name</span>
 
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
@@ -143,7 +179,7 @@
 
                                         <!-- Project Type -->
                                         <div class="col-md-4 position-relative">
-                                            <span class="label-style">Project Type</span>
+                                            <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.8px;">Project Type</span>
 
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
@@ -167,7 +203,7 @@
 
                                         <!-- Client Name -->
                                         <div class="col-md-4 position-relative">
-                                            <span class="label-style">Client Name</span>
+                                            <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.8px;">Client Name</span>
 
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
@@ -190,10 +226,11 @@
 
                                         <!-- Description -->
                                         <div class="col-12 position-relative">
-                                            <span class="label-style">Project Description</span>
+                                            <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.8px;">Project Description</span>
 
                                             <div class="input-group input-group-text bg-light border-end-0">
-                                                <span class="me-2 align-items-start pt-2">
+
+                                                <span class="me-2 d-flex align-items-center pt-1">
                                                     <i class="fas fa-align-left text-muted"></i>
                                                 </span>
 
@@ -209,7 +246,7 @@
 
                                         <!-- Status -->
                                         <div class="col-md-4 position-relative">
-                                            <span class="label-style">Project Status</span>
+                                            <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.8px;">Project Status</span>
 
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
@@ -228,7 +265,7 @@
 
                                         <!-- Start Date -->
                                         <div class="col-md-4 position-relative">
-                                            <span class="label-style">Start Date</span>
+                                            <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.8px;">Start Date</span>
 
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">
@@ -249,9 +286,10 @@
 
                                         <!-- Deadline -->
                                         <div class="col-md-4 position-relative">
-                                            <span class="label-style">Deadline</span>
+                                            <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.8px;">Deadline</span>
 
                                             <div class="input-group input-group-text bg-light">
+
                                                 <span class="me-2">
                                                     <i class="fas fa-calendar-check text-muted"></i>
                                                 </span>
@@ -270,7 +308,7 @@
 
                                         <!-- Date Created -->
                                         <div class="col-md-4 position-relative">
-                                            <span class="label-style">Date Created</span>
+                                            <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.8px;">Date Created</span>
 
                                             <div class="input-group input-group-text bg-light">
                                                 <span class="me-2">

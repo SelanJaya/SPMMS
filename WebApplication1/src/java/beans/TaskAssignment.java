@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class TaskAssignment implements Serializable {
 
     private int task_id, task_assigned_to, task_assigned_by, task_assigned_at;
-    private String task_assigned_to_Role, user_name;
+    private String task_assigned_to_Role, user_name, removal_reason;
 
     public TaskAssignment() {
     }
@@ -48,6 +48,10 @@ public class TaskAssignment implements Serializable {
         this.user_name = user_name;
     }
 
+    public void setRemoval_reason(String removal_reason) {
+        this.removal_reason = removal_reason;
+    }
+
    
 
     public int getTask_id() {
@@ -72,5 +76,9 @@ public class TaskAssignment implements Serializable {
 
     public int getTask_assigned_by() {
         return task_assigned_by;
+    }
+
+    public String getRemoval_reason() {
+        return removal_reason;
     }
 }
