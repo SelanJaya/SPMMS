@@ -24,7 +24,7 @@
 // * @author HP
 // */
 //
-//@WebListener
+//
 //public class ProjectRiskPredictionScheduler implements ServletContextListener {
 //
 //    private ScheduledExecutorService scheduler;

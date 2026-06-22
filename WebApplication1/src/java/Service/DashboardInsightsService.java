@@ -7,7 +7,6 @@ package Service;
 import DAO.ProjectDAO;
 import beans.DashboardInsight;
 import beans.ProjectRiskScore_ML;
-import Service.MLPredictionService;
 import beans.RiskPredictionResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,8 +89,8 @@ public class DashboardInsightsService {
 
             List<RiskPredictionResponse> predictions = new ArrayList<>();
 
-            MLPredictionService mLPredictionService = new MLPredictionService();
-            predictions = mLPredictionService.predictRisk(new ArrayList(projectMap.values()));
+            //MLPredictionService mLPredictionService = new MLPredictionService();
+            //predictions = mLPredictionService.predictRisk(new ArrayList(projectMap.values()));
 
            
             return predictions;
