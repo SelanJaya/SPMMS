@@ -38,7 +38,7 @@ public class TaskApprovalDAO {
             ps.setInt(1, taskApproval.getTask_id());
             ps.setString(2, taskApproval.getTaskApproval_status());
             ps.setInt(3, taskApproval.getApproved_by());
-            ps.setNull(4, java.sql.Types.VARCHAR);
+            ps.setString(4, taskApproval.getRemarks());
 
             if (ps.executeUpdate() > 0) {
                 // 2. Retrieve the generated keys
@@ -54,7 +54,7 @@ public class TaskApprovalDAO {
         } catch (Exception e) {
             System.out.println("Exception occur in insertTaskApproval :" + e);
             e.printStackTrace();
-            throw e;
+            throw new Error("Rejection Reason insertion Failed");
         }
     }
     

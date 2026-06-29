@@ -13,6 +13,7 @@ import java.util.List;
 public class ProjectRiskScore_ML {
 
     private int projectId;
+    private int  total_story_points;
     private double completionRate;
     private double overduePercentage;
     private double rejectionRate;
@@ -25,6 +26,10 @@ public class ProjectRiskScore_ML {
 
     public void setProjectId(int projectId) {
         this.projectId = projectId;
+    }
+
+    public void setTotal_story_points(int total_story_points) {
+        this.total_story_points = total_story_points;
     }
 
     public void setCompletionRate(double completionRate) {
@@ -53,6 +58,10 @@ public class ProjectRiskScore_ML {
 
     public int getProjectId() {
         return projectId;
+    }
+
+    public int getTotal_story_points() {
+        return total_story_points;
     }
 
     public double getCompletionRate() {

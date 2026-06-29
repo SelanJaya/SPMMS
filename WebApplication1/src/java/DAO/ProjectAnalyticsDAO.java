@@ -401,7 +401,7 @@ public class ProjectAnalyticsDAO {
         String sql = """
                     SELECT 
                                             DATE(t.task_start_date) AS task_start_date,
-                                            DATE(t.task_end_date) AS task_end_Date,
+                                            DATE(t.actual_endDate) AS actual_endDate,
                                             total.sprint_start_date,
                                             total.sprint_end_date
                                             
@@ -439,7 +439,8 @@ public class ProjectAnalyticsDAO {
                 ProjectAnalytics projectAnalytics = new ProjectAnalytics();
 
                 projectAnalytics.setTaskStartDate(rs.getObject("task_start_date", LocalDate.class));
-                projectAnalytics.setTaskEndDate(rs.getObject("task_end_Date", LocalDate.class));
+                projectAnalytics.setActual_endDate(rs.getObject("actual_endDate", LocalDate.class));
+                //projectAnalytics.setTaskEndDate(rs.getObject("task_end_Date", LocalDate.class));
                 projectAnalytics.setSprintStartDate(rs.getObject("sprint_start_date", LocalDate.class));
                 projectAnalytics.setSprintEndDate(rs.getObject("sprint_end_date", LocalDate.class));
 
@@ -575,39 +576,43 @@ public class ProjectAnalyticsDAO {
         List<Activity> activities = new ArrayList<>();
 
         String sql = """
-                        SELECT
-                            CONCAT('Assigned ', u.username, ' to project') AS activity,
-                            pa.proj_assigned_at AS activity_date,
-                            'PROJECT_JOIN' AS activity_type
-                        FROM project_assignments pa
-                        JOIN users u
-                            ON pa.proj_assign_to = u.user_id
-                        WHERE pa.proj_assign_by = ?
-                        AND pa.proj_assign_status = 'ACTIVE'
-
-                        UNION ALL
-
-                        SELECT
-                            CONCAT(
-                                'Removed ',
-                                u.username,
-                                ' from project',
-                                CASE
-                                    WHEN pa.removal_reason IS NOT NULL
-                                    THEN CONCAT(' (', pa.removal_reason, ')')
-                                    ELSE ''
-                                END
-                            ) AS activity,
-                            pa.removed_at AS activity_date,
-                            'PROJECT_REMOVE' AS activity_type
-                        FROM project_assignments pa
-                        JOIN users u
-                            ON pa.proj_assign_to = u.user_id
-                        WHERE pa.proj_assign_by = ?
-                        AND pa.proj_assign_status = 'REMOVED'
-
-                        ORDER BY activity_date DESC
-                        LIMIT 20
+                       SELECT
+                                                    CONCAT('Assigned ', u.username, ' to ', p.project_name) AS activity,
+                                                    pa.proj_assigned_at AS activity_date,
+                                                    'PROJECT_JOIN' AS activity_type
+                                                FROM project_assignments pa
+                                                JOIN users u
+                                                    ON pa.proj_assign_to = u.user_id
+                                                JOIN projects p 
+                                                USING (project_id)
+                                                WHERE pa.proj_assign_by = ?
+                                                AND pa.proj_assign_status = 'ACTIVE'
+                        
+                                                UNION ALL
+                        
+                                                SELECT
+                                                    CONCAT(
+                                                        'Removed ',
+                                                        u.username,
+                                                        ' from ', p.project_name,
+                                                        CASE
+                                                            WHEN pa.removal_reason IS NOT NULL
+                                                            THEN CONCAT(' (', pa.removal_reason, ')')
+                                                            ELSE ''
+                                                        END
+                                                    ) AS activity,
+                                                    pa.removed_at AS activity_date,
+                                                    'PROJECT_REMOVE' AS activity_type
+                                                FROM project_assignments pa
+                                                JOIN users u
+                                                    ON pa.proj_assign_to = u.user_id
+                                                JOIN projects p 
+                                                USING (project_id)
+                                                WHERE pa.proj_assign_by = ?
+                                                AND pa.proj_assign_status = 'REMOVED'
+                        
+                                                ORDER BY activity_date DESC
+                                                LIMIT 20 
                     """;
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {

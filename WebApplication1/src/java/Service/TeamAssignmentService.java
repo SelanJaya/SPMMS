@@ -61,27 +61,27 @@ public class TeamAssignmentService {
                     + assign_by_username;
 
             // Send email asynchronously
-            emailExecutor.submit(() -> {
-                try {
-                    EmailService emailService = new EmailService();
-                    emailService.sendEmail(
-                            projectTeamAssignment.getAsign_to_Email(),
-                            subject,
-                            message
-                    );
-                    System.out.println(
-                            "Removal email sent to: "
-                            + projectTeamAssignment.getAsign_to_Email()
-                    );
-
-                } catch (Exception e) {
-                    System.err.println(
-                            "Failed to send removal email to: "
-                            + projectTeamAssignment.getAsign_to_Email()
-                    );
-                    e.printStackTrace();
-                }
-            });
+//            emailExecutor.submit(() -> {
+//                try {
+//                    EmailService emailService = new EmailService();
+//                    emailService.sendEmail(
+//                            projectTeamAssignment.getAsign_to_Email(),
+//                            subject,
+//                            message
+//                    );
+//                    System.out.println(
+//                            "Removal email sent to: "
+//                            + projectTeamAssignment.getAsign_to_Email()
+//                    );
+//
+//                } catch (Exception e) {
+//                    System.err.println(
+//                            "Failed to send removal email to: "
+//                            + projectTeamAssignment.getAsign_to_Email()
+//                    );
+//                    e.printStackTrace();
+//                }
+//            });
 
             //EmailService emailService = new EmailService( projectTeamAssignment.getAsign_to_Email(), );
             //emailService.sendEmail(taskAssignment., subject, messageText);
@@ -120,29 +120,29 @@ public class TeamAssignmentService {
                     + assign_by_username;
 
             // Send email asynchronously
-            emailExecutor.submit(() -> {
-                try {
-                    EmailService emailService = new EmailService();
-
-                    emailService.sendEmail(
-                            projectTeamAssignment.getAsign_to_Email(),
-                            subject,
-                            message
-                    );
-
-                    System.out.println(
-                            "Removal email sent to: "
-                            + projectTeamAssignment.getAsign_to_Email()
-                    );
-
-                } catch (Exception e) {
-                    System.err.println(
-                            "Failed to send removal email to: "
-                            + projectTeamAssignment.getAsign_to_Email()
-                    );
-                    e.printStackTrace();
-                }
-            });
+//            emailExecutor.submit(() -> {
+//                try {
+//                    EmailService emailService = new EmailService();
+//
+//                    emailService.sendEmail(
+//                            projectTeamAssignment.getAsign_to_Email(),
+//                            subject,
+//                            message
+//                    );
+//
+//                    System.out.println(
+//                            "Removal email sent to: "
+//                            + projectTeamAssignment.getAsign_to_Email()
+//                    );
+//
+//                } catch (Exception e) {
+//                    System.err.println(
+//                            "Failed to send removal email to: "
+//                            + projectTeamAssignment.getAsign_to_Email()
+//                    );
+//                    e.printStackTrace();
+//                }
+//            });
 
         } catch (Exception e) {
             e.printStackTrace();

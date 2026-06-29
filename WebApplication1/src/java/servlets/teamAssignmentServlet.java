@@ -180,7 +180,7 @@ public class teamAssignmentServlet extends HttpServlet {
 
                 TeamAssignmentService teamAssignmentService = new TeamAssignmentService();
                 teamAssignmentService.recruitementService(projectTeamAssignment);
-
+                result.put("message", "Team Assignment Successful");
 //               projectTeamDao.assignTeamMember(projectTeamAssignment);
             } else if ("delete".equalsIgnoreCase(action)) {
 
@@ -188,11 +188,13 @@ public class teamAssignmentServlet extends HttpServlet {
 
                 TeamAssignmentService teamAssignmentService = new TeamAssignmentService();
                 teamAssignmentService.removeMemberService(projectTeamAssignment);
+                result.put("message", "Team Assignment Deletion Successful");
             }
             result.put("status", "Success");
         } catch (Exception e) {
             System.out.println("Exception occur :" + e);
             e.printStackTrace();
+            result.put("message", e.getMessage());
             result.put("status", "Failed");
         }
 

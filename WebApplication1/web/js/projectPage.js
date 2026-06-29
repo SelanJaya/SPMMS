@@ -866,6 +866,7 @@ document.getElementById("deletedocBtnCfm").addEventListener("click", async funct
         tab.show();
     }
 });
+
 async function editForm(document_id) {
     console.log("Edit form");
     isEditTask = true;

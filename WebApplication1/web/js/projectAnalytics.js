@@ -25,38 +25,80 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById("cycleTime").innerText = data.CycleTime ?? fallbackText;
     document.getElementById("rejectionRate").innerText = data.rejectionRate ?? fallbackText;
 
-    //velocity Chart
+//    //velocity Chart
+//    // 1. Extract the array from your JSON response
+//    const velocityData = result.analyticsData.velocityGraphData;
+//
+//    // 2. Map the data into the arrays that Chart.js expects
+//    // We generate the labels dynamically based on the number of items in the array (e.g., Sprint 1, Sprint 2)
+//    const sprintLabels = velocityData.map((_, index) => `Sprint ${index + 1}`);
+//
+//    // Extract 'totalTask' for the Planned dataset and 'completedTask' for the Completed dataset
+//    const plannedTasks = velocityData.map(data => data.totalTask);
+//    const completedTasks = velocityData.map(data => data.completedTask);
+//
+//    // 3. Render the Chart
+//    new Chart(document.getElementById('velocityChart'), {
+//        type: 'bar',
+//        data: {
+//            labels: sprintLabels,
+//            datasets: [
+//                {
+//                    label: 'Planned',
+//                    data: plannedTasks,
+//                    backgroundColor: '#94a3b8'
+//                },
+//                {
+//                    label: 'Completed',
+//                    data: completedTasks,
+//                    backgroundColor: '#2563eb'
+//                }
+//            ]
+//        },
+//        options: chartOptions // Assuming you have chartOptions defined elsewhere
+//    });
+
+
     // 1. Extract the array from your JSON response
     const velocityData = result.analyticsData.velocityGraphData;
+    const chartContainer = document.getElementById('velocityChart').parentElement;
 
-    // 2. Map the data into the arrays that Chart.js expects
-    // We generate the labels dynamically based on the number of items in the array (e.g., Sprint 1, Sprint 2)
-    const sprintLabels = velocityData.map((_, index) => `Sprint ${index + 1}`);
+// 2. Check if data is empty
+    if (!velocityData || velocityData.length === 0) {
+        // Hide the canvas and show a message
+        document.getElementById('velocityChart').style.display = 'none';
 
-    // Extract 'totalTask' for the Planned dataset and 'completedTask' for the Completed dataset
-    const plannedTasks = velocityData.map(data => data.totalTask);
-    const completedTasks = velocityData.map(data => data.completedTask);
+        // Create or show an empty state message
+        const emptyMsg = document.createElement('div');
+        emptyMsg.className = 'text-center py-5 text-muted';
+        emptyMsg.innerHTML = '<i class="fas fa-chart-bar fa-3x mb-3 opacity-50"></i><p>No sprint data available to display.</p>';
+        chartContainer.appendChild(emptyMsg);
+    } else {
+        // 3. Map the data and render the chart
+        const sprintLabels = velocityData.map((_, index) => `Sprint ${index + 1}`);
+        const plannedTasks = velocityData.map(data => data.totalTask);
+        const completedTasks = velocityData.map(data => data.completedTask);
 
-    // 3. Render the Chart
-    new Chart(document.getElementById('velocityChart'), {
-        type: 'bar',
-        data: {
-            labels: sprintLabels,
-            datasets: [
-                {
-                    label: 'Planned',
-                    data: plannedTasks,
-                    backgroundColor: '#94a3b8'
-                },
-                {
-                    label: 'Completed',
-                    data: completedTasks,
-                    backgroundColor: '#2563eb'
-                }
-            ]
-        },
-        options: chartOptions // Assuming you have chartOptions defined elsewhere
-    });
+        new Chart(document.getElementById('velocityChart'), {
+            type: 'bar',
+            data: {
+                labels: sprintLabels,
+                datasets: [
+                    {
+                        label: 'Planned',
+                        data: plannedTasks,
+                        backgroundColor: '#94a3b8'
+                    },
+                    {
+                        label: 'Completed',
+                        data: completedTasks,
+                        backgroundColor: '#2563eb'
+                    }
+                ]
+            },
+            options: chartOptions
+        });
+    }
 
     //BurnDown Chart
     displayBurndownChart(result.analyticsData.burnDownChartData);
@@ -207,7 +249,7 @@ function displayBurndownChart(result) {
 
 // Labels = actual dates from backend
     const labels = burnDownData.map(item => {
-        
+
         const date = item.taskEndDate || item.taskStartDate;
         return new Date(date).toLocaleDateString('en-GB', {
             day: '2-digit',

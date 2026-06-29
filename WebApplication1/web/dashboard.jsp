@@ -133,7 +133,7 @@
                             </div>
 
                             <div id="myActiveCollapse" class="collapse show">
-                                <div id="myActiveBody" class="card-body pt-0 px-4">
+                                <div id="myActiveBody" class="card-body custom-scrollbar pt-0 px-4" style="max-height: 200px;">
                                 </div>
                             </div>
                         </div>
@@ -151,52 +151,12 @@
                                         Recent Activities
                                     </div>
                                     <i class="fas fa-chevron-down text-muted" style="font-size: 0.8rem;"></i>
+                                    
                                 </h6>
                             </div>
 
                             <div id="recentActivitiesCollapse" class="collapse show">
                                 <div class="card-body custom-scrollbar pt-0 px-4" id="activityFeedContainer" style="max-height: 260px; overflow-y: auto;">
-
-                                    <div class="d-flex mb-3 pb-3 border-bottom">
-                                        <div class="mt-1 me-3">
-                                            <span class="d-inline-block bg-success rounded-circle shadow-sm" style="width: 10px; height: 10px;"></span>
-                                        </div>
-                                        <div>
-                                            <p class="mb-0 text-dark lh-sm" style="font-size: 0.85rem;"><strong>Ahmad</strong> joined ERD Project</p>
-                                            <small class="text-muted" style="font-size: 0.7rem;">2 hours ago</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex mb-3 pb-3 border-bottom">
-                                        <div class="mt-1 me-3">
-                                            <span class="d-inline-block bg-warning rounded-circle shadow-sm" style="width: 10px; height: 10px;"></span>
-                                        </div>
-                                        <div>
-                                            <p class="mb-0 text-dark lh-sm" style="font-size: 0.85rem;">Task <strong>"Database ERD"</strong> assigned</p>
-                                            <small class="text-muted" style="font-size: 0.7rem;">5 hours ago</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex mb-3 pb-3 border-bottom">
-                                        <div class="mt-1 me-3">
-                                            <span class="d-inline-block bg-primary rounded-circle shadow-sm" style="width: 10px; height: 10px;"></span>
-                                        </div>
-                                        <div>
-                                            <p class="mb-0 text-dark lh-sm" style="font-size: 0.85rem;">Milestone <strong>Phase 1</strong> completed</p>
-                                            <small class="text-muted" style="font-size: 0.7rem;">Yesterday</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex mb-1">
-                                        <div class="mt-1 me-3">
-                                            <span class="d-inline-block bg-danger rounded-circle shadow-sm" style="width: 10px; height: 10px;"></span>
-                                        </div>
-                                        <div>
-                                            <p class="mb-0 text-dark lh-sm" style="font-size: 0.85rem;"><strong>Sarah</strong> removed from Project Alpha</p>
-                                            <small class="text-muted" style="font-size: 0.7rem;">2 days ago</small>
-                                        </div>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>

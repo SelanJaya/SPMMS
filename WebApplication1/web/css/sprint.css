@@ -568,10 +568,14 @@ body {
 }
 
 /* Displays the placeholder only when the container is completely empty */
-    #assignedNamesContainer:empty::before {
-        content: "Click '+' to assign user...";
-        color: #6c757d; /* Bootstrap text-muted */
-        font-size: 0.875em; /* Bootstrap small */
-        padding-left: 0.25rem; /* Bootstrap ps-1 */
-        pointer-events: none; /* Ensures the text doesn't block mouse clicks */
-    }
+#assignedNamesContainer:empty::before {
+    content: "Click '+' to assign user...";
+    color: #6c757d; /* Bootstrap text-muted */
+    font-size: 0.875em; /* Bootstrap small */
+    padding-left: 0.25rem; /* Bootstrap ps-1 */
+    pointer-events: none; /* Ensures the text doesn't block mouse clicks */
+}
+
+.remove {
+    display: none;
+}

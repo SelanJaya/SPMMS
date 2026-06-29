@@ -107,7 +107,9 @@ public class ProjectAnalyticsService {
             double cycleTime = 0;
             for (Task item : taskArr) {
                 System.out.println("Data" + item);
-                cycleTime += ChronoUnit.DAYS.between(item.getActual_startDate(), item.getActual_endDate());
+                if (item.getActual_startDate() != null && item.getActual_endDate() != null) {
+                    cycleTime += ChronoUnit.DAYS.between(item.getActual_startDate(), item.getActual_endDate());
+                }
             }
 
             double avarageCycleTime = cycleTime / taskArr.size();
@@ -215,15 +217,16 @@ public class ProjectAnalyticsService {
 
                 // Calculate task state for this day
                 for (ProjectAnalytics task : rawData) {
-                    // Task started
-                    if (task.getTaskStartDate() != null && !task.getTaskStartDate().isAfter(currentDate)) {
+                    // Task has started
+                    if (task.getTaskStartDate() != null
+                            && !task.getTaskStartDate().isAfter(currentDate)) {
 
                         activeTask++;
                     }
 
-                    // Task completed
-                    if (task.getTaskEndDate() != null
-                            && !task.getTaskEndDate().isAfter(currentDate)) {
+                    // Task has actually been completed
+                    if (task.getActual_endDate() != null
+                            && !task.getActual_endDate().isAfter(currentDate)) {
 
                         completedTask++;
                     }
@@ -253,7 +256,7 @@ public class ProjectAnalyticsService {
         return burnDownChart;
     }
 
-    public void projectStatusCheckingService() throws Exception{
+    public void projectStatusCheckingService() throws Exception {
         System.out.println("projectStatusCheckingService Executed \n");
         List<Project> projectsList = new ArrayList<>();
         try {
@@ -264,7 +267,7 @@ public class ProjectAnalyticsService {
 
             for (Project item : projectsList) {
 
-                if (today.equals(item.getProjEndDate())  || today.isAfter(item.getProjEndDate())) {
+                if (today.equals(item.getProjEndDate()) || today.isAfter(item.getProjEndDate())) {
                     System.out.println("");
                     projectDAO.updateProjectStatus("Delayed", item.getProjectId());
                 }
@@ -272,7 +275,7 @@ public class ProjectAnalyticsService {
         } catch (Exception e) {
             System.out.println("Exception occurs in service calulateApproveRateChart : " + e);
             e.printStackTrace();
-            throw  e;
+            throw e;
         }
     }
 

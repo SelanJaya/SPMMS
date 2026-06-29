@@ -222,7 +222,7 @@ public class UserDAO {
                      FROM users u
                      LEFT JOIN project_assignments pa
                      ON u.user_id = pa.proj_assign_to
-                     WHERE u.user_role = ? AND pa.project_id = ?;
+                     WHERE u.user_role = ? AND pa.project_id = ? AND pa.proj_assign_status != "REMOVED";
                      """;
 
         try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {

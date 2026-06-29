@@ -15,7 +15,7 @@ import java.util.List;
 public class ProjectAnalytics {
     
     int completedTask, totalSprint, totalTask, rejectedTask, approvedTask, totalApprovedTask, totalRejectedTask, sprintId, remainingTask;
-    LocalDate taskEndDate, taskStartDate, sprintStartDate, sprintEndDate;
+    LocalDate taskEndDate, taskStartDate, sprintStartDate, sprintEndDate, actual_endDate;
     double sprintSuccRate, AVGVelocity, CycleTime, RejectionRate;
     List<ProjectAnalytics> velocityGraphData, reworkGraphData, burnDownChartData;
 
@@ -80,6 +80,10 @@ public class ProjectAnalytics {
 
     public void setTaskStartDate(LocalDate taskStartDate) {
         this.taskStartDate = taskStartDate;
+    }
+
+    public void setActual_endDate(LocalDate actual_endDate) {
+        this.actual_endDate = actual_endDate;
     }
 
     public void setSprintStartDate(LocalDate sprintStartDate) {
@@ -156,6 +160,10 @@ public class ProjectAnalytics {
 
     public LocalDate getSprintStartDate() {
         return sprintStartDate;
+    }
+
+    public LocalDate getActual_endDate() {
+        return actual_endDate;
     }
 
     public LocalDate getSprintEndDate() {

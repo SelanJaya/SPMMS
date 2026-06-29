@@ -14,7 +14,7 @@
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
         <link href="css/common.css" rel="stylesheet">
-        <link rel="stylesheet" href="projectPage.css">
+<!--        <link rel="stylesheet" href="projectPage.css">-->
     </head>
 
     <body>
@@ -59,28 +59,28 @@
                         <div class="col-md-3">
                             <div class="report-card bg-gray-100 border-0 shadow-sm p-4 rounded-lg text-center h-100">
                                 <p class="text-muted medium mb-1">Avg Velocity</p>
-                                <h4 id="avgVelocity" class="fw-bold mb-0">28.4 pts</h4>
+                                <h4 id="avgVelocity" class="fw-bold mb-0"></h4>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="report-card bg-gray-100 border-0 shadow-sm p-4 rounded-lg text-center h-100">
                                 <p class="text-muted medium mb-1">Sprint Success Rate</p>
-                                <h4 id="sprintSuccRate" class="fw-bold mb-0">92%</h4>
+                                <h4 id="sprintSuccRate" class="fw-bold mb-0"></h4>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="report-card bg-gray-100 border-0 shadow-sm p-4 rounded-lg text-center h-100">
                                 <p class="text-muted medium mb-1">Cycle Time</p>
-                                <h4 id="cycleTime" class="fw-bold mb-0">3.2 days</h4>
+                                <h4 id="cycleTime" class="fw-bold mb-0"></h4>
                             </div>
                         </div>
 
                         <div class="col-md-3">
                             <div class="report-card bg-gray-100 border-0 shadow-sm p-4 rounded-lg text-center h-100">
                                 <p class="text-muted medium mb-1">Rejection Rate</p>
-                                <h4 id="rejectionRate" class="fw-bold mb-0 text-danger">4.2%</h4>
+                                <h4 id="rejectionRate" class="fw-bold mb-0 text-danger"></h4>
                             </div>
                         </div>
                     </div>
@@ -142,43 +142,10 @@
                 </main>
             </div>
         </div>
-
+                            
         <script>
-
             const project_id = ${project_id};
         </script>
         <script src="js/projectAnalytics.js"></script>
     </body>
 </html>
-
-
-
-
-
-
-<!--                    <div class="row g-4">
-                        <div class="col-12 col-lg-6">
-                            <div class="report-card">
-                                <h5 class="fw-bold text-dark mb-3 text-center">Team Velocity</h5>
-                                <div style="position: relative; height: 300px; width: 100%;"><canvas id="velocityChart"></canvas></div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6">
-                            <div class="report-card">
-                                <h5 class="fw-bold text-dark mb-3 text-center">Sprint Burndown</h5>
-                                <div style="position: relative; height: 300px; width: 100%;"><canvas id="burndownChart"></canvas></div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6">
-                            <div class="report-card">
-                                <h5 class="fw-bold text-dark mb-3 text-center">Approval Rate</h5>
-                                <div style="position: relative; height: 300px; width: 100%;"><canvas id="approvalChart"></canvas></div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-6">
-                            <div class="report-card">
-                                <h5 class="fw-bold text-dark mb-3 text-center">Rework Trends</h5>
-                                <div style="position: relative; height: 300px; width: 100%;"><canvas id="reworkChart"></canvas></div>
-                            </div>
-                        </div>
-                    </div>-->

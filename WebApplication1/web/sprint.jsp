@@ -48,7 +48,6 @@
                         <i class="fas fa-sign-out-alt me-3"></i><span>Logout</span>
                     </a>
                 </div>
-
             </div>
         </nav>
 
@@ -80,14 +79,6 @@
             <div id="statusTab"></div>
             <nav class="top-nav px-4 d-flex justify-content-between align-items-center">
                 <div class="small text-muted">Management/Dashboard/Project_${project_id}/<span class="fw-semibold text-dark">Sprint</span></div>
-                <!--                <div class="d-flex align-items-center">
-                                    <div class="text-end me-3">
-                                        <div class="small fw-bold lh-1">${user.username}</div>
-                                        <small class="text-muted" style="font-size: 10px;">${user.user_role}</small>
-                                    </div>
-                                    <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff" class="rounded-circle border"
-                                         width="34">
-                                </div>-->
                 <div class="user-info">
                     <div class="user-details d-none d-sm-block">
                         <span class="user-name">${user.username}</span>
@@ -284,11 +275,8 @@
                                     id="SprintSubBtn">
                                 Create Sprint
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>
@@ -479,6 +467,52 @@
             </div>
         </div>
 
+        <div class="modal fade" id="deleteSprintModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+
+                    <!-- Initial State -->
+                    <div id="initialBody">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title fw-bold" style="font-size: 1rem;">
+                                <i class="fas fa-trash-alt me-2"></i> Permanent Sprint Deletion
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-tasks text-danger fa-4x opacity-25"></i>
+                            </div>
+                            <h5 class="fw-bold">Delete Sprint?</h5>
+                            <p class="text-muted">You are about to delete <strong>${sprint.sprintName}</strong>. This will <strong>permanently remove</strong> this sprint and all associated tasks and logs.</p>
+                            <div class="alert alert-danger p-2 mb-0">
+                                <small class="fw-bold text-uppercase"><i class="fas fa-info-circle me-1"></i> This action is irreversible.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" id="deleteSprintBtn" class="btn btn-sm btn-danger fw-bold px-3">
+                                Yes, Delete Sprint
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Success State -->
+                    <div id="successBody" class="d-none">
+                        <div class="modal-body p-5 text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle text-success fa-5x animate__animated animate__bounceIn"></i>
+                            </div>
+                            <h5 class="fw-bold">Sprint Deleted</h5>
+                            <p class="text-muted mb-0">The sprint and all associated data have been successfully removed.</p>
+                            <p class="small text-muted mt-2">Refreshing view...</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
         <!--Backlog level document pop up tab -->
         <div class="modal fade" id="backlogDocModal" data-backlogId  tabindex="-1" data-bs-backdrop="false">
             <input type="hidden" id="backlog_id">
@@ -663,8 +697,7 @@
 
                         <div class="mb-4">
                             <label class="info-label text-muted fw-bold small mb-2">DESCRIPTION</label>
-                            <textarea id="t_desc" class="form-control bg-light border-0 task-input view-mode" rows="4"
-                                      readonly></textarea>
+                            <textarea id="t_desc" class="form-control bg-light border-0 task-input view-mode" rows="4" readonly></textarea>
                         </div>
 
                         <div class="row g-3 mb-4">

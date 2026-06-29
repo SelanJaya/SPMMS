@@ -246,7 +246,6 @@ public class TaskServlet extends HttpServlet {
             } else if ("UpdateTaskDetials".equalsIgnoreCase(action)) {
                 System.out.println("Updated executed");
                 Task task = gson.fromJson(json, Task.class);
-                System.out.println("TASK ASSIGNMENT ASSIGNTO : " + task.getTaskAssignment().getTask_assigned_to());
 //                TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
 //                task.setTaskAssignment(taskAssignment);
 
@@ -284,6 +283,8 @@ public class TaskServlet extends HttpServlet {
 
                 TaskApprovalDAO taskApprovalDAO = new TaskApprovalDAO();
                 int taskAproval_id = taskApprovalDAO.insertTaskApproval(taskApproval);
+                System.out.println("Task reviews"+ taskApproval.getRemarks());
+                result.put("message", "Task Rejection Inserted");
                 result.put("taskAproval_id", taskAproval_id);
                 result.put("status", "Success");
             } else if ("update_taskApproval".equalsIgnoreCase(action)) {
@@ -294,6 +295,7 @@ public class TaskServlet extends HttpServlet {
                 System.out.println("Data : " + taskApproval.getApproval_id() + " " + taskApproval.getTaskApproval_status());
                 TaskApprovalDAO taskApprovalDAO = new TaskApprovalDAO();
                 taskApprovalDAO.updateTaskApproval(taskApproval);
+                result.put("message", "Task Rejection Updated");
                 result.put("status", "Success");
             } else if ("updateTaskReason".equalsIgnoreCase(action)) {
                 TaskApproval taskApproval = gson.fromJson(json, TaskApproval.class);

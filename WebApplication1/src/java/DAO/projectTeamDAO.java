@@ -62,6 +62,10 @@ public class ProjectTeamDAO {
             ps.setInt(2, proj_assign_to);
 
             return ps.executeUpdate() > 0;
+        }catch(Exception e){
+            System.out.println("Exception ocuurect in reactivateProjectAssignment");
+            e.printStackTrace();
+            throw new Error("Team Assignment Failed");
         }
     }
 
@@ -105,7 +109,7 @@ public class ProjectTeamDAO {
         } catch (SQLException e) {
             System.out.println("Exception ocuured in insertion : " + e);
             e.printStackTrace();
-            throw e;
+            throw new Error("Team Assignment Failed");
         }
     }
 
@@ -167,7 +171,7 @@ public class ProjectTeamDAO {
         } catch (SQLException e) {
             System.err.println("SQL Error in removeTeamMember: " + e.getMessage());
             e.printStackTrace();
-            throw e;
+            throw new Error("Team Assignment Deletion Failed");
         }
     }
 

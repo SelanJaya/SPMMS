@@ -136,7 +136,7 @@ public class TaskAssignmentDAO {
                  UPDATE task_assignments
                  SET task_assignment_status = 'REMOVED',
                      removal_reason = ?,
-                     removed_at = ?,
+                     removed_at = ?
                  WHERE task_id = ?
                  AND task_assigned_to = ?
                  """;

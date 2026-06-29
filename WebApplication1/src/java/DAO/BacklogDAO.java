@@ -57,7 +57,7 @@ public class BacklogDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Exception in in insertion DOA : " + e);
-            throw e;
+            throw new Error("Backlog Item Insertion Failed");
         }
         return -1;
     }
@@ -161,6 +161,7 @@ public class BacklogDAO {
         } catch (SQLException e) {
             System.out.println("Exception occurs : " + e);
             e.printStackTrace();
+            throw new Error("Backlog Item Update Failed");
         }
 
     }
@@ -200,6 +201,7 @@ public class BacklogDAO {
         } catch (SQLException e) {
             System.out.println("Exception occurs : " + e);
             e.printStackTrace();
+            throw new Error("Backlog Item Update Failed");
         }
 
     }
@@ -222,7 +224,7 @@ public class BacklogDAO {
         } catch (SQLException e) {
             System.out.println("Exception occurs : " + e);
             e.printStackTrace();
-            throw e;
+            throw new Error("Backlog Item Update Failed");
         }
 
     }
@@ -242,6 +244,7 @@ public class BacklogDAO {
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Exception from DAO :" + e);
+            throw new Error("Backlog Item Reorder Failed");
         }
 
         System.out.println("Status from DAO " + status);
@@ -257,6 +260,7 @@ public class BacklogDAO {
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new Error("Backlog Item Deletion Failed");
         }
 
     }
@@ -371,7 +375,7 @@ public class BacklogDAO {
         } catch (SQLException e) {
             System.out.println("Exception occurs : " + e);
             e.printStackTrace();
-            throw e;
+            throw new Error("Backlog Item Update Failed");
         }
     }
 

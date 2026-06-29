@@ -59,6 +59,7 @@
 
 
             <div id="content-wrapper">
+                <div id="statusTab"></div>
                 <nav class="top-nav">
                     <div class="small text-muted fw-medium">Management/Dashboard/Project_${project_id}/<span class="text-dark fw-bold">Team</span></div>
 
@@ -116,200 +117,180 @@
                     </div> 
                 </div>
 
-                <!--                <div class="modal fade" id="deleteMemberModal" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content modal-premium">
-                
-                                            <div id="initialBody" class="modal-body p-5">
-                                                <button type="button" class="btn-close btn-modal-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                
-                                                <div class="text-center">
-                                                    <div class="icon-box-danger">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
-                                                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h10s1 0 1-1-1-4-6-4-6 3-6 4m3-11a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5M1.5 3.5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5m13 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5M1 11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5m14 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5M5 9.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5m6 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5"/>
-                                                        </svg>
-                                                    </div>
-                
-                                                    <h4 class="modal-title-bold mb-2">Remove Team Member</h4>
-                                                    <p class="modal-desc-text">
-                                                        You are about to remove <span id="displayUserName" class="text-dark fw-bold">the selected user</span> from this project. They will no longer have access to these tasks.
-                                                    </p>
-                
-                                                    <div class="status-pill-danger">
-                                                        <span class="dot-danger"></span>
-                                                        <span class="pill-text-danger">Action will unasign member</span>
-                                                    </div>
-                
-                
-                                                    <button type="submit" id="deleteCfmBtn" class="btn btn-confirm-destruction shadow-sm w-100" data-bs-dismiss="modal">
-                                                        Confirm Removal
-                                                    </button>
-                
-                                                    <button class="btn btn-link btn-cancel-link"  data-bs-dismiss="modal">
-                                                        Keep Member
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>-->
-
                 <div class="modal fade" id="deleteMemberModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
-                        <div class="modal-content modal-premium">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow">
 
-                            <div id="initialBody" class="modal-body p-5">
-                                <button type="button" class="btn-close btn-modal-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
 
-                                <div class="text-center">
-                                    <div class="icon-box-danger">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h10s1 0 1-1-1-4-6-4-6 3-6 4m3-11a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5M1.5 3.5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5m13 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5M1 11a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5m14 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5M5 9.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5m6 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5"/>
-                                        </svg>
+                            <div id="initialBody">
+
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title fw-bold" style="font-size: 1rem;">
+                                        <i class="fas fa-exclamation-triangle me-2"></i> Remove Team Member
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <div class="modal-body p-4 text-center">
+                                    <div class="mb-3">
+                                        <i class="fas fa-user-times text-danger fa-4x opacity-25"></i>
                                     </div>
 
-                                    <h4 class="modal-title-bold mb-2">Remove Team Member</h4>
-                                    <p class="modal-desc-text">
-                                        You are about to remove <span id="displayUserName" class="text-dark fw-bold">the selected user</span> from this project. They will no longer have access to these tasks.
+                                    <h5 class="fw-bold">Remove Team Member?</h5>
+
+                                    <p class="text-muted mb-3">
+                                        You are about to remove <span id="deleteUsername" class="text-dark fw-bold">the selected user</span> from this project. They will no longer have access to these tasks.
                                     </p>
 
-                                    <div class="status-pill-danger mb-4">
-                                        <span class="dot-danger"></span>
-                                        <span class="pill-text-danger">Action will unassign member</span>
+                                    <div class="alert alert-danger p-2 mb-4">
+                                        <small class="fw-bold text-uppercase"><i class="fas fa-info-circle me-1"></i> Action will unassign member.</small>
                                     </div>
 
-                                    <!-- Form wrapper added to enforce 'required' field validation -->
-                                    <!--                                    <form id="removeMemberForm">-->
-                                    <!-- Reason Input Field -->
-                                    <div class="text-start mb-4">
+                                    <div class="text-start mb-2">
                                         <label for="removalReason" class="form-label fw-bold" style="font-size: 0.9rem;">
                                             Reason for removal <span class="text-danger">*</span>
                                         </label>
                                         <textarea class="form-control shadow-none" id="removalReason" rows="3" placeholder="Briefly explain why this member is being removed..."></textarea>
-                                        <p id="validationMessage" class="d-none ps-0 " style="color: #dc3545; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s ease-in-out;"></p>
+                                        <p id="validationMessage" class="d-none ps-0 mt-1" style="color: #dc3545; font-size: 0.85rem; font-weight: 500; transition: opacity 0.2s ease-in-out;"></p>
                                     </div>
-                                    <button type="submit" id="deleteCfmBtn" class="btn btn-confirm-destruction shadow-sm w-100">
+                                </div>
+
+                                <div class="modal-footer bg-light">
+                                    <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Member</button>
+
+                                    <button type="submit" id="deleteCfmBtn" class="btn btn-sm btn-danger fw-bold px-3">
                                         Confirm Removal
                                     </button>
-
-                                    <button type="button" class="btn btn-link btn-cancel-link w-100 mt-2" data-bs-dismiss="modal">
-                                        Keep Member
-                                    </button>
-                                    <!--                                    </form>-->
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
+                <!--
+                                <div class="modal fade" id="deleteMemberModal" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow">
+                
+                                            <div id="initialBody">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title fw-bold" style="font-size: 1rem;">
+                                                        <i class="fas fa-exclamation-triangle me-2"></i> Confirm Member Removal
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                
+                                                <div class="modal-body p-4 text-center">
+                                                    <div class="mb-3">
+                                                        <i class="fas fa-user-minus text-danger fa-4x opacity-25"></i>
+                                                    </div>
+                
+                                                    <h5 class="fw-bold">Remove Team Member?</h5>
+                
+                                                    <p class="text-muted">
+                                                        You are about to remove <strong id="deleteUsername"></strong> from the project team. They will lose all access to tasks, files, and project communications.
+                                                    </p>
+                
+                                                    <div class="alert alert-danger p-2 mb-0">
+                                                        <small class="fw-bold text-uppercase">
+                                                            <i class="fas fa-info-circle me-1"></i> This action is irreversible.
+                                                        </small>
+                                                    </div>
+                                                </div>
+                
+                                                <div class="modal-footer bg-light">
+                                                    <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Member</button>
+                                                    <button type="button" id="confirmRemoveMemberBtn" class="btn btn-sm btn-danger fw-bold px-3">
+                                                        Yes, Remove Member
+                                                    </button>
+                                                </div>
+                                            </div>
+                
+                                            <div id="memberRemovedSuccessBody" class="d-none">
+                                                <div class="modal-body p-5 text-center">
+                                                    <div class="mb-3">
+                                                        <i class="fas fa-check-circle text-success fa-5x animate__animated animate__bounceIn"></i>
+                                                    </div>
+                                                    <h5 class="fw-bold">Member Removed</h5>
+                                                    <p class="text-muted mb-0">The team member has been successfully removed from the project.</p>
+                                                    <p class="small text-muted mt-2">Updating Team List...</p>
+                                                </div>
+                                            </div>
+                
+                                        </div>
+                                    </div>
+                                </div>
+                
+                
+                                <div id="successBody" class="modal-body p-5 d-none">
+                                    <div class="text-center">
+                                        <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                                        <h4>Member Removed</h4>
+                                        <p>Updating project team...</p>
+                                    </div>
+                                </div>
+                
+                            </div>
+                        </div>-->
 
-                <div id="successBody" class="modal-body p-5 d-none">
-                    <div class="text-center">
-                        <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
-                        <h4>Member Removed</h4>
-                        <p>Updating project team...</p>
+
+                <div class="modal fade" id="inviteModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content shadow">
+                            <div class="modal-body p-4">
+                                <div class="text-center mb-4">
+                                    <div class="mb-2"><i class="fas fa-paper-plane text-primary fa-2x"></i></div>
+                                    <h6 class="fw-bold text-dark">Invite Team Member</h6>
+                                    <p class="text-muted small">Collaborate with your team by sending an invite.</p>
+                                </div>
+
+                                <input type="hidden" id="finalUserInput" name="userId">
+                                <input type="hidden" id="finalAssigntoEmail" name="finalAssigntoEmail">
+
+                                <label>1. Select Role to Filter Employees</label>
+                                <select id="roleSelector" class="form-select">
+                                    <option value="" selected disabled>Choose a role...</option>
+                                    <option value="Product Owner">Product Owner</option>
+                                    <option value="Scrum Master">Scrum Master</option>
+                                    <option value="Developer">Developer</option>
+                                </select>
+
+                                <div class="mb-3 mt-3 position-relative">
+                                    <label for="employeeSearch" class="form-label fw-bold">2. Search Available Employees</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                                        <input type="text" class="form-control border-start-0" id="employeeSearch" 
+                                               placeholder="Type initials, name or email..." autocomplete="off">
+                                    </div>
+
+                                    <div id="searchSuggestions" class="list-group shadow-sm position-absolute w-100 mt-1 d-none" 
+                                         style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" id="inviteMemberSubmit_btn" class="btn btn-primary fw-bold py-2 rounded-pill" data-bs-dismiss="modal">Send
+                                        Invitation</button>
+                                    <button type="button" class="btn btn-link text-muted small text-decoration-none"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
-    </div>
+        <script>
+                const project_id = ${project_id};
+                console.log(project_id);
+                const user_id = "${userId}";
+                console.log(user_id);
+                const user_role = "${user.user_role}";
+                console.log(user_role);
+        </script>
+        <script src="js/teamAssignment.js"></script>
 
-    <!-- Deletion pop up tab -->
-    <div class="modal fade" id="removeProjectMember" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-
-                <div id="initialBody">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title fw-bold" style="font-size: 1rem;">
-                            <i class="fas fa-exclamation-triangle me-2"></i> Remove Project Team Member
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-4 text-center">
-                        <div class="mb-3">
-                            <i class="fas fa-folder-open text-danger fa-4x opacity-25"></i>
-                        </div>
-                        <h5 class="fw-bold">Remove Project Team Member?</h5>
-                        <p class="text-muted">You are about to remove <strong id="usernameRemove"></strong>. This will <strong>permanently remove</strong> all uploaded files.</p>
-                        <div class="alert alert-danger p-2 mb-0">
-                            <small class="fw-bold text-uppercase"><i class="fas fa-info-circle me-1"></i> This action is irreversible.</small>
-                        </div>
-                    </div>
-                    <div class="modal-footer bg-light">
-                        <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" id="deleteModelBtn" class="btn btn-sm btn-danger fw-bold px-3">
-                            Yes, Proceed
-                        </button>
-                    </div>
-                </div>
-                <div id="successBody" class="d-none">
-                    <div class="modal-body p-5 text-center">
-                        <div class="mb-3">
-                            <i class="fas fa-check-circle text-success fa-5x animate__animated animate__bounceIn"></i>
-                        </div>
-                        <h5 class="fw-bold">Project Deleted</h5>
-                        <p class="text-muted mb-0">The directory and all data have been successfully removed.</p>
-                        <p class="small text-muted mt-2">Redirecting to Dashboard...</p>
-                    </div>
-                </div                                                            >
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="inviteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow">
-                <div class="modal-body p-4">
-                    <div class="text-center mb-4">
-                        <div class="mb-2"><i class="fas fa-paper-plane text-primary fa-2x"></i></div>
-                        <h6 class="fw-bold text-dark">Invite Team Member</h6>
-                        <p class="text-muted small">Collaborate with your team by sending an invite.</p>
-                    </div>
-
-                    <input type="hidden" id="finalUserInput" name="userId">
-                    <input type="hidden" id="finalAssigntoEmail" name="finalAssigntoEmail">
-
-                    <label>1. Select Role to Filter Employees</label>
-                    <select id="roleSelector" class="form-select">
-                        <option value="" selected disabled>Choose a role...</option>
-                        <option value="Product Owner">Product Owner</option>
-                        <option value="Scrum Master">Scrum Master</option>
-                        <option value="Developer">Developer</option>
-                    </select>
-
-                    <div class="mb-3 mt-3 position-relative">
-                        <label for="employeeSearch" class="form-label fw-bold">2. Search Available Employees</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                            <input type="text" class="form-control border-start-0" id="employeeSearch" 
-                                   placeholder="Type initials, name or email..." autocomplete="off">
-                        </div>
-
-                        <div id="searchSuggestions" class="list-group shadow-sm position-absolute w-100 mt-1 d-none" 
-                             style="z-index: 1050; max-height: 200px; overflow-y: auto;">
-                        </div>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" id="inviteMemberSubmit_btn" class="btn btn-primary fw-bold py-2 rounded-pill" data-bs-dismiss="modal">Send
-                            Invitation</button>
-                        <button type="button" class="btn btn-link text-muted small text-decoration-none"
-                                data-bs-dismiss="modal">Cancel</button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        const project_id = ${project_id};
-        console.log(project_id);
-        const user_id = "${userId}";
-        console.log(user_id);
-        const user_role = "${user.user_role}";
-        console.log(user_role);
-    </script>
-    <script src="js/teamAssignment.js"></script>
-
-</body>
+    </body>
 
 </html>

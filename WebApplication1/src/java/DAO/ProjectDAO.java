@@ -794,6 +794,41 @@ public class ProjectDAO {
             throw e;
         }
     }
+    
+    public Map getTotalStoryPointAllProject(Map<Integer, ProjectRiskScore_ML> projectMap) throws Exception {
+
+        String sql = """
+                       SELECT
+                           p.project_id,
+                           COALESCE(SUM(b.story_points), 0) AS totalStoryPoint
+                       FROM projects p
+                       LEFT JOIN backlog_items b USING(project_id)
+                       GROUP BY p.project_id;
+                     """;
+
+        try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                int projectId = rs.getInt("project_id");
+
+                ProjectRiskScore_ML project = projectMap.get(projectId);
+
+                if (project != null) {
+                    project.setTotal_story_points(
+                            rs.getInt("totalStoryPoint")
+                    );
+                }
+            }
+
+            return projectMap;
+        } catch (Exception e) {
+            System.out.println("Exception ocurred in getAVGStoryPointPerProject : " + e);
+            e.printStackTrace();
+            throw e;
+        }
+    }
 
     public Map getCompletionRatePerProject(Map<Integer, ProjectRiskScore_ML> projectMap, int user_id) throws Exception {
 
@@ -930,7 +965,7 @@ public class ProjectDAO {
             while (rs.next()) {
                 ProjectRiskScore_ML projectRiskScore = new ProjectRiskScore_ML();
                 projectRiskScore.setProjectId(rs.getInt("project_id"));
-                projectRiskScore.setOverduePercentage(rs.getDouble("overduePercentage"));
+                projectRiskScore.setOverduePercentage(rs.getDouble("overduePercentage") * 100);
                 projectMap.put(rs.getInt("project_id"), projectRiskScore);
             }
 
@@ -974,7 +1009,7 @@ public class ProjectDAO {
 
                 if (project != null) {
                     project.setRejectionRate(
-                            rs.getDouble("rejection_rate")
+                            rs.getDouble("rejection_rate") * 100
                     );
                 }
             }
@@ -1053,7 +1088,7 @@ public class ProjectDAO {
 
                 if (project != null) {
                     project.setCompletionRate(
-                            rs.getDouble("completion_rate")
+                            rs.getDouble("completion_rate") * 100
                     );
                 }
             }

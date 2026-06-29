@@ -81,9 +81,10 @@ async function getBacklogRowData(e, option) {
 
     const rowData = {backlogI_id: backlogId};
     console.log(cell.id);
-    if (cell.id === "status") {
+    
+    if(cell.id === "status") {
         rowData.action = "Update_status";
-    } else {
+    }else{
         rowData.action = "Update_PO";
     }
     console.log(rowData);
@@ -138,7 +139,7 @@ async function getBacklogRowData(e, option) {
         });
     } else if (userRole === "Developer") {
         const cells = row.querySelectorAll(".editable-cell.dev-editable");
-        
+
         cells.forEach(cell => {
             const field = cell.dataset.field;
             console.log(field);
@@ -864,30 +865,55 @@ async function handleAddBacklog() {
     console.log("Server response:", result);
 
 
-    if (result.status === "Success") {
-        backlogData.backlogI_id = result.key;
-        addbacklogToTable(backlogData);
-        displaySuccessProcessTab(result.status);
-    } else if (result.status === "Failed") {
-        displayFailedProcessTab(result.status);
-    }
-
-//    } catch (err) {
-//        console.error("Save Failed", err);
+//    if (result.status === "Success") {
+//        displayMessage(result.status, result.message);
+////        backlogData.backlogI_id = result.key;
+////        addbacklogToTable(backlogData);
+////        displaySuccessProcessTab(result.status);
+////    } else if (result.status === "Failed") {
+////        displayFailedProcessTab(result.status);
 //    }
 }
 
-function displaySuccessProcessTab(msg) {
-    const successProcessTabDOM = document.getElementById("successProcessTab");
-    document.getElementById("successProcessmsg").innerText = msg;
-    successProcessTabDOM.classList.remove("d-none");
-}
 
-function displayFailedProcessTab(msg) {
-    const failedProcessTabDOM = document.getElementById("failedProcessTab");
-    document.getElementById("failedProcessmsg").innerText = msg;
-    failedProcessTabDOM.classList.remove("d-none");
+function displayMessage(status, msg) {
+    console.log("displayMessage");
+    let alertClass = "alert-success";
+    let icon = "fa-check-circle";
+    if (status === "Failed") {
+        alertClass = "alert-danger";
+        icon = "fa-circle-xmark";
+    }
+
+
+    const messageDiv = document.getElementById("statusTab");
+    messageDiv.innerHTML = `<div id="successProcessTab" class="alert ${alertClass} alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                        <div class="icon-container me-3">
+                            <i class="fas ${icon} fa-lg"></i>
+                        </div>
+                        <div class="message-content">
+                            <h6 class="alert-heading mb-0 fw-bold" style="font-size: 0.9rem;">${msg}</h6>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>`;
+    setTimeout(() => {
+        messageDiv.innerHTML = "";
+    }, 5000);
+    return;
 }
+;
+//
+//function displaySuccessProcessTab(msg) {
+//    const successProcessTabDOM = document.getElementById("successProcessTab");
+//    document.getElementById("successProcessmsg").innerText = msg;
+//    successProcessTabDOM.classList.remove("d-none");
+//}
+//
+//function displayFailedProcessTab(msg) {
+//    const failedProcessTabDOM = document.getElementById("failedProcessTab");
+//    document.getElementById("failedProcessmsg").innerText = msg;
+//    failedProcessTabDOM.classList.remove("d-none");
+//}
 
 //Send data to servlet to save
 async function sendBacklog(data) {
@@ -909,7 +935,12 @@ async function sendBacklog(data) {
         throw new Error("Server returned error");
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log(result.status, result.message );
+
+    displayMessage(result.status, result.massage);
+    
+    return await result;
 
 
 //    if (result.status === "Success") {

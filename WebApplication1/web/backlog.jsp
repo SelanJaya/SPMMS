@@ -54,12 +54,11 @@
                             <i class="fas fa-sign-out-alt me-3"></i><span>Logout</span>
                         </a>
                     </div>
-
                 </div>
             </nav>
 
 
-            <div id="successProcessTab" class="d-none alert alert-success alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+<!--            <div id="successProcessTab" class="d-none alert alert-success alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
                 <div class="icon-container me-3">
                     <i class="fas fa-check-circle fa-lg"></i>
                 </div>
@@ -80,11 +79,11 @@
                     <p id="failedProcessmsg" class="mb-0 small"></p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            </div>-->
 
 
             <div id="content-wrapper">
-
+                <div id="statusTab"></div>
                 <nav class="top-nav">
                     <div class="d-flex align-items-center">
                         <div class="small text-muted">Management/Dashbaord/Project_${project_id}/<span class="fw-semibold text-dark">Product_Backlog</span></div>
@@ -146,8 +145,8 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
 
-                    <div class="modal-header border-0 pb-0 pt-4 px-4 justify-content-center">
-                        <h5 class="fw-bold text-dark" style="font-size: 1.25rem;">Create Backlog Item</h5>
+                    <div class="modal-header bg-primary border-0 pb-0 pt-4 px-4 justify-content-center">
+                        <h5 class="fw-bold text-white text-center" style="font-size: 1.25rem;">Create Backlog Item</h5>
                     </div>
 
                     <div class="modal-body p-4 mx-2">
@@ -497,9 +496,9 @@
                             </div>
                         </div>
                         <div class="modal-footer bg-light">
-                            <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Folder</button>
+                            <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Backlog</button>
                             <button type="button" id="deleteModelBtn" class="btn btn-sm btn-danger fw-bold px-3">
-                                Yes, Delete Directory
+                                Confirm Delete Backlog
                             </button>
                         </div>
                     </div>

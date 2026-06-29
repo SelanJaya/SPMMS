@@ -4,7 +4,6 @@
  */
 package DAO;
 
-import DAO.DBConnection;
 import beans.Backlog;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -199,7 +199,7 @@ public class BacklogServlet extends HttpServlet {
 
                 if (generatedKey > -1) {
                     result.put("key", generatedKey);
-                    result.put("message", "Backlog item saved");
+                    result.put("message", "Backlog Item Saved");
                 } else {
                     throw new Exception("Backlog item creation failed ");
                 }
@@ -207,23 +207,29 @@ public class BacklogServlet extends HttpServlet {
             } else if ("Update_PO".equalsIgnoreCase(action)) {
                 //Update
                 backlogDAO.updateBacklogItem(backlog);
+                result.put("message", "Backlog Item Updates");
             } else if ("Update_Dev".equalsIgnoreCase(action)) {
                 if ("Refined".equalsIgnoreCase(backlog.getStatus())) {
                     backlogDAO.updateBacklogItem_Dev(backlog);
+                    result.put("message", "Backlog Item Updated");
                 } else {
                     backlogDAO.updateBacklogItem_Dev(backlog);
+                     result.put("message", "Backlog Item Updated");
                 }
             } else if ("Update_status".equalsIgnoreCase(action)) {
 
                 backlogDAO.updateBacklogItem_status(backlog);
+                result.put("message", "Backlog Item Updated");
             } else if ("Reorder".equalsIgnoreCase(action)) {
                 for (Backlog item : orderList) {
                     backlogDAO.reorderBacklogItem(
                             item.getBacklogI_priority(),
                             item.getBacklogI_id());
                 }
+                 result.put("message", "Backlog Item Reordered");
             } else if ("updateRejectionReason".equalsIgnoreCase(action)) {
                 backlogDAO.updateBacklog_RejectionReason(backlog);
+                 result.put("message", "Backlog Item Updated");
             } else {
                 System.out.println("WRONG CODE \n");
             }

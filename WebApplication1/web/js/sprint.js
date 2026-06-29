@@ -90,9 +90,14 @@ document.getElementById("scrum-container"), addEventListener("click", (e) => {
         editBoard(sprint_id);
     } else if (deleteSprintBtn) {
         console.log("deletebtn is clicked");
+        const deleteSprintModalDOM = document.getElementById("deleteSprintModal");
+        const deleteSprintModal = bootstrap.Modal.getOrCreateInstance(deleteSprintModalDOM);
+
         sprint_div = e.target.closest(".scrum-board-card");
-        sprint_id = sprint_div.id;
-        deleteBoard(sprint_id);
+        deleteSprintModalDOM.dataset.sprintId = sprint_div.id;
+//        deleteBoard(sprint_id);
+
+        deleteSprintModal.show();
     } else if (backlogPill) {
         const backlog_id = backlogPill.dataset.id;
         backlogModal = document.getElementById("backlogDocModal");
@@ -328,6 +333,8 @@ document.getElementById("sprintModal").addEventListener("click", function (e) {
     }
 
 });
+
+//hdie when the page load
 function hideAllErrorMsg() {
 
     const errorField = [
@@ -415,7 +422,14 @@ async function saveBoard() {
     bsModal.hide();
 }
 ;
-async function deleteBoard(sprint_Id) {
+
+
+document.getElementById("deleteSprintBtn").addEventListener("click", async function deleteBoard() {
+
+    const deleteSprintModalDOM = document.getElementById("deleteSprintModal");
+    const deleteSprintModal = bootstrap.Modal.getOrCreateInstance(deleteSprintModalDOM);
+
+    const sprint_Id = deleteSprintModalDOM.dataset.sprintId;
     data = {
         action: "Delete",
         sprint_id: sprint_Id
@@ -431,7 +445,9 @@ async function deleteBoard(sprint_Id) {
             showEmptySprintUI();
         }
     }
-}
+
+    deleteSprintModal.hide();
+});
 
 //to generate tehe UI Scrum Board
 function renderBoard(data) {
@@ -470,8 +486,8 @@ function renderBoard(data) {
     const backlogIds = (data.backlog && data.backlog.length > 0)
             ? data.backlog.map(b => b.backlogI_id).join(',')
             : '';
-    board.dataset.backlogs = backlogIds; // 🔥 ADD THIS LINE
-    const taskDragAndDrop = user_role === "Scrum Master" ? `ondragover="allowDrop(event)" ondrop="drop(event)"` : ``;
+    board.dataset.backlogs = backlogIds;
+    const taskDragAndDrop = user_role === "Scrum Master" || user_role === "Developer" ? `ondragover="allowDrop(event)" ondrop="drop(event)"` : ``;
     const addtaskBtn = user_role === "Scrum Master" ? `<button class="btn text-muted btn-sm fw-bold w-100 text-start" onclick="addTask(this)">+ Add Task</button>` : ``;
     board.innerHTML = `
                     <div class="board-header">
@@ -690,21 +706,25 @@ function addTask(btn) {
     document.querySelectorAll('#taskModal input, #taskModal textarea').forEach(el => el.value = '');
     document.getElementById('t_board_id').value = boardId;
     document.getElementById('t_column_id').value = columnHeader;
+
+    document.querySelector(".add-assignee-btn").classList.remove("d-none");
+
     document.getElementById("taskModel_Sbt").onclick = confirmAddTask;
 
     //Clear the main form container to show an empty state placeholder
     const assignedNamesContainer = document.getElementById("assignedNamesContainer");
     assignedNamesContainer.innerHTML = "";
+
     // 2. Clear the hidden input values
-    document.getElementById("selectedAssigneeIds").value = "";
+    //document.getElementById("selectedAssigneeIds").value = "";
 
     // 3. Reset the dropdown list container back to a clean state
     const assigneeListContainer = document.getElementById("assigneeListContainer");
     assigneeListContainer.innerHTML = ` 
-    <div id="noUsersFoundMessage" class="text-center py-3 text-muted">
-        <i class="fas fa-search text-secondary mb-2" style="font-size: 1rem; opacity: 0.5;"></i>
-        <p class="small mb-0 fw-medium">Search for a team member</p>
-    </div>`;
+                                    <div id="noUsersFoundMessage" class="text-center py-3 text-muted">
+                                        <i class="fas fa-search text-secondary mb-2" style="font-size: 1rem; opacity: 0.5;"></i>
+                                        <p class="small mb-0 fw-medium">Search for a team member</p>
+                                    </div>`;
 
 
     loadTaskDepenecy();
@@ -759,6 +779,8 @@ function addTask(btn) {
 //            }
 //        });
 //
+
+
 function hideAllErrorMsg_Task() {
 
     const errorField = [
@@ -941,11 +963,6 @@ document.getElementById("assigneeListContainer").addEventListener("click", funct
 
 function addAssignedPill(action, data) {
     const assignedNamesContainer = document.getElementById("assignedNamesContainer");
-    const deleteBtn = action !== "initialize" ? `<i id="removeAssignment" data-task-id=${data.task_id} data-task-assigned-to=${data.task_assigned_to} class="fas fa-times ms-1 text-secondary remove-assignee-btn"
-                            role="button"
-                            title="Remove Assignee"
-                            onclick="displayAssignmentRejectionModal(this)">
-                       </i>` : ``;
 
     const assignedNamesDiv = `
         <span id="assignmentTo_${data.task_assigned_to}" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill ps-2 pe-2 py-2 d-flex align-items-center gap-2 shadow-sm">
@@ -960,7 +977,11 @@ function addAssignedPill(action, data) {
                 ${data.user_name}
             </span>
     
-            ${deleteBtn}
+            <i id="removeAssignment" data-action=${action} data-task-id=${data.task_id} data-task-assigned-to=${data.task_assigned_to} class="fas fa-times ms-1 text-secondary remove-assignee-btn"
+                            role="button"
+                            title="Remove Assignee"
+                            onclick="displayAssignmentRejectionModal(this)">
+            </i>
         </span>
     `;
 
@@ -1037,7 +1058,7 @@ function validateTaskForm(data) {
     }
 
     // Assignee
-    if (!newAssignments || newAssignments.length === 0) {
+    if ((!newAssignments || newAssignments.length === 0) && !document.querySelector("#assignedNamesContainer > span")){
         document.getElementById("errorTaskAssignee").innerText =
                 "Please select an assignee.";
         document.getElementById("errorTaskAssignee")
@@ -1110,7 +1131,7 @@ async function confirmAddTask() {
         task_id = document.getElementById("task_id").value.replace("task-", "");
         console.log("Task id", task_id);
         data.task_id = task_id;
-        console.log("Removed Assignment : " , removedAssignments )
+        console.log("Removed Assignment : ", removedAssignments)
         data.removedAssignment = removedAssignments;
         const oldTask = document.getElementById("task-" + task_id);
         console.log("Task old :", oldTask);
@@ -1339,7 +1360,7 @@ async function getTaskDetails(task_id) {
     taskModel.querySelector("#t_desc").value = result.taskData.task_desc;
 
 
-    addAssignedPill("display", result.taskData.taskAssignment);
+    addAssignedPill("edit", result.taskData.taskAssignment);
 
 //    taskModel.querySelector("#t_user_role").value = result.taskData.task_assigned_to_Role
     const assiosiatedBacklog = taskModel.querySelector("#t_backlog");
@@ -1351,9 +1372,9 @@ async function getTaskDetails(task_id) {
     const assignedNamesContainer = document.getElementById("assignedNamesContainer");
     assignedNamesContainer.innerHTML = "";
     let assignedNamesDiv = "";
-    
-    const item =  result.taskData.taskAssignment;
-        assignedNamesDiv = `
+
+    const item = result.taskData.taskAssignment;
+    assignedNamesDiv = `
         <span id="assignmentTo_${item.task_assigned_to}" class="badge bg-primary bg-opacity-10 text-primary border border-primary-subtle rounded-pill ps-2 pe-2 py-2 d-flex align-items-center gap-2 shadow-sm">
 
             <span class="badge bg-white text-primary border border-primary-subtle rounded-pill shadow-sm"
@@ -1366,7 +1387,7 @@ async function getTaskDetails(task_id) {
                 ${item.user_name}
             </span>
 
-            <i id="removeAssignment" data-task-id=${task_id} data-task-assigned-to=${item.task_assigned_to} class="d-none fas fa-times ms-1 text-secondary remove-assignee-btn"
+            <i id="removeAssignment" data-action="edit" data-task-id=${task_id} data-task-assigned-to=${item.task_assigned_to} class="d-none fas fa-times ms-1 text-secondary remove-assignee-btn"
                role="button"
                title="Remove Assignee"
                onclick="displayAssignmentRejectionModal(this)">
@@ -1431,12 +1452,27 @@ async function getTaskDetails(task_id) {
 const assignmentRemovalModalDOM = document.getElementById("assignmentRemovalModal");
 function displayAssignmentRejectionModal(btn) {
     
+    console.log(btn);
+    const action = btn.dataset.action;
+    const taskAssignedTo = btn.dataset.taskAssignedTo;
+    console.log(action, taskAssignedTo);
+
+    if (action !== "edit") {
+        console.log("btn", document.getElementById(`assignmentTo_${taskAssignedTo}`));
+//        document.getElementById(`assignmentTo_${taskAssignedTo}`).classList.add("d-none");
+        btn.parentElement.remove();
+        console.log(btn.parentElement.className);
+        
+        return;
+    }
+    
     const assignmentRemovalModal = bootstrap.Modal.getOrCreateInstance(assignmentRemovalModalDOM);
     document.getElementById("rejectionAssignmentReason").innerText = "";
     assignmentRemovalModalDOM.dataset.task_Id = btn.dataset.taskId;
-    assignmentRemovalModalDOM.dataset.taskAssignedTo = btn.dataset.taskAssignedTo;
+    assignmentRemovalModalDOM.dataset.taskAssignedTo = taskAssignedTo;
 
     assignmentRemovalModal.show();
+
 }
 
 // get the data from the rejection module
@@ -1781,7 +1817,8 @@ async function sendTask_approval(task_id, status, taskApproval_idStr, reason) {
     var action = "insert_taskApproval";
     const taskApproval_id = taskApproval_idStr && taskApproval_idStr !== "null" ? parseInt(taskApproval_idStr, 10) : null;
     console.log(taskApproval_id, typeof (taskApproval_id), (taskApproval_id !== null && taskApproval_id !== ""));
-    if (taskApproval_id !== null && taskApproval_id !== "") {
+    
+    if (taskApproval_id !== null && taskApproval_id !== 0 && taskApproval_id !== "" && taskApproval_id !== 0) {
         action = "update_taskApproval";
     }
 

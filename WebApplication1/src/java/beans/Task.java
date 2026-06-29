@@ -21,7 +21,7 @@ public class Task {
     private String task_name, task_desc, task_status, task_start_date, task_end_date, actual_endDate, actual_startDate, taskApproval_status;
     private TaskAssignment taskAssignment, removedAssignment;
     private List<TaskDependency> taskDependencies;
-   
+
     Backlog backlog;
     TaskApproval taskApproval;
 
@@ -101,7 +101,7 @@ public class Task {
     public void setRemovedAssignment(TaskAssignment removedAssignment) {
         this.removedAssignment = removedAssignment;
     }
-    
+
     public int getTask_id() {
         return task_id;
     }
@@ -138,19 +138,32 @@ public class Task {
     }
 
     public LocalDate getTask_start_date() {
+        if (task_start_date == null || actual_startDate.isBlank()) {
+            return null;
+        }
         return LocalDate.parse(task_start_date);
+
     }
 
     public LocalDate getTask_end_date() {
+        if (task_end_date == null || task_end_date.isBlank()) {
+            return null;
+        }
         return LocalDate.parse(task_end_date);
     }
 
     public LocalDate getActual_endDate() {
-        return LocalDate.parse(actual_endDate) ;
+        if (actual_startDate == null || actual_startDate.isBlank()) {
+            return null;
+        }
+        return LocalDate.parse(actual_endDate);
     }
 
     public LocalDate getActual_startDate() {
-        return LocalDate.parse(actual_startDate) ;
+        if (actual_startDate == null || actual_startDate.isBlank()) {
+            return null;
+        }
+        return LocalDate.parse(actual_startDate);
     }
 
     public List<TaskDependency> getTaskDepedencies() {

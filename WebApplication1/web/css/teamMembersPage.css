@@ -136,27 +136,73 @@ body {
 
 /* --- TEAM CARD --- */
 .team-card {
-    position: relative; /* This "anchors" the button to the card */
-    display: flex;
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    gap: 12px;
     align-items: center;
+
+    padding: 12px;
+    margin-bottom: 10px;
+
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 1rem;
+    border-radius: 12px;
+
     transition: all 0.2s ease;
 }
 
 .team-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+/* Avatar */
+.team-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Important */
+.team-info {
+    min-width: 0;
+}
+
+/* Username */
+.team-name {
+    font-weight: 600;
+    color: #0f172a;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Email */
+.team-email {
+    font-size: 0.75rem;
+    color: #64748b;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Delete Button */
+.btn-delete-member {
+    position: static !important;
+    transform: none !important;
+
+    white-space: nowrap;
+}
+/*
 .avatar-md {
     width: 42px;
     height: 42px;
     border-radius: 8px;
     object-fit: cover;
-}
+}*/
 
 /* --- MODAL --- */
 .modal-content {
@@ -251,7 +297,12 @@ body {
 /* --- DELETE BUTTON --- */
 .btn-delete-member {
     /* Layout */
-    background-color: #dc3545; /* Bootstrap Red */
+    position: static !important;
+    transform: none !important;
+
+    white-space: nowrap;
+    
+/*    background-color: #dc3545;  Bootstrap Red 
     color: white;
     border: none;
     padding: 6px 12px;
@@ -260,14 +311,14 @@ body {
     font-weight: 500;
     cursor: pointer;
 
-    /* Position exactly like your image */
+     Position exactly like your image 
     position: absolute;
     right: 15px;
     top: 50%;
-    transform: translateY(-50%); /* Centers it vertically */
+    transform: translateY(-50%);  Centers it vertically 
 
     z-index: 5;
-    transition: background 0.2s;
+    transition: background 0.2s;*/
 }
 
 .btn-delete-member:hover {
