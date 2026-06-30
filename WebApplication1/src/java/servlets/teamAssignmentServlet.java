@@ -15,6 +15,7 @@ import DAO.ProjectTeamDAO;
 import beans.Project;
 import beans.User;
 import beans.ProjectTeamAssignment;
+import beans.TaskAssignment;
 import Service.TeamAssignmentService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -111,6 +112,11 @@ public class teamAssignmentServlet extends HttpServlet {
                 users = userDAO.getUsersByRole(roleType);
 
                 jsonResponse.put("userData", users);
+            } else if("fetchAssignmentRemovalReason".equalsIgnoreCase(action)){
+                 int project_id = Integer.parseInt(request.getParameter("project_id"));
+                  int assignedTo = Integer.parseInt(request.getParameter("assignedTo"));
+                ProjectTeamDAO projectTeamDAO = new ProjectTeamDAO();
+                jsonResponse.put("removalReason", projectTeamDAO.getProjectRemovalReason(project_id, assignedTo));
             }
             jsonResponse.put("status", "Success");
         } catch (Exception e) {
@@ -189,6 +195,11 @@ public class teamAssignmentServlet extends HttpServlet {
                 TeamAssignmentService teamAssignmentService = new TeamAssignmentService();
                 teamAssignmentService.removeMemberService(projectTeamAssignment);
                 result.put("message", "Team Assignment Deletion Successful");
+            } else if ("updateAssignmentReason".equalsIgnoreCase(action)){
+                ProjectTeamAssignment projectTeamAssignment = gson.fromJson(json, ProjectTeamAssignment.class);
+                
+                projectTeamDao.updateProjectRemovalReason(projectTeamAssignment);
+                result.put("message", "Rejection Reason ");
             }
             result.put("status", "Success");
         } catch (Exception e) {

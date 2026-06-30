@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import DAO.UserDAO;
 import DAO.TaskDAO;
 import DAO.TaskApprovalDAO;
+import DAO.TaskAssignmentDAO;
 import beans.User;
 import beans.Task;
 import beans.TaskApproval;
@@ -80,7 +81,7 @@ public class TaskServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String action = request.getParameter("action");
-//        System.out.println("Action in Task " + action);
+        System.out.println("Action in Task " + action);
         Gson gson = new Gson();
 
         Map<String, Object> result = new HashMap<>();
@@ -159,6 +160,16 @@ public class TaskServlet extends HttpServlet {
 
                 taskApproval = taskApprovalDAO.getTaskRejectionReason(reason_id);
                 result.put("rejectionReason", taskApproval);
+                
+            } else if ("fetchRemovalReason_Assignment".equalsIgnoreCase(action)) {
+                System.out.println("fetchRemovalReason_Assignment /n/n");
+                String task_idStr = request.getParameter("task_id");
+                Integer task_id = task_idStr != null ? Integer.valueOf(task_idStr) : null;
+                String task_assigned_toStr = request.getParameter("task_assigned_to");
+                Integer task_assigned_to = task_idStr != null ? Integer.valueOf(task_assigned_toStr) : null;
+                System.out.println("Task Id" + task_id);
+                TaskDAO taskDAO = new TaskDAO();
+                result.put("removalReason", taskDAO.getTaskRemovalReason(task_id, task_assigned_to));
             }
             result.put("status", "Success");
         } catch (Exception e) {
@@ -303,6 +314,13 @@ public class TaskServlet extends HttpServlet {
                 TaskApprovalDAO taskApprovalDAO = new TaskApprovalDAO();
                 taskApprovalDAO.updateTaskApprovalRemark(taskApproval);
                 result.put("status", "Success");
+            }else if ("updateAssignmentReason".equalsIgnoreCase(action)){
+                 TaskAssignment taskAssignment = gson.fromJson(json, TaskAssignment.class);
+                 
+                 TaskAssignmentDAO taskAssignmentDAO = new TaskAssignmentDAO();
+                 taskAssignmentDAO.updateTaskRemovalReason(taskAssignment);
+                
+                result.put("message", "Rejection Reason updated ");
             }
         } catch (Exception e) {
             System.out.println("Exception in task : " + e);

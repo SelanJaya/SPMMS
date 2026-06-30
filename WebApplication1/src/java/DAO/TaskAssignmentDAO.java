@@ -62,7 +62,7 @@ public class TaskAssignmentDAO {
 
             ps.setInt(1, taskAssignment.getTask_id());
             ps.setInt(2, taskAssignment.getTask_assigned_to());
-            
+
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("Exception occurs in reactivateTaskAssignment" + e);
@@ -90,7 +90,7 @@ public class TaskAssignmentDAO {
             throw e;
         }
     }
-    
+
     public void insertTaskAssignment(Connection con, TaskAssignment taskAssignment) throws Exception {
         String sql = """
                      INSERT INTO task_assignments(task_id, task_assigned_to, task_assigned_by, task_assigned_at) 
@@ -147,7 +147,7 @@ public class TaskAssignmentDAO {
             ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
             ps.setInt(3, taskAssignment.getTask_id());
             ps.setInt(4, taskAssignment.getTask_assigned_to());
-            
+
             ps.executeUpdate();
         } catch (Exception e) {
             System.out.println("Exception in removeTaskAssignment :" + e);
@@ -165,6 +165,29 @@ public class TaskAssignmentDAO {
             ps.setInt(1, task_id);
             ps.executeUpdate();
         } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public void updateTaskRemovalReason(TaskAssignment taskAssignment) throws SQLException {
+
+        String sql = """
+        UPDATE task_assignments
+        SET removal_reason = ?
+        WHERE task_id = ?
+          AND task_assigned_to = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, taskAssignment.getRemoval_reason());
+            ps.setInt(2, taskAssignment.getTask_id());
+            ps.setInt(3, taskAssignment.getTask_assigned_to());
+            
+            ps.executeUpdate();
+        }catch (Exception e) {
+            System.out.println("Exception in updateTaskRemovalReason :" + e);
+            e.printStackTrace();
             throw e;
         }
     }

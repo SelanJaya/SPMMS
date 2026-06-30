@@ -379,6 +379,17 @@ code {
     font-weight:600;
 }
 
+.badge-soft-planned {
+    background: #e0f2fe; /* Soft light blue */
+    color: #0369a1;      /* Crisp dark blue text */
+    padding: 12px 18px;
+    border-radius: 999px;
+    font-size: .9rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
 
 /* ==========================================================================
    SPMMS PREMIUM INLINE-EDITING STATE OVERRIDES

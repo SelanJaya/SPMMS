@@ -41,7 +41,7 @@
             </nav>
 
             <div id="content-wrapper">
-
+                <div id="statusTab"></div>
 
                 <div id="successProcessTab" class="d-none alert alert-success alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
                     <div class="icon-container me-3">
@@ -151,7 +151,7 @@
                                         Recent Activities
                                     </div>
                                     <i class="fas fa-chevron-down text-muted" style="font-size: 0.8rem;"></i>
-                                    
+
                                 </h6>
                             </div>
 
@@ -482,6 +482,49 @@
 
                         </div>
 
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal fade" id="assignmentRemovalModal" data-action="removal" data-task_id="" tabindex="-1" aria-labelledby="removalModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content custom-modal border-0 shadow-lg rounded-4 overflow-hidden">
+
+                        <div class="modal-header bg-primary text-white position-relative border-0 py-3" >
+                            <h5 class="modal-title fw-bold w-100 text-center" id="removalModalLabel">
+                                Remove Assignment
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body px-4 pt-4 pb-3">
+                            <p id="removalPromptMessage" class="text-muted mb-4">
+                               
+                            </p>
+                            
+                                <div>
+                                    <label for="removalReason" class="form-label fw-bold text-dark">Removal Reason</label>
+                                    <textarea class="form-control rounded-3" id="removalReason" rows="4"
+                                              placeholder="e.g., Scope changes, workload balancing, reassigning to another team member, or project hold..."
+                                              required></textarea>
+                                </div>
+                            
+                        </div>
+
+                        <div id="assignmentRemovalModalAction" class="modal-footer border-0 px-4 pb-4 pt-0">
+                            <div class="row w-100 mx-0 g-2">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-secondary w-100 fw-bold rounded-pill" data-bs-dismiss="modal">
+                                        Cancel
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" id="confirmAssignmentRemovalBtn" class="btn bg-primary text-white w-100 fw-bold rounded-pill">
+                                        Edit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -360,7 +360,7 @@ public class TaskDAO {
                     assignment.setTask_assigned_to(assignedUserId);
                     assignment.setUser_name(rs.getString("username"));
                     assignment.setTask_assigned_to_Role(rs.getString("user_role"));
-                    
+
                     task.setTaskAssignment(assignment);
                 }
             }
@@ -557,6 +557,32 @@ public class TaskDAO {
         }
 
     }
-;
 
+    public TaskAssignment getTaskRemovalReason(int taskId, int task_assigned_to) throws SQLException {
+
+        String sql = """
+            SELECT removal_reason
+            FROM task_assignments
+            WHERE task_id = ? AND task_assigned_to = ?
+              AND task_assignment_status = 'REMOVED'
+            ORDER BY removed_at DESC
+            LIMIT 1
+        """;
+        TaskAssignment taskAssignment = null;
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, taskId);
+            ps.setInt(2, task_assigned_to);
+             taskAssignment = new TaskAssignment();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                   taskAssignment.setTask_id(taskId);
+                   taskAssignment.setTask_assigned_to(task_assigned_to);
+                   taskAssignment.setRemoval_reason(rs.getString("removal_reason"));
+                }
+            }
+        }
+
+        return taskAssignment;
+    }
 }

@@ -25,6 +25,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         statusBadge.classList.add("badge-soft-danger");
     } else if (projStatus === "Archive") {
         statusBadge.classList.add("badge-soft-archive");
+    } else if (projStatus === "Planned"){
+        statusBadge.classList.add("badge-soft-planned");
     }
 
     statusBadge.innerHTML =

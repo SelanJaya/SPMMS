@@ -19,12 +19,13 @@ import java.sql.SQLException;
 public class DBConnection {
     // Database URL, user, and password for MySQL
 
-    private static final String URL = "jdbc:mysql://localhost:3307/spmms";  // Your database name
+//    private static final String URL = "jdbc:mysql://localhost:3307/spmms";  // Your database name
+    private static final String URL = "jdbc:mysql://reseau.proxy.rlwy.net:38691/railway"; 
 //    private static final String URL = "jdbc:mysql://localhost:3307/quizsystem";  // Your database name
 
     private static final String USER = "root";  // MySQL username
 //    private static final String PASSWORD = "";  // MySQL password (empty password for root)
-    private static final String PASSWORD = "admin";  // MySQL password 
+    private static final String PASSWORD = "JRozwDvZNfAaOJibfcYimlHxCnYFHHxn";  // MySQL password 
 
     public static Connection getConnection() {
         Connection connection = null;

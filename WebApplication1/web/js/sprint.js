@@ -110,13 +110,10 @@ document.getElementById("scrum-container"), addEventListener("click", (e) => {
         sprint_div = e.target.closest(".scrum-board-card");
         sprint_id = sprint_div.id;
         console.log(sprint_id);
-        populateSprintReview(sprint_id);
+        const sprintName = e.target.closest(".scrum-board-card").querySelector(".val-name").textContent;
+        populateSprintReview(sprint_id, sprintName);
     }
 });
-async function populateSprintReview() {
-    const response = await fetch(``);
-    const result = await response.json();
-}
 
 const sprintModalEl = document.getElementById('sprintModal');
 sprintModalEl.addEventListener("shown.bs.modal", async function () {
@@ -480,8 +477,8 @@ function renderBoard(data) {
                             <button class="btn btn-outline-danger btn-sm deleteSprint-btn">
                                         <i class="fas fa-trash-alt me-1"></i> Delete
                             </button>` : ``;
-    let action_PO = (user_role === "Product Owner" && data.sprint_status === "Completed") ? ` <button class="btn btn-outline-secondary btn-sm verifySprintEnd-btn" onclick="viewDocument('${data.sprint_id}')">
-        <i class="fas fa-file-alt"></i> Approve tasks
+    let action_PO = ( data.sprint_status === "Completed") ? ` <button class="btn btn-outline-secondary btn-sm verifySprintEnd-btn">
+        <i class="fas fa-file-alt"></i> Review tasks
     </button>` : ``;
     const backlogIds = (data.backlog && data.backlog.length > 0)
             ? data.backlog.map(b => b.backlogI_id).join(',')
@@ -1058,7 +1055,7 @@ function validateTaskForm(data) {
     }
 
     // Assignee
-    if ((!newAssignments || newAssignments.length === 0) && !document.querySelector("#assignedNamesContainer > span")){
+    if ((!newAssignments || newAssignments.length === 0) && !document.querySelector("#assignedNamesContainer > span")) {
         document.getElementById("errorTaskAssignee").innerText =
                 "Please select an assignee.";
         document.getElementById("errorTaskAssignee")
@@ -1451,7 +1448,7 @@ async function getTaskDetails(task_id) {
 //get the assignment removal reason
 const assignmentRemovalModalDOM = document.getElementById("assignmentRemovalModal");
 function displayAssignmentRejectionModal(btn) {
-    
+
     console.log(btn);
     const action = btn.dataset.action;
     const taskAssignedTo = btn.dataset.taskAssignedTo;
@@ -1462,10 +1459,10 @@ function displayAssignmentRejectionModal(btn) {
 //        document.getElementById(`assignmentTo_${taskAssignedTo}`).classList.add("d-none");
         btn.parentElement.remove();
         console.log(btn.parentElement.className);
-        
+
         return;
     }
-    
+
     const assignmentRemovalModal = bootstrap.Modal.getOrCreateInstance(assignmentRemovalModalDOM);
     document.getElementById("rejectionAssignmentReason").innerText = "";
     assignmentRemovalModalDOM.dataset.task_Id = btn.dataset.taskId;
@@ -1605,14 +1602,16 @@ async function handleTaskBacklog(selectedId = null) {
 }
 }
 ;
-async function populateSprintReview(sprint_id) {
+async function populateSprintReview(sprint_id, sprintName) {
 
     const response = await fetch(`TaskServlet?action=fetchTask_Backlog&sprint_id=${sprint_id}`);
     const result = await response.json();
-
+    
+    document.getElementById("sprintReviewModalTitle").innerText = sprintName;
+    
     const sprintReviewContainer = document.getElementById("sprintReviewContainer");
     sprintReviewContainer.innerHTML = "";
-
+    
     let backlog_id = null;
     let html = "";
     console.log(result);
@@ -1621,16 +1620,73 @@ async function populateSprintReview(sprint_id) {
         console.log(item);
         const isNewGroup = backlog_id !== item.backlog.backlogI_id;
         const isApproved = item.taskApproval?.taskApproval_status === "approve";
-        const approveBtn = `
-                            <button value="Approve"
-                                class="btn btn-sm btn-outline-success approve-btn ${isApproved ? 'bg-success text-white' : ''}">
-                                <i class="fas fa-check me-1"></i> Approve
-                            </button>`;
         const isRejected = item.taskApproval?.taskApproval_status === "reject";
-        const rejectReasonSymbol = isRejected ? `<i id="rejectionReasonicon" class="fas fa-comment-dots me-1 cursor-pointer"></i>` : `<i id="rejectionReasonicon" class=" d-none fas fa-comment-dots me-1 cursor-pointer"></i>`;
-        const rejectBtn = `<button value="Reject" class="btn btn-sm btn-outline-danger reject-btn ${isRejected ? `bg-danger text-white` : ``} me-1">
-                        <i class="fas fa-times me-2"></i> Reject
-                        </button>`;
+
+        let approveBtn = "";
+        let rejectReasonSymbol = "";
+        let rejectBtn = "";
+//        if (user_role === "Product Owner") {
+//            approveBtn = `
+//                            <button value="Approve"
+//                                class="btn btn-sm btn-outline-success approve-btn ${isApproved ? 'bg-success text-white' : ''}">
+//                                <i class="fas fa-check me-1"></i> Approve
+//                            </button>`;
+//
+//            rejectBtn = `<button value="Reject" class="btn btn-sm btn-outline-danger reject-btn ${isRejected ? `bg-danger text-white` : ``} me-1">
+//                        <i class="fas fa-times me-2"></i> Reject
+//                        </button>`;
+//        } else{
+//            approveBtn = `
+//                            <button value="Approve"
+//                                class="btn btn-sm btn-outline-success approve-btn ${isApproved ? 'bg-success text-white' : ''}">
+//                                <i class="fas fa-check me-1"></i> Approve
+//                            </button>`;
+//
+//            rejectBtn = `<button value="Reject" class="btn btn-sm btn-outline-danger reject-btn ${isRejected ? `bg-danger text-white` : ``} me-1">
+//                        <i class="fas fa-times me-2"></i> Reject
+//                        </button>`;
+//        }
+
+        if (user_role === "Product Owner") {
+            // Product Owner gets fully interactive buttons
+            approveBtn = `
+        <button value="Approve"
+            class="btn btn-sm btn-outline-success approve-btn ${isApproved ? 'bg-success text-white' : ''}">
+            <i class="fas fa-check me-1"></i> Approve
+        </button>`;
+
+            rejectBtn = `
+        <button value="Reject" 
+            class="btn btn-sm btn-outline-danger reject-btn ${isRejected ? 'bg-danger text-white' : ''} me-1">
+            <i class="fas fa-times me-2"></i> Reject
+        </button>`;
+        } else {
+            // Others only see a single, unclickable status badge based on the state
+            if (isApproved) {
+                approveBtn = `
+            <span class="badge bg-success p-2">
+                <i class="fas fa-check me-1"></i> Approved
+            </span>`;
+                rejectBtn = ''; // Hide the reject button completely
+
+            } else if (isRejected) {
+                approveBtn = ''; // Hide the approve button completely
+                rejectBtn = `
+            <span class="badge bg-danger p-2">
+                <i class="fas fa-times me-1"></i> Rejected
+            </span>`;
+
+            } else {
+                // Optional: What others see if it hasn't been reviewed yet (Pending)
+                approveBtn = `
+            <span class="badge bg-secondary p-2">
+                <i class="fas fa-clock me-1"></i> Pending Review
+            </span>`;
+                rejectBtn = '';
+            }
+        }
+
+        rejectReasonSymbol = isRejected ? `<i id="rejectionReasonicon" class="fas fa-comment-dots me-1 cursor-pointer"></i>` : `<i id="rejectionReasonicon" class=" d-none fas fa-comment-dots me-1 cursor-pointer"></i>`;
         // 👉 close previous table BEFORE opening new one
         if (isNewGroup && backlog_id !== null) {
             html += `</tbody></table></div>`;
@@ -1677,13 +1733,15 @@ async function populateSprintReview(sprint_id) {
     sprintReviewModalBoot.show();
 }
 
-
 let taskRejectionUIUpdate_e;
+
+
 document.getElementById("sprintReviewModal").addEventListener("click", async function (e) {
     console.log("clicked");
+
     const reject_btn = e.target.closest(".reject-btn");
     const approve_btn = e.target.closest(".approve-btn");
-    const rejectionReasonicon = document.getElementById("rejectionReasonicon");
+    const rejectionReasonicon = e.target.closest("#rejectionReasonicon");
 
     var status;
     let task_id;
@@ -1726,32 +1784,68 @@ document.getElementById("sprintReviewModal").addEventListener("click", async fun
             updateTaskApproval_UI(e, status);
         }
     } else if (rejectionReasonicon) {
+// val-name
+            console.log("rejecteion icon clicked");
+            const row = e.target.closest("tr");
+            const approval_id = row.dataset.approval_id;
 
-        console.log("rejecteion icon clicked");
-        const row = e.target.closest("tr");
-        const approval_id = row.dataset.approval_id;
+            const response = await fetch(`TaskServlet?action=fetchReason&reason_id=${approval_id}`);
+            const result = await response.json();
+            console.log(result);
 
-        const response = await fetch(`TaskServlet?action=fetchReason&reason_id=${approval_id}`);
-        const result = await response.json();
-        console.log(result);
+            document.getElementById("rejectionTaskPromptMessage").innerText = "This Task is being rejected. Please provide a reason below. "
+            const taskRejectionModalDOM = document.getElementById("taskRejectionModal");
+            const taskRejectionModal = bootstrap.Modal.getOrCreateInstance(taskRejectionModalDOM);
 
-        const taskRejectionModalDOM = document.getElementById("taskRejectionModal");
-        const taskRejectionModal = bootstrap.Modal.getOrCreateInstance(taskRejectionModalDOM);
-
-        taskRejectionModalDOM.dataset.task_id = result.rejectionReason.task_id;
-        document.getElementById("rejectionTaskReason").value = result.rejectionReason.remarks;
+            taskRejectionModalDOM.dataset.task_id = result.rejectionReason.task_id;
+            document.getElementById("rejectionTaskReason").value = result.rejectionReason.remarks;
 
 
-        document.getElementById("confirmTaskRejectBtn").innerText = "Edit";
-        taskRejectionModalDOM.dataset.action = "editReason";
-        console.log(taskRejectionModalDOM);
-        taskRejectionModal.show();
+            document.getElementById("confirmTaskRejectBtn").innerText = "Edit";
+            taskRejectionModalDOM.dataset.action = "editReason";
+            console.log(taskRejectionModalDOM);
+            
+            if (user_role !== "Product Owner") {
+                document.getElementById("rejectionTaskPromptMessage").innerText = "This task is rejected by product owner due to ";
+                taskRejectionModalDOM.querySelector(".modal-footer").classList.add("d-none");
+            }
+            
+            taskRejectionModal.show();
+        
     }
 
 //    const result = await sendTask_approval(task_id, status, taskApproval_id);
 //    console.log(result);
 
 });
+//    
+//} else {
+//    document.getElementById("rejectionReasonicon").addEventListener("click", async function (e) {
+//
+//        console.log("rejecteion icon clicked");
+//        const row = e.target.closest("tr");
+//        const approval_id = row.dataset.approval_id;
+//
+//        const response = await fetch(`TaskServlet?action=fetchReason&reason_id=${approval_id}`);
+//        const result = await response.json();
+//        console.log(result);
+//
+//        document.getElementById("rejectionTaskPromptMessage").innerText = "This task is rejected by product owner due to "
+//
+//        const taskRejectionModalDOM = document.getElementById("taskRejectionModal");
+//        const taskRejectionModal = bootstrap.Modal.getOrCreateInstance(taskRejectionModalDOM);
+//
+//        taskRejectionModalDOM.dataset.task_id = result.rejectionReason.task_id;
+//        document.getElementById("rejectionTaskReason").value = result.rejectionReason.remarks;
+//
+//
+//        document.getElementById("confirmTaskRejectBtn").innerText = "Edit";
+//        taskRejectionModalDOM.dataset.action = "editReason";
+//        console.log(taskRejectionModalDOM);
+//        taskRejectionModal.show();
+//    });
+//}
+
 
 document.getElementById("confirmTaskRejectBtn").addEventListener("click", async function () {
 
@@ -1817,7 +1911,7 @@ async function sendTask_approval(task_id, status, taskApproval_idStr, reason) {
     var action = "insert_taskApproval";
     const taskApproval_id = taskApproval_idStr && taskApproval_idStr !== "null" ? parseInt(taskApproval_idStr, 10) : null;
     console.log(taskApproval_id, typeof (taskApproval_id), (taskApproval_id !== null && taskApproval_id !== ""));
-    
+
     if (taskApproval_id !== null && taskApproval_id !== 0 && taskApproval_id !== "" && taskApproval_id !== 0) {
         action = "update_taskApproval";
     }

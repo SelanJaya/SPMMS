@@ -62,7 +62,7 @@ public class ProjectTeamDAO {
             ps.setInt(2, proj_assign_to);
 
             return ps.executeUpdate() > 0;
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Exception ocuurect in reactivateProjectAssignment");
             e.printStackTrace();
             throw new Error("Team Assignment Failed");
@@ -175,4 +175,60 @@ public class ProjectTeamDAO {
         }
     }
 
+    public ProjectTeamAssignment getProjectRemovalReason(int projectId, int assignedTo) throws SQLException {
+
+        String sql = """
+        SELECT removal_reason
+        FROM project_assignments
+        WHERE project_id = ?
+          AND proj_assign_to = ?
+          AND proj_assign_status = 'REMOVED'
+        LIMIT 1
+        """;
+
+        ProjectTeamAssignment projectTeamAssignment = null;
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, projectId);
+            ps.setInt(2, assignedTo);
+            projectTeamAssignment = new ProjectTeamAssignment();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    projectTeamAssignment.setProject_id(projectId);
+                    projectTeamAssignment.setAssign_to(assignedTo);
+                    projectTeamAssignment.setRemoval_reason(rs.getString("removal_reason"));
+                }
+            }
+        }
+
+        return projectTeamAssignment;
+    }
+
+    public void updateProjectRemovalReason(ProjectTeamAssignment projectTeamAssignment) throws SQLException {
+
+        String sql = """
+        UPDATE project_assignments
+        SET removal_reason = ?
+        WHERE project_id = ?
+          AND proj_assign_to = ?
+          AND proj_assign_status = 'REMOVED'
+        """;
+
+        try (Connection conn = DBConnection.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, projectTeamAssignment.getRemoval_reason());
+            System.out.println("Reason" + projectTeamAssignment.getRemoval_reason());
+            ps.setInt(2, projectTeamAssignment.getProject_id());
+            System.out.println("Project id" + projectTeamAssignment.getProject_id());
+            ps.setInt(3, projectTeamAssignment.getAssign_to());
+            System.out.println("Assign to " +projectTeamAssignment.getAssign_to() );
+            
+            int status = ps.executeUpdate();
+            System.out.println("Status update" + status);
+        } catch (SQLException e) {
+            System.err.println("SQL Error in updateProjectRemovalReason: " + e.getMessage());
+            e.printStackTrace();
+            throw new Error("Rejection Reson failed to update ");
+        }
+    }
 }

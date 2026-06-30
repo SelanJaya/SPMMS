@@ -780,7 +780,7 @@ function populateRecentActivity_Dev(activities) {
         // Default fallbacks using FontAwesome (fas)
         let iconMarkup = `<i class="fas fa-info-circle text-primary"></i>`;
         let iconBg = "bg-primary-subtle";
-        
+
         // Variables for the accordion effect
         let toggleAttributes = "";
         let chevronIcon = "";
@@ -791,7 +791,7 @@ function populateRecentActivity_Dev(activities) {
 
         switch (activity.activityType) {
             case "PROJECT_JOIN":
-            case "TASK_ASSIGN": 
+            case "TASK_ASSIGN":
                 // Swapped to FontAwesome User-Plus
                 iconMarkup = `<i class="fas fa-user-plus text-success" style="font-size: 0.8rem;"></i>`;
                 iconBg = "bg-success-subtle";
@@ -805,7 +805,7 @@ function populateRecentActivity_Dev(activities) {
 
                 // 1. Make the row clickable
                 toggleAttributes = `style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#${uniqueCollapseId}" aria-expanded="false"`;
-                
+
                 // 2. Swapped the chevron to FontAwesome
                 chevronIcon = `<i class="fas fa-chevron-down text-muted" style="font-size: 0.7rem;"></i>`;
 
@@ -814,10 +814,9 @@ function populateRecentActivity_Dev(activities) {
                     <div class="collapse mt-2" id="${uniqueCollapseId}">
                         <div class="bg-light p-2 rounded border border-light d-flex justify-content-between align-items-center" style="font-size: 0.75rem; margin-left: 36px;">
                             <div>
-                                <strong class="text-danger">Reason:</strong> ${activity.reason || 'No reason provided'} <br>
-                                <span class="text-muted">Action by: ${activity.performedBy || 'System'}</span>
+                                <strong class="text-danger">Reason:</strong> Click view <br>
                             </div>
-                            <button class="btn btn-sm btn-outline-info py-0 px-2" style="font-size: 0.7rem;" onclick="viewRemovalReason('${activity.assignmentId}')">
+                            <button data-task_id=${activity.task_id} data-project_id=${activity.project_id} data-assigned_to=${activity.assigned_to} class="btn btn-sm btn-outline-info py-0 px-2" style="font-size: 0.7rem;" onclick="viewRemovalReason(this)">
                                 View
                             </button>
                         </div>
@@ -861,15 +860,16 @@ function populateRecentActivity_Dev(activities) {
 
 function populateRecentActivity(activities) {
     const container = document.getElementById("activityFeedContainer"); // Make sure this points to your scrolling body!
+    console.log(activities);
     container.innerHTML = "";
 
     activities.forEach((activity, index) => {
-        
+
         // 1. Setup default variables for standard items
         let iconMarkup = `<i class="bi bi-info-circle text-primary"></i>`;
-        let iconBg = "bg-primary-subtle"; 
-        let actionButton = ""; 
-        
+        let iconBg = "bg-primary-subtle";
+        let actionButton = "";
+
         // New variables for the accordion effect
         let toggleAttributes = "";
         let chevronIcon = "";
@@ -893,7 +893,7 @@ function populateRecentActivity(activities) {
 
                 // Make the main row clickable to trigger the collapse
                 toggleAttributes = `style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#${uniqueCollapseId}" aria-expanded="false"`;
-                
+
                 // Add the little down arrow to show it can be clicked
                 chevronIcon = `<i class="fas fa-chevron-down text-muted" style="font-size: 0.7rem;"></i>`;
 
@@ -903,9 +903,8 @@ function populateRecentActivity(activities) {
                         <div class="bg-light p-2 rounded border border-light d-flex justify-content-between align-items-center" style="font-size: 0.75rem; margin-left: 36px;">
                             <div>
                                 <strong class="text-danger">Reason:</strong> ${activity.reason || 'No reason provided'} <br>
-                                <span class="text-muted">Action by: ${activity.performedBy || 'System'}</span>
                             </div>
-                            <button class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.7rem;" onclick="editRemovalReason('${activity.assignmentId}')">
+                            <button data-assigned_to=${activity.task_assigned_to || activity.proj_assign_to}  data-task_id= ${activity.task_id} data-project_id=${activity.project_id} class="btn btn-sm btn-outline-secondary py-0 px-2" style="font-size: 0.7rem;" onclick="editRemovalReason(this)">
                                 Edit
                             </button>
                         </div>
@@ -944,4 +943,189 @@ function populateRecentActivity(activities) {
             </div>
         `;
     });
+}
+
+async function viewRemovalReason(btn) {
+    console.log(btn);
+    const assigned_to = btn.dataset.assigned_to;
+    const project_id = parseInt(btn.dataset.project_id, 10);
+    const task_id = parseInt(btn.dataset.task_id, 10);
+    console.log(task_id, project_id, assigned_to);
+
+    let result;
+    if (task_id !== 0 && task_id && assigned_to) {
+        console.log("task");
+        const response = await fetch(`TaskServlet?action=fetchRemovalReason_Assignment&task_id=${task_id}&&task_assigned_to=${assigned_to}`);
+         result = await response.json();
+
+        console.log(result);
+    } else if (project_id !== 0 && project_id && assigned_to) {
+        const response = await fetch(`teamAssignmentServlet?action=fetchAssignmentRemovalReason&task_id&project_id=${project_id}&assignedTo=${assigned_to}`);
+         result = await response.json();
+
+        console.log(result);
+    }
+    prepareAssignmentModal_Dev(result.removalReason);
+}
+
+function prepareAssignmentModal_Dev(result) {
+    console.log(result);
+    const task_id = result.task_id || 0;
+    const project_id = result.project_id || 0;
+    const assigned_to = result.task_assigned_to || result.assign_to;
+    
+    document.getElementById("removalPromptMessage").innerText = "The Member removed from Project for the reason below :";
+    
+    if (task_id !== 0 && task_id && assigned_to) {
+         document.getElementById("removalPromptMessage").innerText = "The Member removed from task for the reason below :";
+    }
+   
+    document.getElementById("removalReason").value = result.removal_reason;
+    document.getElementById("removalReason").disabled = true;
+    const assignmentRemovalModal = document.getElementById("assignmentRemovalModal");
+    const assignmentRemoval = bootstrap.Modal.getOrCreateInstance(assignmentRemovalModal);
+    document.getElementById("assignmentRemovalModalAction").classList.add("d-none");
+    assignmentRemoval.show();
+}
+
+async function editRemovalReason(btn) {
+
+    console.log(btn);
+    const assigned_to = btn.dataset.assigned_to;
+    const project_id = parseInt(btn.dataset.project_id, 10);
+    const task_id = parseInt(btn.dataset.task_id, 10);
+    console.log(task_id, project_id, assigned_to);
+
+    if (task_id !== 0 && task_id && assigned_to) {
+        console.log("task");
+        const response = await fetch(`TaskServlet?action=fetchRemovalReason_Assignment&task_id=${task_id}&&task_assigned_to=${assigned_to}`);
+        const result = await response.json();
+
+        console.log(result);
+        prepareAssignmentModal(result.removalReason);
+    } else if (project_id !== 0 && project_id && assigned_to) {
+        const response = await fetch(`teamAssignmentServlet?action=fetchAssignmentRemovalReason&task_id&project_id=${project_id}&assignedTo=${assigned_to}`);
+        const result = await response.json();
+
+        console.log(result);
+        prepareAssignmentModal(result.removalReason);
+    }
+}
+
+function prepareAssignmentModal(result) {
+
+    document.getElementById("removalPromptMessage").innerText = "The Member removed from task for the reason below :";
+    document.getElementById("removalReason").value = result.removal_reason;
+    const assignmentRemovalModal = document.getElementById("assignmentRemovalModal");
+    assignmentRemovalModal.dataset.task_id = result.task_id;
+    assignmentRemovalModal.dataset.project_id = result.project_id;
+    assignmentRemovalModal.dataset.assigned_to = result.task_assigned_to || result.assign_to;
+    const assignmentRemoval = bootstrap.Modal.getOrCreateInstance(assignmentRemovalModal);
+    assignmentRemoval.show();
+}
+
+document.getElementById("confirmAssignmentRemovalBtn").addEventListener("click", async function () {
+
+    const assignmentRemovalModal = document.getElementById("assignmentRemovalModal");
+    let result = null;
+    const data = {
+        action: "updateAssignmentReason",
+        removal_reason: document.getElementById("removalReason").value
+    };
+    const task_id = parseInt(assignmentRemovalModal.dataset.task_id, 10);
+    const project_id = parseInt(assignmentRemovalModal.dataset.project_id, 10);
+    if (task_id && task_id !== 0) {
+        data.task_id = task_id;
+        data.task_assigned_to = assignmentRemovalModal.dataset.assigned_to;
+
+        result = await sendData_TaskReason(data);
+    } else if (project_id && task_id !== 0) {
+        data.project_id = project_id;
+        data.assign_to = assignmentRemovalModal.dataset.assigned_to;
+
+        result = await sendData_ProjectReason(data);
+    }
+
+    console.log("Before ", data);
+
+    displayMessage(result.message, result.status);
+
+
+    const assignmentRemoval = bootstrap.Modal.getOrCreateInstance(assignmentRemovalModal);
+    assignmentRemoval.hide();
+
+});
+
+
+async function sendData_TaskReason(data) {
+    try {
+        const response = await fetch("TaskServlet", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            throw new Error("Server error: " + response.status);
+        }
+
+        const result = await response.json();
+        console.log("return Result");
+        console.log(result);
+        return result;
+        console.log("Failed to return Result");
+    } catch (error) {
+        console.error("Error sending task approval:", error);
+        return null;
+    }
+}
+
+
+async function sendData_ProjectReason(data) {
+    try {
+        const response = await fetch("teamAssignmentServlet", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+            throw new Error("Server error: " + response.status);
+        }
+
+        const result = await response.json();
+        console.log("return Result");
+        return result;
+        console.log("Failed to return Result");
+    } catch (error) {
+        console.error("Error sending task approval:", error);
+        return null;
+    }
+}
+
+
+function displayMessage(msg, status) {
+
+    let alertClass = "alert-success";
+    let icon = "fa-check-circle";
+    if (status === "Failed") {
+        alertClass = "alert-danger";
+        icon = "fa-circle-xmark";
+    }
+    const messageDiv = document.getElementById("statusTab");
+    messageDiv.innerHTML = `<div id="successProcessTab" class="alert ${alertClass} alert-dismissible fade show shadow-lg border-0 d-flex align-items-center" role="alert">
+                        <div class="icon-container me-3">
+                            <i class="fas ${icon} fa-lg"></i>
+                        </div>
+                        <div class="message-content">
+                            <h6 class="alert-heading mb-0 fw-bold" style="font-size: 0.9rem;">${msg}</h6>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>`;
+    setTimeout(() => {
+        messageDiv.innerHTML = "";
+    }, 5000);
+    return;
 }

@@ -1,6 +1,6 @@
-FROM tomcat:8.5-jdk17
+FROM tomcat:8.5-jdk21
 
-COPY WebApplication1/dist/SPMMS.war /usr/local/tomcat/webapps/SPMMS.war
+COPY dist/SPMMS.war /usr/local/tomcat/webapps/SPMMS.war
 
 EXPOSE 8080
 

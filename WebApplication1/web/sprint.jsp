@@ -610,12 +610,12 @@
                 <div class="modal-content border-0 shadow-lg rounded-5">
 
                     <!-- Header -->
-                    <div class="modal-header bg-gradient text-white rounded-top-5 py-3">
-                        <div>
+                    <div class="modal-header bg-primary text-white py-3 shadow-sm">
+                        <div class="ms-1">
                             <h5 id="sprintReviewModalTitle" class="modal-title fw-bold mb-0">Sprint Review: Sprint 1</h5>
                             <small id="sprintReviewModalDate" class="text-light"></small>
                         </div>
-                        <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white me-1" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
                     <!-- Body -->
