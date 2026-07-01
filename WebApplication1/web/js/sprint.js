@@ -1127,8 +1127,9 @@ async function confirmAddTask() {
         data.action = "UpdateTaskDetials";
         task_id = document.getElementById("task_id").value.replace("task-", "");
         console.log("Task id", task_id);
+        console.log("Taskkk ", document.getElementById('taskModal').querySelector("#task_id").value.replace("task-", ""));
         data.task_id = task_id;
-        console.log("Removed Assignment : ", removedAssignments)
+        console.log("Removed Assignment : ", removedAssignments);
         data.removedAssignment = removedAssignments;
         const oldTask = document.getElementById("task-" + task_id);
         console.log("Task old :", oldTask);
@@ -1138,6 +1139,7 @@ async function confirmAddTask() {
 
     console.log(data);
     const result = await sendData_Task(data);
+    console.log(result);
     if (result.status !== "Success") {
         bsTaskModal.hide();
         return;
@@ -1355,7 +1357,7 @@ async function getTaskDetails(task_id) {
 
     taskModel.querySelector("#t_name").value = result.taskData.task_name;
     taskModel.querySelector("#t_desc").value = result.taskData.task_desc;
-
+    console.log(taskModel);
 
     addAssignedPill("edit", result.taskData.taskAssignment);
 

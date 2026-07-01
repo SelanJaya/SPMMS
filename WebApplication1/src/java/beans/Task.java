@@ -138,7 +138,7 @@ public class Task {
     }
 
     public LocalDate getTask_start_date() {
-        if (task_start_date == null || actual_startDate.isBlank()) {
+        if (task_start_date == null || task_start_date.isBlank()) {
             return null;
         }
         return LocalDate.parse(task_start_date);

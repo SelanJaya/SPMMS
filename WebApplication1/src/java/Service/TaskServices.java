@@ -191,16 +191,20 @@ public class TaskServices {
         con.setAutoCommit(false);
 
         try {
-
-            TaskDAO taskDAO = new TaskDAO();
-            taskDAO.deleteTask(con, task_id);
-
+            
+            TaskDependencyDAO taskDependencyDAO = new TaskDependencyDAO();
+            taskDependencyDAO.deleteTaskDependency(con,  task_id);
+            
             TaskAssignmentDAO taskAssignmentDAO = new TaskAssignmentDAO();
             taskAssignmentDAO.deleteTaskAssignment(con, task_id);
-
+            
+            TaskDAO taskDAO = new TaskDAO();
+            taskDAO.deleteTask(con, task_id);
+            
             con.commit();
         } catch (SQLIntegrityConstraintViolationException e) {
             con.rollback();
+             e.printStackTrace(); 
             throw new Exception("Cannot delete this task because other tasks depend on it.");
         } catch (Exception e) {
             con.rollback();
