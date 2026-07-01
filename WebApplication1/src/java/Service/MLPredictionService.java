@@ -64,7 +64,7 @@ public class MLPredictionService {
         String json = gson.toJson(projects);
         System.out.println(json);
 
-//        URL url = new URL("http://localhost:5000/predict-batch");
+        //URL url = new URL("http://localhost:5000/predict-batch");
         URL url = new URL("https://reasonable-cat-production-9405.up.railway.app/predict-batch");
 
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
