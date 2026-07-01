@@ -33,6 +33,7 @@ public class ProjectDocumentService {
         try {
             // Base directory where ALL documents will be stored
             //String basePath = "C:\\Users\\HP\\Documents\\SPMMSDocuments";
+            
             String basePath = System.getProperty("java.io.tmpdir") + File.separator + "SPMMSDocuments";
             System.out.println("Upload directory: " + basePath);
             
