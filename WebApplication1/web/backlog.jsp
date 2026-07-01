@@ -32,7 +32,7 @@
         <div id="wrapper">
             <nav id="sidebar" title="Double-click to toggle">
                 <div class="sidebar-brand">
-                    <span class="brand-text text-center">SPMMS </span>
+                    <span class="brand-text text-center ps-2">SPMMS</span>
                 </div>
                 <div class="nav flex-column mt-3">
                     <a href="dashboard.jsp" class="nav-link"><i class="fas fa-chart-pie me-3"></i> Dashboard</a>

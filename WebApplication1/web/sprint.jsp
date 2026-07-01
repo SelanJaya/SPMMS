@@ -662,9 +662,9 @@
 
                     <!-- Footer -->
                     <div class="modal-footer justify-content-between bg-light rounded-bottom-5">
-                        <button class="btn btn-outline-secondary btn-sm">
+<!--                        <button class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-download me-1"></i> Download Report
-                        </button>
+                        </button>-->
                         <div>
                             <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
                                 Close

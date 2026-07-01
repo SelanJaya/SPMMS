@@ -99,10 +99,10 @@
                         <i class="fas fa-eye eye-toggle"></i>
                     </div>
 
-                    <div class="w-100 d-flex justify-content-between my-2">
+<!--                    <div class="w-100 d-flex justify-content-between my-2">
                         <div class="small text-muted"><input type="checkbox"> Remember me</div>
                         <a href="#" class="small link-color text-primary text-decoration-none fw-bold">Forgot Password?</a>
-                    </div>
+                    </div>-->
 
                     <button class="btn-main">Login</button>
                 </form>
