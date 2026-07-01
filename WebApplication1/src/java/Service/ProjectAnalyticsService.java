@@ -66,9 +66,15 @@ public class ProjectAnalyticsService {
             proAnalysisArr = projectAnalyticsDAO.getAVGSpSuccRateData(project_id);
 
             for (ProjectAnalytics item : proAnalysisArr) {
-                double sprintSucc = ((double) item.getCompletedTask() / item.getTotalTask()) * 100;
+                double sprintSucc;
+                if (item.getTotalTask() == 0) {
+                    sprintSucc = 0;
+                } else {
+                    sprintSucc = ((double) item.getCompletedTask() / item.getTotalTask()) * 100;
+                }
                 totalSprintSuccRate += sprintSucc;
             }
+
             if (proAnalysisArr.isEmpty()) {
                 return 0;
             }
@@ -88,7 +94,14 @@ public class ProjectAnalyticsService {
             ProjectAnalyticsDAO projectAnalyticsDAO = new ProjectAnalyticsDAO();
             ProjectAnalytics projectAnalytics = projectAnalyticsDAO.getAVGVelocityData(project_id);
 
-            double avgVelocity = (projectAnalytics.getCompletedTask() / projectAnalytics.getTotalSprint());
+            int totalSprint = projectAnalytics.getTotalSprint();
+
+            if (totalSprint == 0) {
+                return 0;
+
+            }
+            double avgVelocity = (projectAnalytics.getCompletedTask() / totalSprint);
+
             return Math.round(avgVelocity * 100.0) / 100.0;
 
         } catch (Exception e) {
@@ -111,8 +124,10 @@ public class ProjectAnalyticsService {
                     cycleTime += ChronoUnit.DAYS.between(item.getActual_startDate(), item.getActual_endDate());
                 }
             }
-
-            double avarageCycleTime = cycleTime / taskArr.size();
+            double avarageCycleTime = 0;
+            if (!taskArr.isEmpty()) {
+                avarageCycleTime = cycleTime / taskArr.size();
+            }
             return Math.round(avarageCycleTime * 100.0) / 100.0;
         } catch (Exception e) {
             System.out.println("Exception occurs in service calculateCycleTime : " + e);
@@ -135,12 +150,18 @@ public class ProjectAnalyticsService {
 
                 if (item.getTotalTask() > 0) {
 
-                    rejectionRate += ((double) item.getRejectedTask() / item.getTotalTask()) * 100;
+                    if (item.getTotalTask() != 0) {
+                        rejectionRate += ((double) item.getRejectedTask() / item.getTotalTask()) * 100;
+                    } else {
+                        rejectionRate = 0;
+                    }
+
                 }
             }
-
-            double avgRejectionRate = rejectionRate / projectAnalyticArr.size();
-
+            double avgRejectionRate=0;
+            if (!projectAnalyticArr.isEmpty()) {
+                 avgRejectionRate = rejectionRate / projectAnalyticArr.size();
+            }
             return Math.round(avgRejectionRate * 100.0) / 100.0;
 
         } catch (Exception e) {

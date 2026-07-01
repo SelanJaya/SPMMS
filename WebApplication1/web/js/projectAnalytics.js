@@ -231,6 +231,7 @@ async function loadBurndownDropDown() {
     // prevent duplicate options
     sprintType.innerHTML = '<option value="">Select Sprint</option>';
 
+
     result.sprintData.forEach(item => {
         const option = document.createElement("option");
 
@@ -287,7 +288,10 @@ function displayBurndownChart(result) {
 
     const selectType = document.getElementById("sprintSelect");
     if (!selectType.value) {
-        document.getElementById("sprintSelect").value = String(result[0].sprintId);
+        if (Array.isArray(result) && result.length > 0) {
+            document.getElementById("sprintSelect").value =
+                    String(result[0].sprintId);
+        }
     }
 }
 
