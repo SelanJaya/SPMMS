@@ -15,7 +15,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        
+
         <link rel="stylesheet" href="css\common.css">
         <link rel="stylesheet" href="css\profile.css">
     </head>
@@ -41,8 +41,14 @@
             <div id="content-wrapper">
                 <nav class="top-nav">
                     <div class="small text-muted">Management/<span class="fw-bold text-dark">Profile</span></div>
-                    <img src="https://ui-avatars.com/api/?name=Douglas+McGee&background=2563eb&color=fff"
-                         class="rounded-circle border" width="34">
+                    <div class="user-info">
+                        <div class="user-details d-none d-sm-block">
+                            <span class="user-name">${userInfo.username}</span>
+                            <span class="user-role">${userInfo.user_role}</span>
+                        </div>
+                        <img src="https://ui-avatars.com/api/?name=DM&background=2563eb&color=fff"
+                             class="rounded-circle border" width="34">
+                    </div>
                 </nav>
 
                 <main class="p-4">
@@ -60,7 +66,7 @@
                             <div class="settings-card shadow-sm">
                                 <div class="card-header-spmms">
                                     <span>Personal & Security Information</span>
-                                    <button class="btn-action" id="editToggleBtn" onclick="toggleEditMode()">
+                                    <button class="btn-action bg-primary" id="editToggleBtn" onclick="toggleEditMode()">
                                         <i class="fas fa-edit me-2"></i>Edit Profile
                                     </button>
                                 </div>

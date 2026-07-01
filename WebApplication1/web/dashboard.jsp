@@ -138,7 +138,7 @@
                             </div>
                         </div>
 
-                        <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                        <div id="recentActivityDiv" class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
                             <div class="card-header bg-white border-bottom-0 py-3 px-4"
                                  style="cursor: pointer;" 
                                  data-bs-toggle="collapse" 

@@ -211,7 +211,6 @@ body {
 }
 
 .btn-action {
-    background-color: var(--primary-blue);
     color: white;
     font-weight: 600;
     padding: 0.5rem 1.5rem;

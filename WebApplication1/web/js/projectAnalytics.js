@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.getElementById("avgVelocity").innerText = data.AVGVelocity ?? fallbackText;
     document.getElementById("sprintSuccRate").innerText = data.sprintSuccRate ?? fallbackText;
     document.getElementById("cycleTime").innerText = data.CycleTime ?? fallbackText;
-    document.getElementById("rejectionRate").innerText = data.rejectionRate ?? fallbackText;
+    document.getElementById("rejectionRate").innerText = data.RejectionRate ?? fallbackText;
 
 //    //velocity Chart
 //    // 1. Extract the array from your JSON response

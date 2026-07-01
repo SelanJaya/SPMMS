@@ -150,7 +150,8 @@ public class ProjectAnalyticsDAO {
 
             while (rs.next()) {
                 ProjectAnalytics projectAnalytics = new ProjectAnalytics();
-                projectAnalytics.setCompletedTask(rs.getInt("total_task"));
+
+                projectAnalytics.setTotalTask(rs.getInt("total_task"));
                 projectAnalytics.setRejectedTask(rs.getInt("rejected_task"));
 
                 projectAnalyticArr.add(projectAnalytics);
@@ -551,7 +552,7 @@ public class ProjectAnalyticsDAO {
             while (rs.next()) {
 
                 Activity activity = new Activity();
-                
+
                 activity.setProject_id(rs.getInt("project_id"));
                 activity.setTask_id(rs.getInt("task_id"));
                 activity.setAssigned_to(rs.getInt("assigned_to"));
@@ -630,7 +631,7 @@ public class ProjectAnalyticsDAO {
             while (rs.next()) {
 
                 Activity activity = new Activity();
-                
+
                 activity.setProject_id(rs.getInt("project_id"));
                 activity.setProj_assign_to(rs.getInt("proj_assign_to"));
                 activity.setActivity(

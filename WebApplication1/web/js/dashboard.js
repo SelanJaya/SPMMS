@@ -13,6 +13,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     populateProjectFolder();
     if (userRole === "Project Manager" || userRole === "Product Owner" || userRole === "Scrum Master") {
         populateMyActive_PM_PO();
+        
+        if (userRole === "Product Owner") {
+            document.getElementById("recentActivityDiv").classList.add("d-none");
+        }
     } else if (userRole === "Developer") {
         populateMyActive_Dev();
     }
@@ -60,6 +64,7 @@ async function populateMyActive_PM_PO() {
     }
 
     result = await response.json();
+
     if (userRole !== "Product Owner") {
         populateRecentActivity(result.DashboardInsightData.activitys);
     }
@@ -956,12 +961,12 @@ async function viewRemovalReason(btn) {
     if (task_id !== 0 && task_id && assigned_to) {
         console.log("task");
         const response = await fetch(`TaskServlet?action=fetchRemovalReason_Assignment&task_id=${task_id}&&task_assigned_to=${assigned_to}`);
-         result = await response.json();
+        result = await response.json();
 
         console.log(result);
     } else if (project_id !== 0 && project_id && assigned_to) {
         const response = await fetch(`teamAssignmentServlet?action=fetchAssignmentRemovalReason&task_id&project_id=${project_id}&assignedTo=${assigned_to}`);
-         result = await response.json();
+        result = await response.json();
 
         console.log(result);
     }
@@ -973,13 +978,13 @@ function prepareAssignmentModal_Dev(result) {
     const task_id = result.task_id || 0;
     const project_id = result.project_id || 0;
     const assigned_to = result.task_assigned_to || result.assign_to;
-    
+
     document.getElementById("removalPromptMessage").innerText = "The Member removed from Project for the reason below :";
-    
+
     if (task_id !== 0 && task_id && assigned_to) {
-         document.getElementById("removalPromptMessage").innerText = "The Member removed from task for the reason below :";
+        document.getElementById("removalPromptMessage").innerText = "The Member removed from task for the reason below :";
     }
-   
+
     document.getElementById("removalReason").value = result.removal_reason;
     document.getElementById("removalReason").disabled = true;
     const assignmentRemovalModal = document.getElementById("assignmentRemovalModal");

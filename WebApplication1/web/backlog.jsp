@@ -352,8 +352,7 @@
 
                     <div class="modal-header bg-primary text-white py-3 shadow-sm" style="cursor: move;">
                         <h5 class="modal-title fw-bold">
-                            <i class="fas fa-folder-open me-2"></i>Documents: <span id="modalBacklogTitle">Initial Database
-                                Schema</span>
+                            <i class="fas fa-folder-open me-2"></i>Documents <span id="modalBacklogTitle"></span>
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
@@ -538,9 +537,9 @@
                             </div>
                         </div>
                         <div class="modal-footer bg-light">
-                            <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Folder</button>
+                            <button type="button" class="btn btn-sm btn-secondary fw-bold" data-bs-dismiss="modal">Keep Document</button>
                             <button type="button" id="deletedocBtnCfm" class="btn btn-sm btn-danger fw-bold px-3" ">
-                                Yes, Delete Directory
+                                Yes, Delete Document
                             </button>
                         </div>
                     </div>
