@@ -81,10 +81,10 @@ async function getBacklogRowData(e, option) {
 
     const rowData = {backlogI_id: backlogId};
     console.log(cell.id);
-    
-    if(cell.id === "status") {
+
+    if (cell.id === "status") {
         rowData.action = "Update_status";
-    }else{
+    } else {
         rowData.action = "Update_PO";
     }
     console.log(rowData);
@@ -189,9 +189,16 @@ async function getBacklogRowData(e, option) {
             const newStatus = option.dataset.value || rowData.status || row.status.dataset.status;
             console.log(newStatus);
 
-            //insert in the ui to fetch later
             const container = option.closest(".status-container");
             console.log(container);
+            
+            if (newStatus === "Rejected") {
+                const status_container = cell.querySelector(".status-dropdown");
+
+                console.log(status_container);
+                status_container.innerHTML += `<div class="dropdown-item view-reason-action border-top mt-1 pt-2 text-primary fw-semibold" data-value="View_EditReason">
+                ✏️ View / Edit Reason </div>`;
+            }
             applyStatusUI(container, newStatus);
         }
     }
@@ -492,6 +499,7 @@ document.getElementById("confirmRejectBtn").addEventListener("click", async func
 
         if (result.status === "Success") {
             console.log("reason Update Success");
+            displayMessage(result.status, "Rejection reason update successfully");
 
         }
 
@@ -936,10 +944,10 @@ async function sendBacklog(data) {
     }
 
     const result = await response.json();
-    console.log(result.status, result.message );
+    console.log(result.status, result.message);
 
     displayMessage(result.status, result.massage);
-    
+
     return await result;
 
 
