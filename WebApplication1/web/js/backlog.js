@@ -865,14 +865,14 @@ async function handleAddBacklog() {
     console.log("Server response:", result);
 
 
-//    if (result.status === "Success") {
-//        displayMessage(result.status, result.message);
-////        backlogData.backlogI_id = result.key;
-////        addbacklogToTable(backlogData);
-////        displaySuccessProcessTab(result.status);
-////    } else if (result.status === "Failed") {
-////        displayFailedProcessTab(result.status);
-//    }
+    if (result.status === "Success") {
+        displayMessage(result.status, result.message);
+        backlogData.backlogI_id = result.key;
+        addbacklogToTable(backlogData);
+        displaySuccessProcessTab(result.status);
+    } else if (result.status === "Failed") {
+        displayFailedProcessTab(result.status);
+    }
 }
 
 
