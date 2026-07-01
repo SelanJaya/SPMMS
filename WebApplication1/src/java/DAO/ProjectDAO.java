@@ -515,17 +515,25 @@ public class ProjectDAO {
     public List getTotalOverduePerProject(int user_id) throws Exception {
         List<DashboardInsight> dashboardInsightsArr = new ArrayList<>();
         String sql = """
-                     SELECT COUNT(*) AS overdue_tasks, project_name
-                     FROM projects p
-                     LEFT JOIN users u
-                         ON p.proj_created_by = u.user_id
-                     LEFT JOIN sprints s
-                         USING (project_id)
-                     LEFT JOIN tasks t
-                         USING (sprint_id)
-                     WHERE u.user_id = ?
-                       AND t.task_end_date < NOW()
-                       AND t.task_status != 'DONE';
+                     SELECT
+                           p.project_id,
+                           p.project_name,
+                           COUNT(
+                               CASE
+                                   WHEN t.task_end_date < NOW()
+                                    AND t.task_status != 'DONE'
+                                   THEN 1
+                               END
+                           ) AS overdue_tasks
+                       FROM projects p
+                       LEFT JOIN users u
+                           ON p.proj_created_by = u.user_id
+                       LEFT JOIN sprints s
+                           USING (project_id)
+                       LEFT JOIN tasks t
+                           USING (sprint_id)
+                       WHERE u.user_id = ?
+                       GROUP BY p.project_id, p.project_name;
                      """;
 
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
