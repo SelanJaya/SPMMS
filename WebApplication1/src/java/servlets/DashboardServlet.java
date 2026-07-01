@@ -150,7 +150,7 @@ public class DashboardServlet extends HttpServlet {
                     System.out.println("PO Executed");
                     ProjectDAO projectDAO = new ProjectDAO();
                     dashboardInsight.setActiveProjects(projectDAO.getMYActiveProject_PO(user_id));
-                    System.out.println("AAAA " + dashboardInsight.getActiveProjects().getFirst());
+                    
                     
                     if("Scrum Master".equalsIgnoreCase(userRole)){
                         ProjectAnalyticsDAO projectAnalyticsDAO = new ProjectAnalyticsDAO();

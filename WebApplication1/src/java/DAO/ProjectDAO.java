@@ -468,7 +468,8 @@ public class ProjectDAO {
 
         List<DashboardInsight> dashboardInsightsArr = new ArrayList<>();
         String sql = """
-                    SELECT p.project_name,
+                    SELECT 
+                                            p.project_name,
                                             COUNT(DISTINCT b.backlog_item_id) AS total_backlog,
                                         
                                             COUNT(DISTINCT CASE
@@ -482,21 +483,28 @@ public class ProjectDAO {
                                             END) AS active,
                                         
                                             COUNT(DISTINCT CASE
-                                                WHEN s.sprint_status NOT IN ('Active', 'Completed')
+                                                WHEN s.sprint_id IS NULL
+                                                     OR s.sprint_status NOT IN ('Active', 'Completed')
                                                 THEN b.backlog_item_id
                                             END) AS pending
                                         
                                         FROM projects p
-                                        LEFT JOIN project_assignments pa 
+                                        
+                                        LEFT JOIN project_assignments pa
                                         USING(project_id)
+                                        
                                         JOIN backlog_items b
                                             ON p.project_id = b.project_id
+                                        
                                         LEFT JOIN sprint_backlog_links sbl
                                             ON b.backlog_item_id = sbl.backlog_item_id
+                                        
                                         LEFT JOIN sprints s
                                             ON sbl.sprint_id = s.sprint_id
+                                        
                                         WHERE pa.proj_assign_to = ?
-                                        GROUP BY p.project_id;
+                                        
+                                        GROUP BY p.project_id, p.project_name;
                     """;
 
         try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
