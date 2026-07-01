@@ -365,7 +365,7 @@
                                     <i class="fas fa-th-list me-2"></i>View Files
                                 </button>
                             </li>
-                            <li class="nav-item">
+                            <li id="uploadLIBtn"class="nav-item">
                                 <button class="nav-link" id="uploadNavBtn" data-bs-toggle="tab" data-bs-target="#uploadPane">
                                     <i class="fas fa-plus-circle me-2"></i>Upload New
                                 </button>
@@ -395,7 +395,7 @@
                                                 <th style="width: 30%;">Document Name</th>
                                                 <th style="width: 15%;">Type</th>
 
-                                                <th class="action-col no-sort" style="width: 20%;" class="text-end">Actions</th>
+                                                <th class="text-center action-col no-sort" style="width: 20%;" class="text-end">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody id="backlogFileRegistry">

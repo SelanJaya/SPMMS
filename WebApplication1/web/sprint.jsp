@@ -856,6 +856,134 @@
                 </div>
             </div>
         </div>
+        
+        <div class="modal fade" id="backlogDocModal" tabindex="-1" data-bs-backdrop="false">
+            <input type="hidden" id="backlog_id">
+            <div class="modal-dialog">
+                <div class="modal-content shadow-lg">
+
+                    <div class="modal-header bg-primary text-white py-3 shadow-sm" style="cursor: move;">
+                        <h5 class="modal-title fw-bold">
+                            <i class="fas fa-folder-open me-2"></i>Documents: <span id="modalBacklogTitle">Initial Database
+                                Schema</span>
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body p-0">
+                        <ul class="nav nav-tabs nav-fill bg-white border-bottom" id="docTabs" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active" id="viewNavBtn" data-bs-toggle="tab" data-bs-target="#viewPane">
+                                    <i class="fas fa-th-list me-2"></i>View Files
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="uploadNavBtn" data-bs-toggle="tab" data-bs-target="#uploadPane">
+                                    <i class="fas fa-plus-circle me-2"></i>Upload New
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="d-flex justify-content-between mx-3 mt-2">
+                            <input type="text" id="searchDoc" class="form-control w-50"
+                                   placeholder="Search document name...">
+
+                            <select id="filterType" class="form-select w-25 ms-2">
+                                <option value="">All Types</option>
+                                <option value="Requirement">Requirement</option>
+                                <option value="Design">Design</option>
+                                <option value="Acceptance">Acceptance</option>
+                                <option value="Technical">Technical</option>
+                                <option value="Reference">Reference</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active p-4" id="viewPane">
+                                <div class="table-responsive">
+                                    <table class="table align-middle table-hover">
+                                        <thead class="text-muted">
+                                            <tr>
+                                                <th style="width: 30%;">Document Name</th>
+                                                <th style="width: 15%;">Type</th>
+
+                                                <th class="action-col no-sort" style="width: 20%;" class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="backlogFileRegistry">
+                                            <tr>
+                                                <td><span class="fw-bold">ERD_Final.png</span></td>
+                                                <td><span class="badge bg-secondary-subtle text-secondary border">PNG</span>
+                                                </td>
+                                                <td class="text-center pe-4">
+                                                    <button class="btn btn-sm btn-light border p-1 px-2 docViewBtn">
+                                                        <i class="fas fa-eye text-muted"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-light border p-1 px-2 docDownloadBtn">
+                                                        <i class="fas fa-download text-muted "></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-light border p-1 px-2 ms-1 docDeleteBtn">
+                                                        <i class="fas fa-trash-alt text-danger"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade p-4" id="uploadPane">
+
+                                <input type="hidden" id="document_id">
+                                <div class="mb-3">
+                                    <label class="label-style mb-2">Document Name</label>
+                                    <input type="text" id="docLabel" class="form-control"
+                                           placeholder="e.g. Login Validation Rules, API Auth Spec">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="label-style mb-2">Document Category</label>
+                                    <select id="docType" class="form-select">
+                                        <option value="" selected disabled>Select Category...</option>
+                                        <option value="Requirement">Requirement Document</option>
+                                        <option value="Design">Design Requirement</option>
+                                        <option value="Acceptance">Acceptance Document</option>
+                                        <option value="Technical">Technical Document</option>
+                                        <option value="Reference">Reference Document</option>
+                                        <option value="Other">Other Document</option>
+
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="label-style mb-2">Attachment</label>
+                                    <div id="dropZone" class="dropzone-container">
+                                        <input type="file" id="actualFile" class="d-none">
+                                        <img src="https://img.icons8.com/fluency/96/cloud-lighting.png" width="60"
+                                             class="mb-2">
+                                        <h6 class="fw-bold mb-1">Drag and drop file here</h6>
+                                        <p class="text-muted small mb-0">or click to browse from computer</p>
+
+                                        <div id="fileInfo" class="mt-3 d-none">
+                                            <span class="badge bg-primary rounded-pill py-2 px-3">
+                                                <i class="fas fa-file-alt me-2"></i><span id="selectedFileName"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light border-top">
+                        <button type="button" class="btn btn-sm btn-outline-secondary fw-bold px-3"
+                                data-bs-dismiss="modal">Close</button>
+                        <button type="button" id="confirmDocBtn" class="btn btn-sm btn-primary fw-bold px-4 d-none">Confirm
+                            Upload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script>
             var project_id = ${project_id != null ? project_id : "null"};

@@ -191,7 +191,7 @@ async function getBacklogRowData(e, option) {
 
             const container = option.closest(".status-container");
             console.log(container);
-            
+
             if (newStatus === "Rejected") {
                 const status_container = cell.querySelector(".status-dropdown");
 
@@ -247,9 +247,9 @@ $(document).ready(function () {
 
     });
 
-    if (userRole !== "Product Owner" && userRole !== "Developer") {
-        table.column('.action-col').visible(false);
-    }
+//    if (userRole !== "Product Owner" && userRole !== "Developer") {
+//        table.column('.action-col').visible(false);
+//    }
 
 //    const sidebar = document.getElementById('sidebar');
 //    // 1. Sidebar Toggle
@@ -373,6 +373,11 @@ document.getElementById("backlogTable").addEventListener("click", async function
         console.log(backlogDocModal);
 
         populateViewDocTable();
+
+        if (userRole !== "Product Owner" && userRole !== "Developer") {
+            document.getElementById("uploadLIBtn").classList.add("d-none");
+        }
+
         backlogDocModalBoot = new bootstrap.Modal(backlogDocModal);
         backlogDocModal.querySelector("#backlog_id").value = backlogid;
         backlogDocModalBoot.show();
@@ -502,6 +507,9 @@ document.getElementById("confirmRejectBtn").addEventListener("click", async func
             displayMessage(result.status, "Rejection reason update successfully");
 
         }
+
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.hide();
 
     }
 });
@@ -687,16 +695,18 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 });
 
-document.getElementById("addNewBacklogBtn").addEventListener("click", () => {
-    const addItemModal = new bootstrap.Modal(document.getElementById("addItemModal"));
+if (userRole === "Product Owner" || userRole === "Developer") {
+    document.getElementById("addNewBacklogBtn").addEventListener("click", () => {
+        const addItemModal = new bootstrap.Modal(document.getElementById("addItemModal"));
 
-    if (userRole !== "Developer") {
-        document.getElementById("devBacklogField").classList.add("d-none");
-    }
+        if (userRole !== "Developer") {
+            document.getElementById("devBacklogField").classList.add("d-none");
+        }
 
-    hideAllErrorMsg_backlog();
-    addItemModal.show();
-});
+        hideAllErrorMsg_backlog();
+        addItemModal.show();
+    });
+}
 
 const addItemForm = document.getElementById("addItemForm");
 
@@ -964,16 +974,16 @@ function addbacklogToTable(data) {
     console.log("Data", data);
 //    console.log("ROLE", userRole);
 
-    const actionPermitted = (userRole === "Developer" && data.created_by === userId);
+    //const actionPermitted = (userRole === "Developer" && data.created_by === userId);
 
     const canDelete = userRole === "Product Owner";
     const canManageDoc = (userRole === "Product Owner") || (userRole === "Developer");
 
     const actionHtml = `<div class="d-flex justify-content-center align-items-center gap-2">
-                            ${canManageDoc ? `<button type="button"  
+                             <button type="button"  
                                         class="btn btn-sm btn-outline-primary shadow-sm btn-manageDoc">
                                         <i class="fas fa-file-alt"></i>
-                                        </button>` : ``}
+                                        </button>
                             ${canDelete ? `<button type="button"
                                         class="btn btn-sm btn-outline-danger shadow-sm btn-delete"
                                         data-bs-id="${data.backlogI_id}"
@@ -981,7 +991,6 @@ function addbacklogToTable(data) {
                                         <i class="fas fa-trash-alt"></i>
                                    </button>` : ``}
 
-                            ${!canDelete && !canManageDoc ? `<span class="upload-restricted">Restricted</span>` : ``}
                         </div>`;
 
 
@@ -1060,6 +1069,7 @@ function addbacklogToTable(data) {
     $('#addItemModal').modal('hide');
     $('#addItemForm')[0].reset();
 }
+
 //
 //function showEmptyBacklogUI() {
 //    // Replace this ID with the ID of the div wrapping your <table>
